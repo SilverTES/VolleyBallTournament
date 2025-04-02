@@ -23,7 +23,7 @@ namespace VolleyBallTournament
             SetSize(Screen.Width, Screen.Height);
 
             _divMain = new Container(Style.Space.One * 10, Style.Space.One * 0, Mugen.Physics.Position.VERTICAL);
-            _divMatch = new Container(Style.Space.One * 10, new Style.Space(10, 10, 160, 160), Mugen.Physics.Position.HORIZONTAL);
+            _divMatch = new Container(Style.Space.One * 10, new Style.Space(10, 10, 80, 80), Mugen.Physics.Position.HORIZONTAL);
             _divGroup = new Container(Style.Space.One * 10, Style.Space.One * 40, Mugen.Physics.Position.HORIZONTAL);
 
             for (int i = 0; i < _matchs.Length; i++)
