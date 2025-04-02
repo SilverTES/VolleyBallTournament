@@ -8,14 +8,21 @@ namespace VolleyBallTournament
 {
     internal class Score : Node
     {
+        public Team TeamA => _teamA;
         Team _teamA;
+        public Team TeamB => _teamB;
         Team _teamB;
 
-
+        public int NbSetToWin => _nbSetToWin;
         int _nbSetToWin = 2;
+
+        public int SetA => _setA;
         int _setA = 0;
+        public int SetB => _setB;
         int _setB = 0;
+        public int ScoreB => _scoreB;
         int _scoreA = 0;
+        public int ScoreA => _scoreA;
         int _scoreB = 0;
 
         Container _div;
@@ -47,12 +54,15 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
+                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .75f);
                 //batch.Rectangle(AbsRectF, Color.Gray, 3f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
-                batch.LeftMiddleBorderedString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle + Vector2.UnitX * 10 , Color.White, Color.Black);
-                batch.RightMiddleBorderedString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitX * 10 , Color.White, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitX * 10 - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
+
+                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 48, Color.White);
+                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitX * 10 - Vector2.UnitY * 48 , Color.White);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);

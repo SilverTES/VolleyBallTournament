@@ -11,18 +11,21 @@ namespace VolleyBallTournament
     {
         public Group Group => _group;
         Group _group;
-
+        public int Rank => _rank;
         int _rank = 0;
         public int Score => _score;
         int _score = 0;
         public int Set => _set;
         int _set = 0;
 
-        int _pointTotal = 0; EasingValue _easePointTotal = new(0);
+        public int TotalPoint => _totalPoint;
+        int _totalPoint = 0; EasingValue _easePointTotal = new(0);
+        public int NbMatchWin => _nbMatchWin;
         int _nbMatchWin = 0;
+        public int NbMatchPlayer => _nbMatchPlayed;
         int _nbMatchPlayed = 3;
-        string _teamName;
         public string TeamName => _teamName;
+        string _teamName;
 
         public Team(string teamName, Group group)
         {
@@ -32,37 +35,22 @@ namespace VolleyBallTournament
         }
         public void AddPointTotal(int points)
         { 
-            _pointTotal += points; 
-            _easePointTotal.SetValue(_pointTotal);
+            _totalPoint += points; 
+            _easePointTotal.SetValue(_totalPoint);
         }
-        public void AddPoint(int points)
-        {
-            _score += points;
-        }
+        public void AddPoint(int points) { _score += points; }
         public void SetScore(int score) { _score = score; }
-        public void SetSet(int set) { _set = set; } 
-        public void SetGroup(Group group)
-        { 
-            _group = group; 
-        }
-        public void SetRank(int rank)
-        { 
-            _rank = rank; 
-        }
-        public void SetNbMatchWin(int nbMatchWin)
-        {
-            _nbMatchWin = nbMatchWin;
-        }
-        public void SetNbMatchPlayed(int nbMatchPlayed)
-        {
-            _nbMatchPlayed = nbMatchPlayed;
-        }
-        public void SetTeamName(string teamName)
-        { 
-            _teamName = teamName; 
-        }
+        public void SetSet(int set) { _set = set; }
+        public void SetGroup(Group group) { _group = group; }
+        public void SetRank(int rank) { _rank = rank; }
+        public void SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; }
+        public void SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; }
+        public void SetTeamName(string teamName) { _teamName = teamName; }
         public override Node Update(GameTime gameTime)
         {
+            _score = int.Clamp(_score, 0, 99);
+            _set = int.Clamp(_set, 0, 3);
+
             UpdateRect();
 
             return base.Update(gameTime);
@@ -75,9 +63,9 @@ namespace VolleyBallTournament
                 batch.Rectangle(AbsRectF.Extend(-4f), Color.Gray, 1f);
 
 
-                batch.LeftMiddleBorderedString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White);
 
-                batch.CenterBorderedStringXY(Static.FontMain, $"{_rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.Orange, Color.Black);
+                batch.CenterStringXY(Static.FontMain, $"{_rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.Orange);
 
                 for (int i = 0; i < _nbMatchPlayed; i++)
                 {

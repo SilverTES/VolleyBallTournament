@@ -72,13 +72,29 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
-
-            if (ButtonControl.OnePress("Set", Keyboard.GetState().IsKeyDown(Keys.F1))) 
+            for (int i = 0; i < _matchs.Length; i++)
             {
-                _teams[0].SetTeamName("Little Giant");
-                _teams[0].SetNbMatchWin(2);
-                _teams[0].AddPoint(1);
-                Misc.Log("Set Team Debug");
+                var match = _matchs[i];
+
+                var teamA = match.Score.TeamA;
+                var teamB = match.Score.TeamB;
+
+                if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
+                {
+                    teamA.AddPoint(1);
+                }
+                if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
+                {
+                    teamA.AddPoint(-1);
+                }
+                if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
+                {
+                    teamB.AddPoint(1);
+                }
+                if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
+                {
+                    teamB.AddPoint(-1);
+                }
             }
 
             if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
@@ -113,12 +129,14 @@ namespace VolleyBallTournament
 
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Gray * .5f, 1f);
 
-                batch.CenterBorderedStringXY(Static.FontMain3, $"{_tournamentName}", AbsRectF.TopCenter + Vector2.UnitY * 32, Color.White, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"{_tournamentName}", AbsRectF.TopCenter + Vector2.UnitY * 32, Color.White, Color.Black);
             }
 
             if (indexLayer == (int)Layers.Debug)
             {
-                batch.CenterBorderedStringXY(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White, Color.Black);
+                batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
+                
+                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + l'écart de point entre le gagant et le perdant", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

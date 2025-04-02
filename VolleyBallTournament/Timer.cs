@@ -22,7 +22,7 @@ namespace VolleyBallTournament
             _elapsedTime = 0;
             _isRunning = false;
 
-            SetSize(320, 80);
+            SetSize(360, 120);
             SetPivot(Mugen.Physics.Position.CENTER);
         }
         public void StartTimer()
@@ -45,7 +45,7 @@ namespace VolleyBallTournament
         }
         public string GetFormattedTime()
         {
-            return string.Format("{0:D2}:{1:D2}", // {2:D2} {3:D2}",
+            return string.Format("{0:D2}:{1:D2}",//:{2:D2}",// {3:D2}",
                 ElapsedTime.Minutes,
                 ElapsedTime.Seconds);
                 //ElapsedTime.Milliseconds / 10);
@@ -66,9 +66,9 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .5f, 0);
-                //batch.CenterBorderedStringXY(Static.FontDigitMono, "00:00", AbsXY + OXY, Color.Black, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.Orange, Color.Black);
+                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .25f, 0);
+                //batch.CenterStringXY(Static.FontDigitMonoBG, GetFormattedTime(), AbsXY + OXY, Color.Black);
+                batch.CenterStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.Orange);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

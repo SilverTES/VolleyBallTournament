@@ -27,6 +27,7 @@ namespace VolleyBallTournament
         public static SpriteFont FontMain2;
         public static SpriteFont FontMain3;
         public static SpriteFont FontDigitMono;
+        public static SpriteFont FontDigitMonoBG;
 
         public static Texture2D TexBG00;
         public static Texture2D TexCircle;
@@ -64,6 +65,7 @@ namespace VolleyBallTournament
             Static.FontMain2 = Content.Load<SpriteFont>("Fonts/fontMain2");
             Static.FontMain3 = Content.Load<SpriteFont>("Fonts/fontMain3");
             Static.FontDigitMono = Content.Load<SpriteFont>("Fonts/fontDigitMono");
+            Static.FontDigitMonoBG = Content.Load<SpriteFont>("Fonts/fontDigitMonoBG");
 
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
 
@@ -81,7 +83,7 @@ namespace VolleyBallTournament
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Static.Key.IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (ButtonControl.OnePress("ToggleFullscreen", Static.Key.IsKeyDown(Keys.F11)))
+            if (ButtonControl.OnePress("ToggleFullscreen", Static.Key.IsKeyDown(Keys.LeftAlt) && Static.Key.IsKeyDown(Keys.Enter)))
                 WindowManager.ToggleFullscreen();
 
             ScreenManager.Update(gameTime);

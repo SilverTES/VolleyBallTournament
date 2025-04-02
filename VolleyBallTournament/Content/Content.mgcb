@@ -20,6 +20,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/fontDigitMono.spritefont
 
+#begin Fonts/fontDigitMonoBG.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/fontDigitMonoBG.spritefont
+
 #begin Fonts/fontMain.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
