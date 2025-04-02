@@ -45,7 +45,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
+                //batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
                 //batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
 
                 batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {_groupName}", AbsRectF.TopCenter - Vector2.UnitY * 12, Color.Yellow, Color.Black);

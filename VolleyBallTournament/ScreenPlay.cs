@@ -35,11 +35,11 @@ namespace VolleyBallTournament
             int teamNumber = 0;
             for (int i = 0; i < _groups.Length; i++)
             {
-                _groups[i] = (Group)new Group($"{i}").AppendTo(this);
+                _groups[i] = (Group)new Group($"{i+1}").AppendTo(this);
                 
                 for (int t = 0; t < 4; t++)
                 {
-                    var team = new Team($"Team {teamNumber}", _groups[i]);
+                    var team = new Team($"Team {teamNumber+1}", _groups[i]);
                     _teams[teamNumber] = team;
 
                     _groups[i].AddTeam(team);
@@ -69,6 +69,9 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
+            _teams[0].SetTeamName("The Little Giant").SetNbMatchWin(2);
+            _teams[1].SetTeamName("Les nuls du volley").SetNbMatchWin(1);
+
         }
         public override Node Update(GameTime gameTime)
         {
@@ -82,18 +85,25 @@ namespace VolleyBallTournament
                 if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
                 {
                     teamA.AddPoint(1);
+                    new FxExplose(match.Score.ScoreAPos, Color.GreenYellow, 20, 20, 80).AppendTo(this);
+                    new PopInfo("+1", Color.GreenYellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreAPos - Vector2.UnitY * 64).AppendTo(this);
+                       
                 }
                 if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
                 {
                     teamA.AddPoint(-1);
+                    new PopInfo("-1", Color.Red, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreAPos - Vector2.UnitY * 64).AppendTo(this);
                 }
                 if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
                 {
                     teamB.AddPoint(1);
+                    new FxExplose(match.Score.ScoreBPos, Color.GreenYellow, 20, 20, 80).AppendTo(this);
+                    new PopInfo("+1", Color.GreenYellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreBPos - Vector2.UnitY * 64).AppendTo(this);
                 }
                 if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
                 {
                     teamB.AddPoint(-1);
+                    new PopInfo("-1", Color.Yellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreBPos - Vector2.UnitY * 64).AppendTo(this);
                 }
             }
 
@@ -125,7 +135,7 @@ namespace VolleyBallTournament
             {
                 //batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
                 batch.Draw(Static.TexBG00, AbsRect, Color.White);
-                batch.FillRectangle(AbsRectF, Color.Black * .75f);
+                batch.FillRectangle(AbsRectF, Color.Black * .5f);
 
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Gray * .5f, 1f);
 
@@ -136,7 +146,7 @@ namespace VolleyBallTournament
             {
                 batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
                 
-                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + l'écart de point entre le gagant et le perdant", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
+                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + l'écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

@@ -27,6 +27,12 @@ namespace VolleyBallTournament
 
         Container _div;
 
+        public Vector2 SetAPos;
+        public Vector2 SetBPos;
+
+        public Vector2 ScoreAPos;
+        public Vector2 ScoreBPos;
+
         public Score(Team teamA, Team teamB) 
         {
             _teamA = teamA;
@@ -34,7 +40,7 @@ namespace VolleyBallTournament
 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
-            SetSize(580, 80);
+            SetSize(480, 80);
         }
         public void SetNbSetToWin(int nbSetToWin)
         {
@@ -48,6 +54,12 @@ namespace VolleyBallTournament
             _setA = _teamA.Set;
             _setB = _teamB.Set;
 
+            SetAPos = AbsRectF.Center - Vector2.UnitX * 20;
+            SetBPos = AbsRectF.Center + Vector2.UnitX * 20;
+
+            ScoreAPos = AbsRectF.Center - Vector2.UnitX * 80;
+            ScoreBPos = AbsRectF.Center + Vector2.UnitX * 80;
+
             return base.Update(gameTime);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
@@ -58,23 +70,26 @@ namespace VolleyBallTournament
                 //batch.Rectangle(AbsRectF, Color.Gray, 3f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
-                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
-                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitX * 10 - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
 
-                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 48, Color.White);
-                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitX * 10 - Vector2.UnitY * 48 , Color.White);
+                batch.LeftMiddleString(Static.FontMain, _teamA.TeamName, AbsRectF.LeftMiddle - Vector2.UnitY * 48, Color.White);
+                batch.RightMiddleString(Static.FontMain, _teamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitY * 48 , Color.White);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
 
                 if (_nbSetToWin > 1)
                 {
-                    batch.CenterBorderedStringXY(Static.FontMain, _setA.ToString(), AbsRectF.Center - Vector2.UnitX * 20, Color.Cyan, Color.Black);
-                    batch.CenterBorderedStringXY(Static.FontMain, _setB.ToString(), AbsRectF.Center + Vector2.UnitX * 20, Color.Cyan, Color.Black);
+                    batch.CenterBorderedStringXY(Static.FontMain, _setA.ToString(), SetAPos, Color.Cyan, Color.Black);
+                    batch.CenterBorderedStringXY(Static.FontMain, _setB.ToString(), SetBPos, Color.Cyan, Color.Black);
                 }
 
-                batch.CenterBorderedStringXY(Static.FontMain2, _scoreA.ToString(), AbsRectF.Center - Vector2.UnitX * 64, Color.Gold, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontMain2, _scoreB.ToString(), AbsRectF.Center + Vector2.UnitX * 64, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain2, _scoreA.ToString(), ScoreAPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain2, _scoreB.ToString(), ScoreBPos, Color.Gold, Color.Black);
+
+                batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter + Vector2.One * 6, Color.Black, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter, Color.Gold, Color.Black);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

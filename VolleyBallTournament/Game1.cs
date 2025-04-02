@@ -15,6 +15,7 @@ namespace VolleyBallTournament
     public enum Layers
     {
         Main,
+        FrontFX,
         Debug,
     }
 
@@ -53,8 +54,9 @@ namespace VolleyBallTournament
             _screenPlay = new ScreenPlay();
             ScreenManager.Init(_screenPlay, Enums.GetList<Layers>());
 
-            ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearWrap);
-            ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearWrap);
+            ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearClamp);
+            ScreenManager.SetLayerParameter((int)Layers.FrontFX, samplerState: SamplerState.LinearClamp, blendState: BlendState.Additive);
+            ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearClamp);
 
             base.Initialize();
         }
