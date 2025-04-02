@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
+using Mugen.GFX;
 using Mugen.Input;
 
 namespace VolleyBallTournament
@@ -25,8 +26,10 @@ namespace VolleyBallTournament
         public static SpriteFont FontMain;
         public static SpriteFont FontMain2;
         public static SpriteFont FontMain3;
+        public static SpriteFont FontDigitMono;
 
         public static Texture2D TexBG00;
+        public static Texture2D TexCircle;
     }
 
     public class Game1 : Game
@@ -60,8 +63,11 @@ namespace VolleyBallTournament
             Static.FontMain = Content.Load<SpriteFont>("Fonts/fontMain");
             Static.FontMain2 = Content.Load<SpriteFont>("Fonts/fontMain2");
             Static.FontMain3 = Content.Load<SpriteFont>("Fonts/fontMain3");
+            Static.FontDigitMono = Content.Load<SpriteFont>("Fonts/fontDigitMono");
 
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
+
+            Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
 
         }
 

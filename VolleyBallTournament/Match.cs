@@ -8,8 +8,9 @@ namespace VolleyBallTournament
 {
     internal class Match : Node
     {
-
+        public Score Score => _score;
         private Score _score;
+        public Court Court => _court;
         private Court _court;
         private Container _div;
         

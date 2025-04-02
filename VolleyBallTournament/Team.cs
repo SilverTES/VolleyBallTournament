@@ -9,21 +9,53 @@ namespace VolleyBallTournament
 {
     internal class Team : Node  
     {
+        public Group Group => _group;
+        Group _group;
+
         int _rank = 0;
-        int _pointTotal = 0;
-        int _nbWin = 1;
-        int _nbMatch = 3;
+        public int Score => _score;
+        int _score = 0;
+        public int Set => _set;
+        int _set = 0;
+
+        int _pointTotal = 0; EasingValue _easePointTotal = new(0);
+        int _nbMatchWin = 0;
+        int _nbMatchPlayed = 3;
         string _teamName;
         public string TeamName => _teamName;
 
-        public Team(string teamName)
+        public Team(string teamName, Group group)
         {
             SetSize(360, 64);
             _teamName = teamName;
+            _group = group;
+        }
+        public void AddPointTotal(int points)
+        { 
+            _pointTotal += points; 
+            _easePointTotal.SetValue(_pointTotal);
+        }
+        public void AddPoint(int points)
+        {
+            _score += points;
+        }
+        public void SetScore(int score) { _score = score; }
+        public void SetSet(int set) { _set = set; } 
+        public void SetGroup(Group group)
+        { 
+            _group = group; 
         }
         public void SetRank(int rank)
         { 
             _rank = rank; 
+        }
+        public void SetNbMatchWin(int nbMatchWin)
+        {
+            _nbMatchWin = nbMatchWin;
+        }
+        public void SetNbMatchPlayed(int nbMatchPlayed)
+        {
+            _nbMatchPlayed = nbMatchPlayed;
         }
         public void SetTeamName(string teamName)
         { 
@@ -39,21 +71,24 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF, Color.Black * .5f);
-                batch.Rectangle(AbsRectF, Color.Gray, 1f);
+                batch.FillRectangle(AbsRectF.Extend(-4f), Color.Black * .5f);
+                batch.Rectangle(AbsRectF.Extend(-4f), Color.Gray, 1f);
 
 
                 batch.LeftMiddleBorderedString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontMain2, $"{_rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.Orange, Color.Black);
 
-                for (int i = 0; i < _nbMatch; i++)
+                batch.CenterBorderedStringXY(Static.FontMain, $"{_rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.Orange, Color.Black);
+
+                for (int i = 0; i < _nbMatchPlayed; i++)
                 {
-                    var pos = new Vector2(AbsRectF.RightMiddle.X - i * 24 - 20, AbsRectF.Center.Y);
+                    var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * _nbMatchPlayed), AbsRectF.Center.Y);
                     
-                    batch.Circle(pos, 10, 16, Color.White, 2f);
+                    //batch.Circle(pos, 10, 16, Color.White, 2f);
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
                     
-                    if ( i < _nbWin)
-                        batch.Point(pos, 10, Color.Gold);
+                    if ( i < _nbMatchWin)
+                        batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
+                        //batch.Point(pos, 10, Color.Gold);
                 }
             }   
 

@@ -13,6 +13,13 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Fonts/fontDigitMono.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/fontDigitMono.spritefont
+
 #begin Fonts/fontMain.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

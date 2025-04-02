@@ -1,15 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
+using Mugen.Input;
 
 
 namespace VolleyBallTournament
 {
     internal class ScreenPlay : Node
     {
-        private readonly string _tournamentName = "Tournoi de Saint Maurice L'Exil";
+        private readonly string _tournamentName = "Phase de Poule";
         private readonly Container _divMain;
         private readonly Container _divMatch;
         private readonly Container _divGroup;
@@ -20,22 +22,24 @@ namespace VolleyBallTournament
 
         private readonly Team[] _teams = new Team[16];
 
+        private readonly Timer _timer;
+
         public ScreenPlay()
         {
             SetSize(Screen.Width, Screen.Height);
 
             _divMain = new Container(Style.Space.One * 10, Style.Space.One * 0, Mugen.Physics.Position.VERTICAL);
-            _divMatch = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.HORIZONTAL);
+            _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
             _divGroup = new Container(Style.Space.One * 10, Style.Space.One * 40, Mugen.Physics.Position.HORIZONTAL);
 
             int teamNumber = 0;
             for (int i = 0; i < _groups.Length; i++)
             {
-                _groups[i] = (Group)new Group($"Groupe {i}").AppendTo(this);
+                _groups[i] = (Group)new Group($"{i}").AppendTo(this);
                 
                 for (int t = 0; t < 4; t++)
                 {
-                    var team = new Team($"Team {teamNumber}");
+                    var team = new Team($"Team {teamNumber}", _groups[i]);
                     _teams[teamNumber] = team;
 
                     _groups[i].AddTeam(team);
@@ -49,23 +53,50 @@ namespace VolleyBallTournament
             int group = 0;
             for (int i = 0; i < _matchs.Length; i++)
             {
-                _matchs[i] = (Match)new Match($"Terrain {i + 1}", _teams[group * 4 + i], _teams[group * 4 + i + 1]).AppendTo(this);
+                _matchs[i] = (Match)new Match($"{i + 1}", _teams[group * 4 + i], _teams[group * 4 + i + 1]).AppendTo(this);
                 
                 _divMatch.Insert(_matchs[i]);
 
                 group++;
             }
 
+            _timer = (Timer)new Timer().AppendTo(this);
+
+            _divMain.Insert(_timer);
             _divMain.Insert(_divMatch);
             _divMain.Insert(_divGroup);
 
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            _teams[0].SetTeamName("Little Giant");
         }
         public override Node Update(GameTime gameTime)
         {
+
+            if (ButtonControl.OnePress("Set", Keyboard.GetState().IsKeyDown(Keys.F1))) 
+            {
+                _teams[0].SetTeamName("Little Giant");
+                _teams[0].SetNbMatchWin(2);
+                _teams[0].AddPoint(1);
+                Misc.Log("Set Team Debug");
+            }
+
+            if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
+            {
+                _timer.ToggleTimer();
+                Misc.Log("Toggle Timer");
+
+                for (int i = 0; i < _matchs.Length; i++)
+                {
+                    _matchs[i].Court.State.Set(_timer.IsRunning ? Court.States.Play : Court.States.Ready);
+                }
+            }
+            if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
+            {
+                _timer.StopTimer();
+                Misc.Log("Stop Timer");
+            }
+
             UpdateChilds(gameTime);
 
             return base.Update(gameTime);
@@ -76,7 +107,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Main)
             {
-                batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
+                //batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
                 batch.Draw(Static.TexBG00, AbsRect, Color.White);
                 batch.FillRectangle(AbsRectF, Color.Black * .75f);
 

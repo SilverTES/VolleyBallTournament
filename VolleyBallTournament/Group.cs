@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mugen.Core;
 using Mugen.GFX;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 
 namespace VolleyBallTournament
 {
@@ -11,9 +12,12 @@ namespace VolleyBallTournament
     internal class Group : Node
     {
 
+        public string GroupName => _groupName;
         string _groupName;
 
         List<Team> _teams = [];
+
+        public int NbTeam => _teams.Count;
 
         public Group(string groupName) 
         { 
@@ -41,10 +45,10 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF, Color.Black * .5f);
-                batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
+                batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
+                //batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
 
-                batch.CenterBorderedStringXY(Static.FontMain, _groupName, AbsRectF.TopCenter - Vector2.UnitY * 20, Color.Yellow, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {_groupName}", AbsRectF.TopCenter - Vector2.UnitY * 12, Color.Yellow, Color.Black);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
