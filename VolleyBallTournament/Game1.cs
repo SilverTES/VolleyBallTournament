@@ -49,6 +49,9 @@ namespace VolleyBallTournament
             _screenPlay = new ScreenPlay();
             ScreenManager.Init(_screenPlay, Enums.GetList<Layers>());
 
+            ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearWrap);
+            ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearWrap);
+
             base.Initialize();
         }
 
@@ -83,7 +86,7 @@ namespace VolleyBallTournament
         protected override void Draw(GameTime gameTime)
         {
             ScreenManager.DrawScreen(gameTime);
-            ScreenManager.ShowScreen(gameTime);
+            ScreenManager.ShowScreen(gameTime, blendState: BlendState.AlphaBlend, samplerState: SamplerState.LinearWrap);
 
             base.Draw(gameTime);
         }

@@ -13,10 +13,10 @@ namespace VolleyBallTournament
         private Court _court;
         private Container _div;
         
-        public Match(string courtName)
+        public Match(string courtName, Team teamA, Team teamB)
         { 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _score = (Score)new Score().AppendTo(this);
+            _score = (Score)new Score(teamA, teamB).AppendTo(this);
             _court = (Court)new Court(courtName).AppendTo(this);
 
             _div.Insert(_score);

@@ -8,6 +8,7 @@ namespace VolleyBallTournament
     internal class Court : Node
     {
         string _courtName;
+        string _info = "Set en cours";
         public Court(string courtName) 
         {
             _courtName = courtName;
@@ -32,7 +33,8 @@ namespace VolleyBallTournament
                 batch.Line(AbsRectF.LeftMiddle - threeMeter, AbsRectF.RightMiddle - threeMeter, Color.White * .25f, 3f);
                 batch.Line(AbsRectF.LeftMiddle + threeMeter, AbsRectF.RightMiddle + threeMeter, Color.White * .25f, 3f);
 
-                batch.CenterBorderedStringXY(Static.FontMain, _courtName, AbsRectF.Center, Color.Yellow, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"{_courtName}", AbsRectF.Center - Vector2.UnitY * 20, Color.Yellow, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"{_info}", AbsRectF.Center + Vector2.UnitY * 20, Color.Cyan, Color.Black);
             }
 
             return base.Draw(batch, gameTime, indexLayer);
