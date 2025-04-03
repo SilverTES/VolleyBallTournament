@@ -49,7 +49,7 @@ namespace VolleyBallTournament
             new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreAPos - Vector2.UnitY * 64).AppendTo(Match._parent);
             new FxExplose(ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
 
-            Static.SoundPoint.Play(.5f, .5f, 0f);
+            Static.SoundPoint.Play(.25f, .1f, 0f);
         }
         public void AddPointB(int points = 1)
         {
@@ -59,7 +59,7 @@ namespace VolleyBallTournament
             new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreBPos - Vector2.UnitY * 64).AppendTo(Match._parent);
             new FxExplose(ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
 
-            Static.SoundPoint.Play(.5f, .2f, 0f);
+            Static.SoundPoint.Play(.25f, .1f, 0f);
         }
 
         public void SetNbSetToWin(int nbSetToWin)

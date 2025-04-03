@@ -6,6 +6,50 @@ using System.Collections.Generic;
 
 namespace VolleyBallTournament
 {
+    // Définition des types de messages
+    //enum MessageType : byte
+    //{
+    //    Position,
+    //    Chat,
+    //    Connexion
+    //}
+
+    //// Envoi d'un message
+    //void SendPosition(NetPeer peer, Vector3 position)
+    //{
+    //    NetDataWriter writer = new NetDataWriter();
+    //    writer.Put((byte)MessageType.Position); // Identifiant de type
+    //    writer.Put(position.X);
+    //    writer.Put(position.Y);
+    //    writer.Put(position.Z);
+    //    peer.Send(writer, DeliveryMethod.Unreliable);
+    //}
+
+    //// Réception d'un message
+    //void OnReceive(NetPeer peer, NetDataReader reader, DeliveryMethod deliveryMethod)
+    //{
+    //    MessageType messageType = (MessageType)reader.GetByte();
+    //    switch (messageType)
+    //    {
+    //        case MessageType.Position:
+    //            Vector3 position = new Vector3(reader.GetFloat(), reader.GetFloat(), reader.GetFloat());
+    //            // Traiter la position
+    //            break;
+    //        case MessageType.Chat:
+    //            string message = reader.GetString();
+    //            // Traiter le message de chat
+    //            break;
+    //            // ...
+    //    }
+    //}
+
+    public enum MessageType : byte
+    {
+        Unknown = 0,
+        Message,
+        AddPoint,
+    }
+
     public class NetworkServer
     {
         private readonly EventBasedNetListener _listener;
@@ -97,14 +141,39 @@ namespace VolleyBallTournament
         // Réception des messages des clients
         private void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channel, DeliveryMethod deliveryMethod)
         {
-            string message = reader.GetString();
-            Misc.Log($"Message reçu de {peer.Address} : {message}");
+            MessageType messageType = (MessageType)reader.GetByte();
 
-            _screenPlay.GetMatch(0).ScorePanel.AddPointA(1);
-            // Répondre au client (exemple)
-            NetDataWriter writer = new NetDataWriter();
-            writer.Put($"Echo: {message}");
-            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+            switch (messageType)
+            {
+                case MessageType.Unknown:
+
+                    break;
+
+                case MessageType.Message:
+
+                    string message = reader.GetString();
+                    Misc.Log($"Message reçu de {peer.Address} : {message}");
+
+                    
+                    // Répondre au client (exemple)
+                    NetDataWriter writer = new NetDataWriter();
+                    writer.Put($"Echo: {message}");
+                    peer.Send(writer, DeliveryMethod.ReliableOrdered);
+
+                    break;
+                
+                case MessageType.AddPoint:
+
+                    int points = reader.GetInt();
+                    _screenPlay.GetMatch(0).ScorePanel.AddPointA(points);
+
+                    break;
+
+                default:
+                    break;
+            }
+
+
 
             reader.Recycle();
         }
