@@ -60,3 +60,27 @@
 /processorParam:TextureFormat=Color
 /build:Images/bg00.png
 
+#begin Sounds/picked-coin-echo.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/picked-coin-echo.wav
+
+#begin Sounds/race-start.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/race-start.wav
+
+#begin Sounds/simple-clean-logo.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/simple-clean-logo.wav
+
+#begin Sounds/slide-ping.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/slide-ping.wav
+

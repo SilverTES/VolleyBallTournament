@@ -52,7 +52,10 @@ namespace VolleyBallTournament
             int group = 0;
             for (int i = 0; i < _matchs.Length; i++)
             {
-                _matchs[i] = (Match)new Match($"{i + 1}", _teams[group * 4 + i], _teams[group * 4 + i + 1]).AppendTo(this);
+                var teamA = _teams[group * 4 + i];
+                var teamB = _teams[group * 4 + i + 1];
+
+                _matchs[i] = (Match)new Match(new ScorePanel(teamA, teamB), new Court($"{i + 1}")).AppendTo(this);
                 
                 _divMatch.Insert(_matchs[i]);
 

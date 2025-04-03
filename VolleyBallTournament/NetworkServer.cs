@@ -100,6 +100,7 @@ namespace VolleyBallTournament
             string message = reader.GetString();
             Misc.Log($"Message reçu de {peer.Address} : {message}");
 
+            _screenPlay.GetMatch(0).ScorePanel.AddPointA(1);
             // Répondre au client (exemple)
             NetDataWriter writer = new NetDataWriter();
             writer.Put($"Echo: {message}");

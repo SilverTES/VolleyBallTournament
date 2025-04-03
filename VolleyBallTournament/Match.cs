@@ -12,12 +12,17 @@ namespace VolleyBallTournament
         public Court Court;
         private Container _div;
         
-        public Match(string courtName, Team teamA, Team teamB)
+        public Match(ScorePanel scorePanel, Court court)
         {
-
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            ScorePanel = (ScorePanel)new ScorePanel(this, teamA, teamB).AppendTo(this);
-            Court = (Court)new Court(courtName).AppendTo(this);
+            
+            var teamA = scorePanel.TeamA;
+            var teamB = scorePanel.TeamB;
+            
+            ScorePanel = (ScorePanel)scorePanel.AppendTo(this);
+            ScorePanel.Match = this;
+
+            Court = (Court)court.AppendTo(this);
 
             teamA.Match = this;
             teamB.Match = this;

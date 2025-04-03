@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
@@ -37,6 +38,8 @@ namespace VolleyBallTournament
         public static Texture2D TexBG00;
         public static Texture2D TexCircle;
         public static Texture2D TexLine;
+
+        public static SoundEffect SoundPoint;
 
         public static void DrawRoundedRectangle(SpriteBatch batch, Texture2D texLine, Rectangle rect, Color color, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius, int thickness, int segments = 4)
         {
@@ -124,6 +127,8 @@ namespace VolleyBallTournament
             Static.FontDigitMonoBG = Content.Load<SpriteFont>("Fonts/fontDigitMonoBG");
 
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
+
+            Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
 
             Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
             Static.TexLine = GFX.CreateLineTextureAA(GraphicsDevice, 100, 15, 7);
