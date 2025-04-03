@@ -7,50 +7,45 @@ using System;
 
 namespace VolleyBallTournament
 {
-    internal class Team : Node  
+    public class Team : Node  
     {
-        public Group Group => _group;
-        Group _group;
-        public int Rank => _rank;
-        int _rank = 0;
-        public int Score => _score;
-        int _score = 0;
-        public int Set => _set;
-        int _set = 0;
+        public Match Match = null;
+        public Court Court = null;
+        public ScorePanel ScorePanel = null;
+        public Group Group;
+        public int Rank = 0;
+        public int Score = 0;
+        public int Set = 0;
 
-        public int TotalPoint => _totalPoint;
-        int _totalPoint = 0; EasingValue _easePointTotal = new(0);
-        public int NbMatchWin => _nbMatchWin;
-        int _nbMatchWin = 0;
-        public int NbMatchPlayer => _nbMatchPlayed;
-        int _nbMatchPlayed = 3;
-        public string TeamName => _teamName;
-        string _teamName;
+        public int TotalPoint = 0; EasingValue _easePointTotal = new(0);
+        public int NbMatchWin = 0;
+        public int NbMatchPlayed = 3;
+        public string TeamName;
 
-        public Team(string teamName, Group group)
+        public Team(string teamName, Group group, Match match = null, ScorePanel scorePanel = null, Court court = null)
         {
             SetSize(360, 64);
-            _teamName = teamName;
-            _group = group;
+            TeamName = teamName;
+            Group = group;
+            Match = match;
+            ScorePanel = scorePanel;
+            Court = court;
         }
         public Team AddPointTotal(int points)
         { 
-            _totalPoint += points; 
-            _easePointTotal.SetValue(_totalPoint);
+            TotalPoint += points; 
+            _easePointTotal.SetValue(TotalPoint);
             return this;
         }
-        public Team AddPoint(int points) { _score += points; return this; }
-        public Team SetScore(int score) { _score = score; return this; }
-        public Team SetSet(int set) { _set = set; return this; }
-        public Team SetGroup(Group group) { _group = group; return this; }
-        public Team SetRank(int rank) { _rank = rank; return this; }
-        public Team SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; return this; }
-        public Team SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; return this; }
-        public Team SetTeamName(string teamName) { _teamName = teamName; return this; }
+        public Team AddPoint(int points) 
+        { 
+            Score += points; 
+            return this; 
+        }
         public override Node Update(GameTime gameTime)
         {
-            _score = int.Clamp(_score, 0, 99);
-            _set = int.Clamp(_set, 0, 3);
+            Score = int.Clamp(Score, 0, 99);
+            Set = int.Clamp(Set, 0, 3);
 
             UpdateRect();
 
@@ -64,18 +59,18 @@ namespace VolleyBallTournament
                 //batch.Rectangle(AbsRectF.Extend(-4f), Color.Black, 3f);
 
 
-                batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White);
+                batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White);
 
-                batch.CenterStringXY(Static.FontMain, $"{_rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
+                batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
 
-                for (int i = 0; i < _nbMatchPlayed; i++)
+                for (int i = 0; i < NbMatchPlayed; i++)
                 {
-                    var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * _nbMatchPlayed), AbsRectF.Center.Y);
+                    var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
                     
                     //batch.Circle(pos, 10, 16, Color.White, 2f);
                     batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
                     
-                    if ( i < _nbMatchWin)
+                    if ( i < NbMatchWin)
                         batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
                         //batch.Point(pos, 10, Color.Gold);
                 }

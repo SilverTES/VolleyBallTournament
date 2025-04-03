@@ -6,22 +6,27 @@ using Mugen.GUI;
 
 namespace VolleyBallTournament
 {
-    internal class Match : Node
+    public class Match : Node
     {
-        public Score Score => _score;
-        private Score _score;
-        public Court Court => _court;
-        private Court _court;
+        public ScorePanel ScorePanel;
+        public Court Court;
         private Container _div;
         
         public Match(string courtName, Team teamA, Team teamB)
-        { 
-            _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _score = (Score)new Score(teamA, teamB).AppendTo(this);
-            _court = (Court)new Court(courtName).AppendTo(this);
+        {
 
-            _div.Insert(_score);
-            _div.Insert(_court);
+            _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+            ScorePanel = (ScorePanel)new ScorePanel(this, teamA, teamB).AppendTo(this);
+            Court = (Court)new Court(courtName).AppendTo(this);
+
+            teamA.Match = this;
+            teamB.Match = this;
+
+            teamA.Court = Court;
+            teamB.Court = Court;
+
+            _div.Insert(ScorePanel);
+            _div.Insert(Court);
             _div.Refresh();
 
             SetSize(_div._rect.Width, _div._rect.Height);

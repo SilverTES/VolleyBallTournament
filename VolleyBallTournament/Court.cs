@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace VolleyBallTournament
 {
-    internal class Court : Node
+    public class Court : Node
     {
         public enum States
         {

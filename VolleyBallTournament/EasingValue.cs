@@ -5,7 +5,7 @@ namespace VolleyBallTournament
 {
     public class EasingValue
     {
-        public float _value { get; set; }
+        float _value { get; set; }
         Animate _animate = new();
         public EasingValue(float initValue = 0f)
         {

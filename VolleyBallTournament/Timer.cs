@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace VolleyBallTournament
 {
-    internal class Timer : Node
+    public class Timer : Node
     {
         private double _elapsedTime;
         public bool IsRunning => _isRunning;

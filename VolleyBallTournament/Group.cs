@@ -7,13 +7,10 @@ using System.Diagnostics.Contracts;
 
 namespace VolleyBallTournament
 {
-
-
-    internal class Group : Node
+    public class Group : Node
     {
 
-        public string GroupName => _groupName;
-        string _groupName;
+        public string GroupName;
 
         List<Team> _teams = [];
 
@@ -21,13 +18,13 @@ namespace VolleyBallTournament
 
         public Group(string groupName) 
         { 
-            _groupName = groupName;
+            GroupName = groupName;
         }
         public void AddTeam(Team team)
         {
             team.AppendTo(this);
             _teams.Add(team);
-            team.SetRank(_teams.Count);
+            team.Rank = _teams.Count;
             
             team.SetPosition(0, team._rect.Height * (_teams.Count - 1));
 
@@ -48,7 +45,7 @@ namespace VolleyBallTournament
                 //batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
                 //batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
 
-                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {_groupName}", AbsRectF.TopCenter - Vector2.UnitY * 12, Color.Yellow, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 12, Color.Yellow, Color.Black);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

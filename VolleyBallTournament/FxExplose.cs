@@ -49,7 +49,7 @@ namespace VolleyBallTournament
     }
 
 
-    internal class FxExplose : Node
+    public class FxExplose : Node
     {
         int _numParticles = 10;
         Particles[] _particles;

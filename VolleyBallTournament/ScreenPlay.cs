@@ -6,10 +6,9 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
 
-
 namespace VolleyBallTournament
 {
-    internal class ScreenPlay : Node
+    public class ScreenPlay : Node
     {
         private readonly string _tournamentName = "Phase de Poule";
         private readonly Container _divMain;
@@ -17,9 +16,7 @@ namespace VolleyBallTournament
         private readonly Container _divGroup;
 
         private readonly Match[] _matchs = new Match[3];
-
         private readonly Group[] _groups = new Group[4];
-
         private readonly Team[] _teams = new Team[16];
 
         private readonly Timer _timer;
@@ -48,6 +45,8 @@ namespace VolleyBallTournament
                 }
 
                 _divGroup.Insert(_groups[i]);
+
+                
             }
 
             int group = 0;
@@ -69,9 +68,24 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            _teams[0].SetTeamName("The Little Giant").SetNbMatchWin(2);
-            _teams[1].SetTeamName("Les nuls du volley").SetNbMatchWin(1);
+            _teams[0].TeamName = "The Little Giant";
+            _teams[0].NbMatchWin = 2;
 
+            _teams[1].TeamName = "Les nuls du volley";
+            _teams[1].NbMatchWin = 1;
+
+        }
+        public Team GetTeam(int index)
+        {
+            return _teams[index];
+        }
+        public Match GetMatch(int index)
+        {
+            return _matchs[index];
+        }
+        public Group GetGroup(int index)
+        {
+            return _groups[index];
         }
         public override Node Update(GameTime gameTime)
         {
@@ -79,31 +93,21 @@ namespace VolleyBallTournament
             {
                 var match = _matchs[i];
 
-                var teamA = match.Score.TeamA;
-                var teamB = match.Score.TeamB;
-
                 if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
                 {
-                    teamA.AddPoint(1);
-                    new FxExplose(match.Score.ScoreAPos, Color.GreenYellow, 20, 20, 80).AppendTo(this);
-                    new PopInfo("+1", Color.GreenYellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreAPos - Vector2.UnitY * 64).AppendTo(this);
-                       
+                    match.ScorePanel.AddPointA(1);
                 }
                 if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
                 {
-                    teamA.AddPoint(-1);
-                    new PopInfo("-1", Color.Red, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreAPos - Vector2.UnitY * 64).AppendTo(this);
+                    match.ScorePanel.AddPointA(-1);
                 }
                 if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
                 {
-                    teamB.AddPoint(1);
-                    new FxExplose(match.Score.ScoreBPos, Color.GreenYellow, 20, 20, 80).AppendTo(this);
-                    new PopInfo("+1", Color.GreenYellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreBPos - Vector2.UnitY * 64).AppendTo(this);
+                    match.ScorePanel.AddPointB(1);
                 }
                 if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
                 {
-                    teamB.AddPoint(-1);
-                    new PopInfo("-1", Color.Yellow, Color.Black, 0, 16, 32).SetPosition(match.Score.ScoreBPos - Vector2.UnitY * 64).AppendTo(this);
+                    match.ScorePanel.AddPointB(-1);
                 }
             }
 
@@ -133,8 +137,8 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Main)
             {
-                //batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
-                batch.Draw(Static.TexBG00, AbsRect, Color.White);
+                batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
+                //batch.Draw(Static.TexBG00, AbsRect, Color.White);
                 batch.FillRectangle(AbsRectF, Color.Black * .5f);
 
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Gray * .5f, 1f);
@@ -147,6 +151,12 @@ namespace VolleyBallTournament
                 batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
                 
                 batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + l'écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
+
+                //Static.DrawRoundedRectangle(batch, Static.TexLine, new Rectangle(100, 100, 800, 400),  Color.White, 30, 30, 30, 80, 3, 24);
+
+                //batch.LineTexture(Static.TexLine, Vector2.Zero, Static.MousePos, 9, Color.Gold);
+
+                //Static.DrawArcFilled(batch, Vector2.One * 600, 1200, Geo.RAD_0, Geo.RAD_90, Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
