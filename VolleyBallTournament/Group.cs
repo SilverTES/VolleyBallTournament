@@ -4,6 +4,7 @@ using Mugen.Core;
 using Mugen.GFX;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace VolleyBallTournament
 {
@@ -24,14 +25,30 @@ namespace VolleyBallTournament
         {
             team.AppendTo(this);
             _teams.Add(team);
-            team.Rank = _teams.Count;
-            
-            team.SetPosition(0, team._rect.Height * (_teams.Count - 1));
+
+            Refresh();
 
             SetSize(team._rect.Width, team._rect.Height * _teams.Count);
         }
+        public void Refresh()
+        {
+            _teams = _teams.OrderByDescending(p => p.TotalPoint).ToList();
+
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+
+                team.MoveToRank(i + 1);
+                //team.Rank = i + 1;
+                team.MoveToPosition(new Vector2(0, team._rect.Height * i));
+                //team.SetPosition(0, team._rect.Height * i);
+            }
+
+        }
         public override Node Update(GameTime gameTime)
         {
+            //Refresh();
+
             UpdateRect();
 
             UpdateChilds(gameTime);
@@ -45,7 +62,12 @@ namespace VolleyBallTournament
                 //batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
                 //batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
 
-                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 12, Color.Yellow, Color.Black);
+            }
+
+            if (indexLayer == (int)Layers.HUD)
+            {
+                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 20 + Vector2.One * 6, Color.Black, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 20, Color.Yellow, Color.Black);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

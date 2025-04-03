@@ -17,6 +17,7 @@ namespace VolleyBallTournament
     public enum Layers
     {
         Main,
+        HUD,
         FrontFX,
         Debug,
     }
@@ -36,6 +37,7 @@ namespace VolleyBallTournament
         public static SpriteFont FontDigitMonoBG;
 
         public static Texture2D TexBG00;
+        public static Texture2D TexVBall;
         public static Texture2D TexCircle;
         public static Texture2D TexLine;
 
@@ -107,9 +109,10 @@ namespace VolleyBallTournament
             _screenPlay = new ScreenPlay();
             ScreenManager.Init(_screenPlay, Enums.GetList<Layers>());
 
-            ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearClamp);
-            ScreenManager.SetLayerParameter((int)Layers.FrontFX, samplerState: SamplerState.LinearClamp, blendState: BlendState.Additive);
-            ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearClamp);
+            ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearWrap);
+            ScreenManager.SetLayerParameter((int)Layers.HUD, samplerState: SamplerState.LinearWrap);
+            ScreenManager.SetLayerParameter((int)Layers.FrontFX, samplerState: SamplerState.LinearWrap, blendState: BlendState.Additive);
+            ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearWrap);
 
             Static.Server = new NetworkServer(_screenPlay);
 
@@ -127,6 +130,7 @@ namespace VolleyBallTournament
             Static.FontDigitMonoBG = Content.Load<SpriteFont>("Fonts/fontDigitMonoBG");
 
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
+            Static.TexVBall = Content.Load<Texture2D>("Images/vballmini");
 
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
 

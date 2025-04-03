@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Mugen.Core;
 using Mugen.GFX;
+using Mugen.Physics;
 using System;
 using System.Collections.Generic;
 
@@ -35,12 +36,17 @@ namespace VolleyBallTournament
 
         float _ticWave = 0;
         float _waveValue = 0;
+
+        Vector2 _vball = new Vector2();
+        float _rotation = 0f;
         public Court(string courtName) 
         {
             _courtName = courtName;
-            SetSize(240, 320);
+            SetSize(480, 240);
 
             State.Set(States.WarmUp);
+
+            _rotation = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
         }
         public override Node Update(GameTime gameTime)
         {
@@ -48,6 +54,9 @@ namespace VolleyBallTournament
 
             _ticWave += 0.1f;
             _waveValue = MathF.Sin(_ticWave) * 4f;
+
+            if (State.CurState == States.Play)
+                _rotation += .05f;
 
             switch (State.CurState)
             {
@@ -84,17 +93,22 @@ namespace VolleyBallTournament
                 batch.FillRectangle(AbsRectF.Extend(8f), Color.MonoGameOrange * .25f);
                 batch.Rectangle(AbsRectF, color, 3f);
 
-                batch.Line(AbsRectF.LeftMiddle, AbsRectF.RightMiddle, color, 3f);
+                batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, color, 3f);
 
-                var threeMeter = Vector2.UnitY * 50;
+                var threeMeter = Vector2.UnitX * 80;
 
-                batch.Line(AbsRectF.LeftMiddle - threeMeter, AbsRectF.RightMiddle - threeMeter, color, 3f);
-                batch.Line(AbsRectF.LeftMiddle + threeMeter, AbsRectF.RightMiddle + threeMeter, color, 3f);
+                batch.Line(AbsRectF.TopCenter - threeMeter, AbsRectF.BottomCenter - threeMeter, color, 3f);
+                batch.Line(AbsRectF.TopCenter + threeMeter, AbsRectF.BottomCenter + threeMeter, color, 3f);
+
+
+                batch.Draw(Static.TexVBall, Color.White, _rotation, AbsRectF.LeftMiddle + _vball, Mugen.Physics.Position.CENTER, Vector2.One / 2);
 
                 batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", AbsRectF.Center - Vector2.UnitY * 20, Color.Yellow);
 
                 batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * 20 + Vector2.UnitY * _waveValue + Vector2.One * 6, Color.Black);
                 batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * 20 + Vector2.UnitY * _waveValue, Color.Cyan);
+
+
             }
 
             if (indexLayer == (int)Layers.Debug)

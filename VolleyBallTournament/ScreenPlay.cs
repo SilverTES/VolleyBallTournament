@@ -12,6 +12,7 @@ namespace VolleyBallTournament
     {
         private readonly string _tournamentName = "Phase de Poule";
         private readonly Container _divMain;
+        private readonly Container _divTimer;
         private readonly Container _divMatch;
         private readonly Container _divGroup;
 
@@ -29,6 +30,8 @@ namespace VolleyBallTournament
             _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
             _divGroup = new Container(Style.Space.One * 10, Style.Space.One * 40, Mugen.Physics.Position.HORIZONTAL);
 
+            _divTimer = new Container(Style.Space.One * 10, Style.Space.One * 20, Mugen.Physics.Position.HORIZONTAL);
+
             int teamNumber = 0;
             for (int i = 0; i < _groups.Length; i++)
             {
@@ -38,6 +41,7 @@ namespace VolleyBallTournament
                 {
                     var team = new Team($"Team {teamNumber+1}", _groups[i]);
                     _teams[teamNumber] = team;
+                    team.AddPointTotal(Misc.Rng.Next(0, 0));
 
                     _groups[i].AddTeam(team);
 
@@ -52,8 +56,8 @@ namespace VolleyBallTournament
             int group = 0;
             for (int i = 0; i < _matchs.Length; i++)
             {
-                var teamA = _teams[group * 4 + i];
-                var teamB = _teams[group * 4 + i + 1];
+                var teamA = _teams[group * 3 + i];
+                var teamB = _teams[group * 3 + i + 1];
 
                 _matchs[i] = (Match)new Match(new ScorePanel(teamA, teamB), new Court($"{i + 1}")).AppendTo(this);
                 
@@ -63,8 +67,9 @@ namespace VolleyBallTournament
             }
 
             _timer = (Timer)new Timer().AppendTo(this);
+            _divTimer.Insert(_timer);
 
-            _divMain.Insert(_timer);
+            _divMain.Insert(_divTimer);
             _divMain.Insert(_divMatch);
             _divMain.Insert(_divGroup);
 
@@ -116,6 +121,9 @@ namespace VolleyBallTournament
 
             if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
             {
+                _teams[3].AddPointTotal(1);
+                _groups[0].Refresh();
+
                 _timer.ToggleTimer();
                 Misc.Log("Toggle Timer");
 
@@ -144,7 +152,7 @@ namespace VolleyBallTournament
                 //batch.Draw(Static.TexBG00, AbsRect, Color.White);
                 batch.FillRectangle(AbsRectF, Color.Black * .5f);
 
-                //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Gray * .5f, 1f);
+                //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Black * .5f, 1f);
 
                 batch.CenterBorderedStringXY(Static.FontMain, $"{_tournamentName}", AbsRectF.TopCenter + Vector2.UnitY * 32, Color.White, Color.Black);
             }
@@ -153,7 +161,7 @@ namespace VolleyBallTournament
             {
                 batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
                 
-                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + l'écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
+                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
 
                 //Static.DrawRoundedRectangle(batch, Static.TexLine, new Rectangle(100, 100, 800, 400),  Color.White, 30, 30, 30, 80, 3, 24);
 

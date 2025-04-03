@@ -29,6 +29,9 @@ namespace VolleyBallTournament
         public Vector2 ScoreAPos;
         public Vector2 ScoreBPos;
 
+        public Vector2 TeamAPos;
+        public Vector2 TeamBPos;
+
         public ScorePanel(Team teamA, Team teamB) 
         {
             TeamA = teamA;
@@ -39,7 +42,7 @@ namespace VolleyBallTournament
 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
-            SetSize(480, 80);
+            SetSize(560, 120);
         }
         public void AddPointA(int points = 1)
         {
@@ -80,6 +83,9 @@ namespace VolleyBallTournament
             ScoreAPos = AbsRectF.Center - Vector2.UnitX * 80;
             ScoreBPos = AbsRectF.Center + Vector2.UnitX * 80;
 
+            TeamAPos = AbsRectF.LeftMiddle - Vector2.UnitY * 64;
+            TeamBPos = AbsRectF.RightMiddle - Vector2.UnitY * 64;
+
             return base.Update(gameTime);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
@@ -90,11 +96,11 @@ namespace VolleyBallTournament
                 //batch.Rectangle(AbsRectF, Color.Gray, 3f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
-                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, AbsRectF.LeftMiddle - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitY * 48 + Vector2.One * 6, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
 
-                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, AbsRectF.LeftMiddle - Vector2.UnitY * 48, Color.White);
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, AbsRectF.RightMiddle - Vector2.UnitY * 48 , Color.White);
+                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos, Color.White);
+                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos , Color.White);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);

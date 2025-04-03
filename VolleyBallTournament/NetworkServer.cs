@@ -151,21 +151,13 @@ namespace VolleyBallTournament
 
                 case MessageType.Message:
 
-                    string message = reader.GetString();
-                    Misc.Log($"Message reçu de {peer.Address} : {message}");
-
-                    
-                    // Répondre au client (exemple)
-                    NetDataWriter writer = new NetDataWriter();
-                    writer.Put($"Echo: {message}");
-                    peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                    ProcessMessage(peer, reader);
 
                     break;
                 
                 case MessageType.AddPoint:
 
-                    int points = reader.GetInt();
-                    _screenPlay.GetMatch(0).ScorePanel.AddPointA(points);
+                    ProcessAddPoint(peer, reader);
 
                     break;
 
@@ -176,6 +168,22 @@ namespace VolleyBallTournament
 
 
             reader.Recycle();
+        }
+
+        private void ProcessMessage(NetPeer peer, NetPacketReader reader)
+        {
+            string message = reader.GetString();
+            Misc.Log($"Message reçu de {peer.Address} : {message}");
+                    
+            // Répondre au client (exemple)
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put($"Echo: {message}");
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        private void ProcessAddPoint(NetPeer peer, NetPacketReader reader)
+        {
+            int points = reader.GetInt();
+            _screenPlay.GetMatch(0).ScorePanel.AddPointA(points);
         }
 
         // Mettre à jour le serveur (appelé dans Game.Update)
