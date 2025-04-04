@@ -25,7 +25,7 @@ namespace VolleyBallTournament
         {
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
-            {States.Play, "En cours"},
+            {States.Play, "Match en cours"},
             {States.Pause, "En attente"},
             {States.Finish, "Fin du match"},
             {States.LastPoint, "Dernière balle"},
@@ -37,8 +37,10 @@ namespace VolleyBallTournament
         float _ticWave = 0;
         float _waveValue = 0;
 
-        Vector2 _vball = new Vector2();
         float _rotation = 0f;
+
+        public bool PrevServiceSide = true;
+        public bool ServiceSide = true; // true A , false B
         public Court(string courtName) 
         {
             _courtName = courtName;
@@ -47,6 +49,26 @@ namespace VolleyBallTournament
             State.Set(States.WarmUp);
 
             _rotation = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
+        }
+        public void SetServiceSideA()
+        {
+            PrevServiceSide = ServiceSide;
+            ServiceSide = true;
+        }
+        public void SetServiceSideB()
+        {
+            PrevServiceSide = ServiceSide;
+            ServiceSide = false;
+        }
+
+        public void ChangeServiceSide()
+        {
+            PrevServiceSide = ServiceSide;
+            ServiceSide = !ServiceSide;
+        }
+        public void CancelChangeServiceSide()
+        {
+            ServiceSide = PrevServiceSide;
         }
         public override Node Update(GameTime gameTime)
         {
@@ -76,6 +98,8 @@ namespace VolleyBallTournament
                     break;
 
                 case States.Play:
+
+
                     break;
 
                 default:
@@ -100,8 +124,9 @@ namespace VolleyBallTournament
                 batch.Line(AbsRectF.TopCenter - threeMeter, AbsRectF.BottomCenter - threeMeter, color, 3f);
                 batch.Line(AbsRectF.TopCenter + threeMeter, AbsRectF.BottomCenter + threeMeter, color, 3f);
 
+                //if (State.CurState == States.Play)
+                    DrawVBall(batch);
 
-                batch.Draw(Static.TexVBall, Color.White, _rotation, AbsRectF.LeftMiddle + _vball, Mugen.Physics.Position.CENTER, Vector2.One / 2);
 
                 batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", AbsRectF.Center - Vector2.UnitY * 20, Color.Yellow);
 
@@ -117,6 +142,12 @@ namespace VolleyBallTournament
             }
 
             return base.Draw(batch, gameTime, indexLayer);
+        }
+
+        private void DrawVBall(SpriteBatch batch)
+        {
+            batch.Draw(Static.TexVBall, Color.Black * .5f, _rotation, (ServiceSide ? AbsRectF.LeftMiddle : AbsRectF.RightMiddle) + Vector2.One * 16, Mugen.Physics.Position.CENTER, Vector2.One / 2);
+            batch.Draw(Static.TexVBall, Color.White, _rotation, ServiceSide ? AbsRectF.LeftMiddle : AbsRectF.RightMiddle, Mugen.Physics.Position.CENTER, Vector2.One / 2);
         }
     }
 }

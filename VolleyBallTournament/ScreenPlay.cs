@@ -103,7 +103,7 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
                 {
-                    match.ScorePanel.AddPointA(1);
+                    match.ScorePanel.AddPointA(+1);
                 }
                 if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
                 {
@@ -111,11 +111,11 @@ namespace VolleyBallTournament
                 }
                 if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
                 {
-                    match.ScorePanel.AddPointB(1);
+                    match.ScorePanel.AddPointB(-1);
                 }
                 if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
                 {
-                    match.ScorePanel.AddPointB(-1);
+                    match.ScorePanel.AddPointB(+1);
                 }
             }
 

@@ -24,6 +24,8 @@ namespace VolleyBallTournament
 
             Court = (Court)court.AppendTo(this);
 
+            ScorePanel.Court = Court;
+
             teamA.Match = this;
             teamB.Match = this;
 

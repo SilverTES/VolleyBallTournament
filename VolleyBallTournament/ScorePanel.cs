@@ -10,6 +10,7 @@ namespace VolleyBallTournament
     public class ScorePanel : Node
     {
         public Match Match;
+        public Court Court;
 
         public Team TeamA;
         public Team TeamB;
@@ -32,7 +33,7 @@ namespace VolleyBallTournament
         public Vector2 TeamAPos;
         public Vector2 TeamBPos;
 
-        public ScorePanel(Team teamA, Team teamB) 
+        public ScorePanel(Team teamA, Team teamB)
         {
             TeamA = teamA;
             TeamB = teamB;
@@ -46,23 +47,59 @@ namespace VolleyBallTournament
         }
         public void AddPointA(int points = 1)
         {
-            if (points == 0) return;
+            if (Court.State.CurState == Court.States.Play)
+            {
+                if (points == 0) return;
 
-            TeamA.AddPoint(points);
-            new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreAPos - Vector2.UnitY * 64).AppendTo(Match._parent);
-            new FxExplose(ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
+                if (points > 0)
+                {
+                    if (!Court.ServiceSide)
+                        Court.ChangeServiceSide();
+                    else
+                        Court.SetServiceSideA();
+                }
 
-            Static.SoundPoint.Play(.25f, .1f, 0f);
+                if (points < 0) 
+                    Court.CancelChangeServiceSide();
+
+                TeamA.AddPoint(points);
+                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreAPos - Vector2.UnitY * 64).AppendTo(Match._parent);
+                new FxExplose(ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
+
+                Static.SoundPoint.Play(.25f, .1f, 0f);
+            }
+            else
+            {
+                Court.SetServiceSideA();
+            }
         }
         public void AddPointB(int points = 1)
         {
-            if (points == 0) return;
+            if (Court.State.CurState == Court.States.Play)
+            {
+                if (points == 0) return;
 
-            TeamB.AddPoint(points);
-            new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreBPos - Vector2.UnitY * 64).AppendTo(Match._parent);
-            new FxExplose(ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
+                if (points > 0)
+                {
+                    if (Court.ServiceSide)
+                        Court.ChangeServiceSide();
+                    else
+                        Court.SetServiceSideB();
+                }
 
-            Static.SoundPoint.Play(.25f, .1f, 0f);
+                if (points < 0) 
+                    Court.CancelChangeServiceSide();
+
+                TeamB.AddPoint(points);
+                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreBPos - Vector2.UnitY * 64).AppendTo(Match._parent);
+                new FxExplose(ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
+
+                Static.SoundPoint.Play(.25f, .1f, 0f);
+            }
+            else
+            {
+                Court.SetServiceSideB();
+            }
         }
 
         public void SetNbSetToWin(int nbSetToWin)
@@ -83,8 +120,8 @@ namespace VolleyBallTournament
             ScoreAPos = AbsRectF.Center - Vector2.UnitX * 80;
             ScoreBPos = AbsRectF.Center + Vector2.UnitX * 80;
 
-            TeamAPos = AbsRectF.LeftMiddle - Vector2.UnitY * 64;
-            TeamBPos = AbsRectF.RightMiddle - Vector2.UnitY * 64;
+            TeamAPos = AbsRectF.TopLeft - Vector2.UnitY * 10;
+            TeamBPos = AbsRectF.TopRight - Vector2.UnitY * 10;
 
             return base.Update(gameTime);
         }
