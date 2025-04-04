@@ -83,6 +83,20 @@ namespace VolleyBallTournament
             _teams[1].NbMatchWin = 1;
 
         }
+        public void ShuffleTeamsTotalPoint()
+        {
+            for (int i = 0; i < _teams.Length; i++)
+            {
+                var team = _teams[i];
+                team.TotalPoint = 0;
+                team.AddPointTotal(Misc.Rng.Next(0, 9));
+            }
+            for (int i = 0; i < _groups.Length; i++)
+            {
+                var group = _groups[i];
+                group.Refresh();
+            }
+        }
         public Team GetTeam(int index)
         {
             return _teams[index];
@@ -132,6 +146,12 @@ namespace VolleyBallTournament
                     _matchs[i].Court.State.Set(_timer.IsRunning ? Court.States.Play : Court.States.Ready);
                 }
             }
+
+            if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
+            {
+                ShuffleTeamsTotalPoint();
+            }
+
             if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
             {
                 _timer.StopTimer();
