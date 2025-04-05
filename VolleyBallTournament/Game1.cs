@@ -38,6 +38,7 @@ namespace VolleyBallTournament
 
         public static Texture2D TexBG00;
         public static Texture2D TexVBall;
+        public static Texture2D TexReferee;
         public static Texture2D TexCircle;
         public static Texture2D TexLine;
 
@@ -131,6 +132,7 @@ namespace VolleyBallTournament
 
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
             Static.TexVBall = Content.Load<Texture2D>("Images/vballmini");
+            Static.TexReferee = Content.Load<Texture2D>("Images/referee00");
 
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
 

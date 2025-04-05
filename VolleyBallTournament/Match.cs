@@ -14,7 +14,7 @@ namespace VolleyBallTournament
         
         public Match(ScorePanel scorePanel, Court court)
         {
-            _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+            _div = new Container(Style.Space.One * 10, new Style.Space(0,40,0,20), Mugen.Physics.Position.VERTICAL);
             
             var teamA = scorePanel.TeamA;
             var teamB = scorePanel.TeamB;

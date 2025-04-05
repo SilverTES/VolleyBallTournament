@@ -32,6 +32,9 @@ namespace VolleyBallTournament
 
         };
 
+        public Team TeamReferee;
+        public Vector2 TeamRefereePos;
+
         string _courtName;
 
         float _ticWave = 0;
@@ -41,9 +44,11 @@ namespace VolleyBallTournament
 
         public bool PrevServiceSide = true;
         public bool ServiceSide = true; // true A , false B
-        public Court(string courtName) 
+        public Court(string courtName, Team teamReferee) 
         {
             _courtName = courtName;
+            TeamReferee = teamReferee;
+
             SetSize(480, 240);
 
             State.Set(States.WarmUp);
@@ -106,6 +111,8 @@ namespace VolleyBallTournament
                     break;
             }
 
+            TeamRefereePos = AbsRectF.TopCenter + Vector2.UnitY * 30;
+
             return base.Update(gameTime);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
@@ -119,7 +126,7 @@ namespace VolleyBallTournament
 
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, color, 3f);
 
-                var threeMeter = Vector2.UnitX * 80;
+                var threeMeter = Vector2.UnitX * _rect.Width / 6;
 
                 batch.Line(AbsRectF.TopCenter - threeMeter, AbsRectF.BottomCenter - threeMeter, color, 3f);
                 batch.Line(AbsRectF.TopCenter + threeMeter, AbsRectF.BottomCenter + threeMeter, color, 3f);
@@ -128,11 +135,16 @@ namespace VolleyBallTournament
                     DrawVBall(batch);
 
 
-                batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", AbsRectF.Center - Vector2.UnitY * 20, Color.Yellow);
+                batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", AbsRectF.BottomCenter - Vector2.UnitY * 20, Color.Yellow);
 
-                batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * 20 + Vector2.UnitY * _waveValue + Vector2.One * 6, Color.Black);
-                batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * 20 + Vector2.UnitY * _waveValue, Color.Cyan);
+                batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * _waveValue + Vector2.One * 6, Color.Black);
+                batch.CenterStringXY(Static.FontMain, $"{_infos[State.CurState]}", AbsRectF.Center + Vector2.UnitY * _waveValue, Color.Cyan);
 
+
+                batch.Draw(Static.TexReferee, Color.Black, 0, TeamRefereePos - Vector2.UnitY * 60 + Vector2.One * 6, Position.CENTER, Vector2.One / 4);
+                batch.Draw(Static.TexReferee, Color.White, 0, TeamRefereePos - Vector2.UnitY * 60, Position.CENTER, Vector2.One / 4);
+                batch.CenterStringXY(Static.FontMain, $"{TeamReferee.TeamName}", TeamRefereePos + Vector2.One * 6, Color.Black);
+                batch.CenterStringXY(Static.FontMain, $"{TeamReferee.TeamName}", TeamRefereePos, Color.White);
 
             }
 

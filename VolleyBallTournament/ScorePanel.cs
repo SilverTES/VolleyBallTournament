@@ -14,6 +14,7 @@ namespace VolleyBallTournament
 
         public Team TeamA;
         public Team TeamB;
+        
 
         public int NbSetToWin = 2;
 
@@ -32,14 +33,18 @@ namespace VolleyBallTournament
 
         public Vector2 TeamAPos;
         public Vector2 TeamBPos;
+        
 
         public ScorePanel(Team teamA, Team teamB)
         {
             TeamA = teamA;
             TeamB = teamB;
 
-            teamA.ScorePanel = this;
-            teamB.ScorePanel = this;
+            TeamA.ScorePanel = this;
+            TeamB.ScorePanel = this;
+
+            TeamA.IsPlaying = true;
+            TeamB.IsPlaying = true;
 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
@@ -66,7 +71,7 @@ namespace VolleyBallTournament
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreAPos - Vector2.UnitY * 64).AppendTo(Match._parent);
                 new FxExplose(ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
 
-                Static.SoundPoint.Play(.25f, .1f, 0f);
+                Static.SoundPoint.Play(.25f, .01f, 0f);
             }
             else
             {
@@ -94,7 +99,7 @@ namespace VolleyBallTournament
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreBPos - Vector2.UnitY * 64).AppendTo(Match._parent);
                 new FxExplose(ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
 
-                Static.SoundPoint.Play(.25f, .1f, 0f);
+                Static.SoundPoint.Play(.25f, .01f, 0f);
             }
             else
             {
@@ -117,11 +122,13 @@ namespace VolleyBallTournament
             SetAPos = AbsRectF.Center - Vector2.UnitX * 20;
             SetBPos = AbsRectF.Center + Vector2.UnitX * 20;
 
-            ScoreAPos = AbsRectF.Center - Vector2.UnitX * 80;
-            ScoreBPos = AbsRectF.Center + Vector2.UnitX * 80;
+            ScoreAPos = AbsRectF.Center - Vector2.UnitX * 120;
+            ScoreBPos = AbsRectF.Center + Vector2.UnitX * 120;
 
             TeamAPos = AbsRectF.TopLeft - Vector2.UnitY * 10;
             TeamBPos = AbsRectF.TopRight - Vector2.UnitY * 10;
+
+            
 
             return base.Update(gameTime);
         }
@@ -134,10 +141,10 @@ namespace VolleyBallTournament
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
                 batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos, Color.Yellow);
 
-                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos, Color.White);
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos , Color.White);
+                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos , Color.Yellow);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
@@ -148,8 +155,8 @@ namespace VolleyBallTournament
                     batch.CenterBorderedStringXY(Static.FontMain, SetB.ToString(), SetBPos, Color.Cyan, Color.Black);
                 }
 
-                batch.CenterBorderedStringXY(Static.FontMain2, ScoreA.ToString(), ScoreAPos, Color.Gold, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontMain2, ScoreB.ToString(), ScoreBPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, ScoreA.ToString(), ScoreAPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, ScoreB.ToString(), ScoreBPos, Color.Gold, Color.Black);
 
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter + Vector2.One * 6, Color.Black, Color.Black);
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter, Color.Gold, Color.Black);

@@ -10,7 +10,7 @@ namespace VolleyBallTournament
 {
     public class ScreenPlay : Node
     {
-        private readonly string _tournamentName = "Phase de Poule";
+        private readonly string _tournamentName = "Phase de Poule 1";
         private readonly Container _divMain;
         private readonly Container _divTimer;
         private readonly Container _divMatch;
@@ -26,11 +26,11 @@ namespace VolleyBallTournament
         {
             SetSize(Screen.Width, Screen.Height);
 
-            _divMain = new Container(Style.Space.One * 10, Style.Space.One * 0, Mugen.Physics.Position.VERTICAL);
+            _divMain = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
             _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
-            _divGroup = new Container(Style.Space.One * 10, Style.Space.One * 40, Mugen.Physics.Position.HORIZONTAL);
+            _divGroup = new Container(Style.Space.One * 10, new Style.Space(80, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
 
-            _divTimer = new Container(Style.Space.One * 10, Style.Space.One * 20, Mugen.Physics.Position.HORIZONTAL);
+            _divTimer = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.HORIZONTAL);
 
             int teamNumber = 0;
             for (int i = 0; i < _groups.Length; i++)
@@ -58,8 +58,9 @@ namespace VolleyBallTournament
             {
                 var teamA = _teams[group * 3 + i];
                 var teamB = _teams[group * 3 + i + 1];
+                var teamReferee = _teams[group * 3 + i + 1];
 
-                _matchs[i] = (Match)new Match(new ScorePanel(teamA, teamB), new Court($"{i + 1}")).AppendTo(this);
+                _matchs[i] = (Match)new Match(new ScorePanel(teamA, teamB), new Court($"{i + 1}", teamReferee)).AppendTo(this);
                 
                 _divMatch.Insert(_matchs[i]);
 
@@ -82,6 +83,8 @@ namespace VolleyBallTournament
             _teams[1].TeamName = "Les nuls du volley";
             _teams[1].NbMatchWin = 1;
 
+            _teams[2].TeamName = "Lovolley";
+            _teams[2].NbMatchWin = 3;
         }
         public void ShuffleTeamsTotalPoint()
         {
@@ -181,7 +184,7 @@ namespace VolleyBallTournament
             {
                 batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
                 
-                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.White);
+                batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + bonus écart de point à la fin des matchs en cas d'égalité", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.Gray);
 
                 //Static.DrawRoundedRectangle(batch, Static.TexLine, new Rectangle(100, 100, 800, 400),  Color.White, 30, 30, 30, 80, 3, 24);
 

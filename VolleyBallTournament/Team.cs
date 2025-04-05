@@ -20,7 +20,9 @@ namespace VolleyBallTournament
         public int Score = 0;
         public int Set = 0;
 
+        public bool IsPlaying = false;
         public int TotalPoint = 0; EasingValue _easePointTotal = new(0);
+        public int BonusPoint = 0;
         public int NbMatchWin = 0;
         public int NbMatchPlayed = 3;
         public string TeamName;
@@ -92,14 +94,14 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 batch.FillRectangle(AbsRectF.Extend(-4f), Color.DarkSlateBlue * .5f);
-                //batch.Rectangle(AbsRectF.Extend(-4f), Color.Black, 3f);
+                
+                if (IsPlaying)
+                    batch.Rectangle(AbsRectF.Extend(-4f), Color.Green, 3f);
 
-
-                batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, Color.White);
-
+                batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, IsPlaying ? Color.Yellow : Color.White);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
-
-                batch.CenterStringXY(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10, Color.Yellow);
+                batch.RightMiddleString(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
+                batch.LeftMiddleString(Static.FontMain, $"+{BonusPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10, Color.Green);
 
                 for (int i = 0; i < NbMatchPlayed; i++)
                 {
