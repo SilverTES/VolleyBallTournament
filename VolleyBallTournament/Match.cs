@@ -41,6 +41,7 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
+            UpdateRect();
 
             UpdateChilds(gameTime);
 

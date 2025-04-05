@@ -70,7 +70,7 @@ namespace VolleyBallTournament
             _listener.PeerDisconnectedEvent += OnPeerDisconnected;
             _listener.NetworkReceiveEvent += OnNetworkReceive;
             _listener.NetworkReceiveUnconnectedEvent += OnNetworkReceiveUnconnected;
-            this._screenPlay = screenPlay;
+            _screenPlay = screenPlay;
         }
         public void StartServer()
         {
@@ -183,7 +183,7 @@ namespace VolleyBallTournament
         private void ProcessAddPoint(NetPeer peer, NetPacketReader reader)
         {
             int points = reader.GetInt();
-            _screenPlay.GetMatch(0).ScorePanel.AddPointA(points);
+            _screenPlay.PhasePool1.GetMatch(0).ScorePanel.AddPointA(points);
         }
 
         // Mettre à jour le serveur (appelé dans Game.Update)

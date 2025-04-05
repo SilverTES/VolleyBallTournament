@@ -30,6 +30,8 @@ namespace VolleyBallTournament
         public static MouseState Mouse;
         public static Vector2 MousePos;
 
+        public static RasterizerState RasterizerState;
+
         public static SpriteFont FontMain;
         public static SpriteFont FontMain2;
         public static SpriteFont FontMain3;
@@ -107,17 +109,19 @@ namespace VolleyBallTournament
 
         protected override void Initialize()
         {
-            _screenPlay = new ScreenPlay();
+            base.Initialize();
+
+            _screenPlay = new ScreenPlay(this);
             ScreenManager.Init(_screenPlay, Enums.GetList<Layers>());
 
+            Static.RasterizerState = new RasterizerState { ScissorTestEnable = true };
             ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearWrap);
-            ScreenManager.SetLayerParameter((int)Layers.HUD, samplerState: SamplerState.LinearWrap);
+            ScreenManager.SetLayerParameter((int)Layers.HUD, samplerState: SamplerState.LinearWrap, rasterizerState : Static.RasterizerState, sortMode: SpriteSortMode.Immediate);
             ScreenManager.SetLayerParameter((int)Layers.FrontFX, samplerState: SamplerState.LinearWrap, blendState: BlendState.Additive);
             ScreenManager.SetLayerParameter((int)Layers.Debug, samplerState: SamplerState.LinearWrap);
 
             Static.Server = new NetworkServer(_screenPlay);
 
-            base.Initialize();
 
             Static.Server.StartServer();
         }

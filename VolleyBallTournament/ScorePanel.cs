@@ -113,6 +113,8 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
+            UpdateRect();
+
             ScoreA = TeamA.Score;
             ScoreB = TeamB.Score;
 
