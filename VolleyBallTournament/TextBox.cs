@@ -35,7 +35,9 @@ public class TextBox : Node
     private const float MOVE_DELAY = 0.1f; // Délai en secondes entre chaque déplacement (ajustable)
     private bool _isMoving = false; // Nouvelle variable pour suivre le déplacement
 
-    private string ClipboardText = "";
+    //private string ClipboardText = "";
+
+    private Point? _mouseStartPosition = null; // Nouvelle variable pour suivre la position initiale du clic
 
     public TextBox(Game game, Rectangle bounds, SpriteFont font, Color bgColor, Color textColor, Color cursorColor, int maxLength = 50)
     {
@@ -77,41 +79,49 @@ public class TextBox : Node
 
     public override Node Update(GameTime gameTime)
     {
-        UpdateRect();
+        //var mouseState = Mouse.GetState();
+        //var keyboardState = Keyboard.GetState();
 
-        _bounds.Location = AbsXY.ToPoint();
-
-        // Réduire le cooldown à chaque frame
         if (_moveCooldown > 0)
             _moveCooldown -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        // Activer/désactiver avec clic
-        if (_bounds.Contains(Static.MousePos) && Static.Mouse.LeftButton == ButtonState.Pressed && !_isDragging)
+        if (_bounds.Contains(Static.MousePos))
         {
-            _isFocus = true;
-            UpdateCursorFromMouse(Static.MousePos.ToPoint());
-            _isDragging = true; // Début du glisser-déposer
+            if (Static.Mouse.LeftButton == ButtonState.Pressed)
+            {
+                if (!_mouseStartPosition.HasValue)
+                {
+                    _isFocus = true;
+                    UpdateCursorFromMouse(Static.MousePos.ToPoint()); // Déplace le curseur au clic initial
+                    _mouseStartPosition = Static.MousePos.ToPoint(); // Enregistre la position initiale
+                    _selectionStart = null;
+                }
+                else if (Static.MousePos.ToPoint() != _mouseStartPosition.Value)
+                {
+                    // Active le dragging seulement si la souris a bougé
+                    _isDragging = true;
+                    UpdateSelectionFromMouse(Static.MousePos.ToPoint());
+                }
+            }
+            else if (Static.Mouse.LeftButton == ButtonState.Released)
+            {
+                _isDragging = false;
+                _mouseStartPosition = null; // Réinitialise la position initiale
+            }
         }
-        else if (!_bounds.Contains(Static.MousePos) && Static.Mouse.LeftButton == ButtonState.Pressed)
+        else if (Static.Mouse.LeftButton == ButtonState.Pressed)
         {
             _isFocus = false;
             _selectionStart = null;
-        }
-
-        // Gestion du glisser-déposer pour la sélection
-        if (_isFocus && _isDragging && Static.Mouse.LeftButton == ButtonState.Pressed)
-        {
-            UpdateSelectionFromMouse(Static.MousePos.ToPoint());
-        }
-        else if (Static.Mouse.LeftButton == ButtonState.Released)
-        {
             _isDragging = false;
+            _mouseStartPosition = null;
         }
 
         if (!_isFocus) return base.Update(gameTime);
 
-        // Gestion du clignotement : désactiver si déplacement en cours
-        _isMoving = Static.Key.IsKeyDown(Keys.Left) || Static.Key.IsKeyDown(Keys.Right);
+        _isMoving = Static.Key.IsKeyDown(Keys.Left) || Static.Key.IsKeyDown(Keys.Right) ||
+                    Static.Key.IsKeyDown(Keys.Home) || Static.Key.IsKeyDown(Keys.End);
+
         if (!_isMoving)
         {
             _blinkTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -123,11 +133,10 @@ public class TextBox : Node
         }
         else
         {
-            _cursorVisible = true; // Curseur reste visible pendant le déplacement
-            _blinkTimer = 0f; // Réinitialiser le timer pour éviter un clignotement immédiat après arrêt
+            _cursorVisible = true;
+            _blinkTimer = 0f;
         }
 
-        // Gestion des touches de déplacement et sélection
         HandleKeyboardInput(Static.Key);
 
         return base.Update(gameTime);
@@ -299,38 +308,55 @@ public class TextBox : Node
 
     private void UpdateCursorFromMouse(Point mousePosition)
     {
-        float textWidth = 0f;
-        int newPosition = 0;
+        float textWidth = _font.MeasureString(_text).X;
+        float mouseXRelative = mousePosition.X - (_bounds.X + 5) + _scrollOffset; // Position relative au texte
 
-        for (int i = 0; i <= _text.Length; i++)
+        if (mouseXRelative > textWidth) // Si clic à droite du texte
         {
-            textWidth = _font.MeasureString(_text.Substring(0, i)).X;
-            if (_bounds.X + 5 + textWidth - _scrollOffset > mousePosition.X)
-            {
-                newPosition = i;
-                break;
-            }
+            _cursorPosition = _text.Length;
         }
-        _cursorPosition = newPosition;
+        else
+        {
+            int newPosition = 0;
+            for (int i = 0; i <= _text.Length; i++)
+            {
+                float currentWidth = _font.MeasureString(_text.Substring(0, i)).X;
+                if (currentWidth > mouseXRelative)
+                {
+                    newPosition = i;
+                    break;
+                }
+            }
+            _cursorPosition = newPosition;
+        }
         AdjustScroll();
     }
 
     private void UpdateSelectionFromMouse(Point mousePosition)
     {
-        float textWidth = 0f;
-        int newPosition = _text.Length;
+        float textWidth = _font.MeasureString(_text).X;
+        float mouseXRelative = mousePosition.X - (_bounds.X + 5) + _scrollOffset; // Position relative au texte
 
-        for (int i = 0; i <= _text.Length; i++)
+        if (mouseXRelative > textWidth) // Si clic à droite du texte
         {
-            textWidth = _font.MeasureString(_text.Substring(0, i)).X;
-            if (_bounds.X + 5 + textWidth - _scrollOffset > mousePosition.X)
-            {
-                newPosition = i;
-                break;
-            }
+            if (!_selectionStart.HasValue) _selectionStart = _cursorPosition;
+            _cursorPosition = _text.Length;
         }
-        if (!_selectionStart.HasValue) _selectionStart = _cursorPosition;
-        _cursorPosition = newPosition;
+        else
+        {
+            int newPosition = _text.Length;
+            for (int i = 0; i <= _text.Length; i++)
+            {
+                float currentWidth = _font.MeasureString(_text.Substring(0, i)).X;
+                if (currentWidth > mouseXRelative)
+                {
+                    newPosition = i;
+                    break;
+                }
+            }
+            if (!_selectionStart.HasValue) _selectionStart = _cursorPosition;
+            _cursorPosition = newPosition;
+        }
         AdjustScroll();
     }
 
