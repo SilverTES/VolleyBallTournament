@@ -79,6 +79,8 @@ public class TextBox : Node
 
     public override Node Update(GameTime gameTime)
     {
+        UpdateRect();
+        _bounds.Location = AbsXY.ToPoint();
         //var mouseState = Mouse.GetState();
         //var keyboardState = Keyboard.GetState();
 

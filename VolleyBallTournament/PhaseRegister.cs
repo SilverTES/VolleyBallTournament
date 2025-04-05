@@ -16,8 +16,12 @@ namespace VolleyBallTournament
 
             for (int i = 0; i < 4; i++)
             {
-                new TextBox(game, new Rectangle(40, 200 + i * 80, 240, 64), Static.FontMain, Color.Black * .5f, Color.Yellow, Color.Gold, 50).AppendTo(this);
+                for (int j = 0; j < 4; j++)
+                {
+                    new TextBox(game, new Rectangle(40 + i * 480, 200 + j * 80, 320, 64), Static.FontMain, Color.Black * .5f, Color.Yellow, Color.Gold, 50).AppendTo(this);
+                }
             }
+
         }
         public void FocusNextTextBox()
         {   
