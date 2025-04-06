@@ -10,7 +10,6 @@ namespace VolleyBallTournament
 {
     public class Group : Node
     {
-
         public string GroupName;
 
         List<Team> _teams = [];

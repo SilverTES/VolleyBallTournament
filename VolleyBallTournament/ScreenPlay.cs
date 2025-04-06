@@ -5,17 +5,19 @@ using Mugen.Animation;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.Input;
-using System.Text.RegularExpressions;
 
 namespace VolleyBallTournament
 {
     public class ScreenPlay : Node  
     {
-        public PhaseRegister PhaseRegister;
-        public PhasePool PhasePool1;
-        public PhasePool PhasePool2;
+        public PhaseRegister PhaseRegister => _phaseRegister;
+        private PhaseRegister _phaseRegister;
+        public PhasePool PhasePool1 => _phasePool1;
+        private PhasePool _phasePool1;
+        public PhasePool PhasePool2 => _phasePool2;
+        private PhasePool _phasePool2;
 
-        public Sequence Sequence;
+        private Sequence _sequence;
 
         KeyboardState _key;
 
@@ -31,9 +33,14 @@ namespace VolleyBallTournament
         {
             SetSize(Screen.Width, Screen.Height);
 
-            PhaseRegister = new PhaseRegister(game).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
-            PhasePool1 = new PhasePool("Phase de pool 1").SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            PhasePool2 = new PhasePool("Phase de pool 2").SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _sequence = new Sequence();
+
+            _phaseRegister = new PhaseRegister(game).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+            _phasePool1 = new PhasePool("Phase de pool 1", _sequence).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool("Phase de pool 2", _sequence).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+
+            _sequence.Init("SetupPool.xml", _phasePool1.GetTeams());
+            _phasePool1.LoadSequence(_sequence, _step);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
@@ -41,40 +48,32 @@ namespace VolleyBallTournament
 
             _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
 
-            var textBoxs = PhaseRegister.GroupOf<TextBox>();
-
+            var textBoxs = _phaseRegister.GroupOf<TextBox>();
             for (int i = 0; i < textBoxs.Count; i++)
             {
                 var textBox = textBoxs[i];
-
                 textBox.OnChange += (t) => 
                 { 
-                    PhasePool1.GetTeam(t.Id).TeamName = textBox.Text;
-                    PhasePool2.GetTeam(t.Id).TeamName = textBox.Text;
+                    _phasePool1.GetTeam(t.Id).SetTeamName(textBox.Text);
+                    _phasePool2.GetTeam(t.Id).SetTeamName(textBox.Text);
                 };
             }
-
-            Sequence = new Sequence();
-            Sequence.Init("SetupPool.xml", PhasePool1.GetTeams());
-
-            PhasePool1.LoadSequence(Sequence, _step);
 
             //Debug
             _cameraX = -Screen.Width;
             SetPosition(-Screen.Width, 0);
-
         }
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();
 
-            PhaseRegister.IsPaused = true;
-            PhasePool1.IsPaused = true;
-            PhasePool2.IsPaused = true;
+            _phaseRegister.IsPaused = true;
+            _phasePool1.IsPaused = true;
+            _phasePool2.IsPaused = true;
 
-            if (_cameraX == -PhaseRegister._x) PhaseRegister.IsPaused = false;
-            if (_cameraX == -PhasePool1._x) PhasePool1.IsPaused = false;
-            if (_cameraX == -PhasePool2._x) PhasePool2.IsPaused = false;
+            if (_cameraX == -_phaseRegister._x) _phaseRegister.IsPaused = false;
+            if (_cameraX == -_phasePool1._x) _phasePool1.IsPaused = false;
+            if (_cameraX == -_phasePool2._x) _phasePool2.IsPaused = false;
 
             _key = Keyboard.GetState();
 
@@ -99,42 +98,6 @@ namespace VolleyBallTournament
                     _animate.SetMotion("SlideRight", Easing.QuadraticEaseOut, _cameraX, _cameraX = _cameraX - Screen.Width, 24);
 
                     _animate.Start("SlideRight");
-                }
-            }
-
-            if (!PhasePool1.IsPaused)
-            {
-                if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
-                {
-                    PhasePool1.Timer.ToggleTimer();
-
-                    var matchs = PhasePool1.GetMatchs();
-
-                    for (int i = 0; i < matchs.Length; i++)
-                    {
-                        matchs[i].Court.State.Set(PhasePool1.Timer.IsRunning ? Court.States.Play : Court.States.Ready);
-                    }
-
-                    if (!PhasePool1.Timer.IsRunning)
-                    {
-                        _step++;
-                        _step = int.Clamp(_step, 0, 7);
-
-                        PhasePool1.ResetTeamsStatus();
-                        PhasePool1.LoadSequence(Sequence, _step);
-                    }
-                }
-
-                if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
-                {
-                    PhasePool1.ShuffleTeamsTotalPoint();
-                }
-
-                if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
-                {
-                    PhasePool1.ResetTeamsStatus();
-                    PhasePool1.LoadSequence(Sequence, _step = 0);
-                    PhasePool1.ResetTeamsTotalPoint();
                 }
             }
 

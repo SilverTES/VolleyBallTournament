@@ -14,6 +14,12 @@ namespace VolleyBallTournament
         public Team TeamB;
         public Team TeamReferee;
 
+        public Set()
+        {
+            TeamA = null;
+            TeamB = null;
+            TeamReferee = null;
+        }
         public Set(Team teamA, Team teamB, Team teamReferee)
         {
             TeamA = teamA;
@@ -40,6 +46,10 @@ namespace VolleyBallTournament
         {
             _grid = new Grid2D<Set>(3, 8);
         }
+        public int NbStep()
+        {
+            return _grid.Height;
+        }
 
         public List<Set> GetList(int step)
         {
@@ -65,7 +75,7 @@ namespace VolleyBallTournament
 
                         if (reader.Name == "match")
                         {
-                            Set set = new Set(new Team("", null), new Team("", null), new Team("", null));
+                            Set set = new();
 
                             while (reader.MoveToNextAttribute()) // Lire les attributs.
                             {
@@ -74,19 +84,9 @@ namespace VolleyBallTournament
                                 if (reader.Name == "referee") set.TeamReferee = teams[Indexs[reader.Value]];
                             }
 
+                            //Console.WriteLine($"<<{set.TeamA.TeamName} vs {set.TeamB.TeamName}>> = {set.TeamReferee.TeamName}");
 
-                            Console.WriteLine($"<<{set.TeamA.TeamName} vs {set.TeamB.TeamName}>> = {set.TeamReferee.TeamName}");
-
-
-                            Misc.Log($"({index} : {step-1})");
-                            //Misc.Log($"{_grid.IsInGrid(index, step)}");
-
-                            _grid.Set(index, step-1, set);
-
-                            //var s = _grid.Get(index, step);
-
-                            //Console.WriteLine($"<<{s.TeamA.TeamName} vs {s.TeamB.TeamName}>> = {s.TeamReferee.TeamName}");
-
+                            _grid.Set(index, step-1, set); // Important le step-1 , parceque le tableau débute à Zero et step est déja 1 quand il renconte l'élément "<step>"
 
                             index++;
                         }
@@ -115,19 +115,6 @@ namespace VolleyBallTournament
                 }
             }
 
-            //for (int j = 0; j < _grid.Height; j++)
-            //{
-            //    for (int i = 0; i < _grid.Width; i++)
-            //    {
-            //        var set = _grid.Get(i, j);
-
-            //        if (set != null)
-            //            Console.Write($"<{set.TeamA.TeamName}x{set.TeamB.TeamName}={set.TeamReferee.TeamName}>");
-            //        else
-            //            Console.WriteLine($"null {i},{j}");
-            //    }
-            //    Console.WriteLine();        
-            //}
         }
     }
 }

@@ -17,19 +17,23 @@ namespace VolleyBallTournament
         private readonly Container _divMatch;
         private readonly Container _divGroup;
 
-        private readonly Match[] _matchs = new Match[3];
-        private readonly Group[] _groups = new Group[4];
-        private readonly Team[] _teams = new Team[16];
+        private Match[] _matchs = new Match[3];
+        private Group[] _groups = new Group[4];
+        private Team[] _teams = new Team[16];
 
         public Timer Timer => _timer;
         private readonly Timer _timer;
 
         private int _step = 0;
         private int _nbStep = 8;
+        private Sequence _sequence;
 
-        public PhasePool(string title)
+
+        public PhasePool(string title, Sequence sequence)
         {
             _title = title;
+            _sequence = sequence;
+
             SetSize(Screen.Width, Screen.Height);
 
             _divMain = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
@@ -37,26 +41,8 @@ namespace VolleyBallTournament
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(40, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
-            int teamNumber = 0;
-            for (int i = 0; i < _groups.Length; i++)
-            {
-                _groups[i] = (Group)new Group($"{i+1}").AppendTo(this);
-                
-                for (int t = 0; t < 4; t++)
-                {
-                    var team = new Team($"Team {teamNumber+1}", _groups[i]);
-                    _teams[teamNumber] = team;
-                    team.AddPointTotal(Misc.Rng.Next(0, 0));
-
-                    _groups[i].AddTeam(team);
-
-                    teamNumber++;
-                }
-
-                _divGroup.Insert(_groups[i]);
-            }
-
-            Init();
+            CreateTeams();
+            CreateMatchs();
 
             _timer = (Timer)new Timer().AppendTo(this);
             _divTimer.Insert(_timer);
@@ -68,64 +54,73 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            //_teams[0].TeamName = "The Little Giant";
-            //_teams[0].NbMatchWin = 2;
-
-            //_teams[1].TeamName = "Les nuls du volley";
-            //_teams[1].NbMatchWin = 1;
-
-            //_teams[2].TeamName = "Lili Hina";
-            //_teams[2].NbMatchWin = 3;
         }
-        public override Node Init()
+        public void CreateTeams()
+        {
+            int teamNumber = 0;
+            for (int i = 0; i < _groups.Length; i++)
+            {
+                _groups[i] = (Group)new Group($"{i + 1}").AppendTo(this);
+
+                for (int t = 0; t < 4; t++)
+                {
+                    var team = new Team($"Team {teamNumber + 1}");
+                    _teams[teamNumber] = team;
+                    team.AddPointTotal(Misc.Rng.Next(0, 0));
+
+                    _groups[i].AddTeam(team);
+
+                    teamNumber++;
+                }
+
+                _divGroup.Insert(_groups[i]);
+            }
+        }
+        public void CreateMatchs()
         {
             int group = 0;
             for (int i = 0; i < _matchs.Length; i++)
             {
-                var teamA = new Team("TeamA", null);
-                var teamB = new Team("TeamB", null);
-                var teamReferee = new Team("TeamR", null);
+                var teamA = new Team("TeamA");
+                var teamB = new Team("TeamB");
+                var teamReferee = new Team("TeamR");
 
-                _matchs[i] = (Match)new Match(new ScorePanel(teamA, teamB), new Court($"{i + 1}", teamReferee)).AppendTo(this);
+                _matchs[i] = (Match)new Match($"{i + 1}", teamA, teamB, teamReferee, _sequence).AppendTo(this);
 
                 _divMatch.Insert(_matchs[i]);
                 group++;
             }
-
-            return base.Init();
         }
         public void ResetTeamsStatus()
         {
             for (int i = 0; i < _teams.Length; i++)
             {
                 var team = _teams[i];
-                team.IsPlaying = false;
-                team.IsReferee = false;
+                team.SetIsPlaying(false);
+                team.SetIsReferee(false);
+
+                team.SetMatch(null);
+            }
+        }
+        public void ResetScoresPoint()
+        {
+            for (int i = 0; i < _matchs.Length; i++)
+            {
+                _matchs[i].ResetScore();
             }
         }
         public void LoadSequence(Sequence sequence, int step)
         {
+            if (sequence == null) return;
+            if (step >= sequence.NbStep()) return;
+
             _step = step;
             var sets = sequence.GetList(step);
 
             for (int i = 0; i < sets.Count; i++)
             {
                 var set = sets[i];
-
-                //if (set == null) continue;
-
-                var teamA = set.TeamA;
-                var teamB = set.TeamB;
-                var teamReferee = set.TeamReferee;
-
-                teamA.IsPlaying = true;
-                teamB.IsPlaying = true;
-                teamReferee.IsReferee = true;
-
-                _matchs[i].ScorePanel.TeamA = teamA;
-                _matchs[i].ScorePanel.TeamB = teamB;
-                _matchs[i].Court.TeamReferee = teamReferee;
-
+                _matchs[i].SetTeam(set.TeamA, set.TeamB, set.TeamReferee);
             }
         }
         public void ShuffleTeamsTotalPoint()
@@ -133,7 +128,7 @@ namespace VolleyBallTournament
             for (int i = 0; i < _teams.Length; i++)
             {
                 var team = _teams[i];
-                team.TotalPoint = 0;
+                team.SetPointTotal(0);
                 team.AddPointTotal(Misc.Rng.Next(0, 9));
             }
             for (int i = 0; i < _groups.Length; i++)
@@ -186,20 +181,54 @@ namespace VolleyBallTournament
 
                     if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
                     {
-                        match.ScorePanel.AddPointA(+1);
+                        match.AddPointA(+1);
                     }
                     if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
                     {
-                        match.ScorePanel.AddPointA(-1);
+                        match.AddPointA(-1);
                     }
                     if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
                     {
-                        match.ScorePanel.AddPointB(-1);
+                        match.AddPointB(-1);
                     }
                     if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
                     {
-                        match.ScorePanel.AddPointB(+1);
+                        match.AddPointB(+1);
                     }
+                }
+
+                if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
+                {
+                    Timer.ToggleTimer();
+
+                    var matchs = GetMatchs();
+
+                    for (int i = 0; i < matchs.Length; i++)
+                    {
+                        matchs[i].State.Set(Timer.IsRunning ? Match.States.Play : Match.States.Ready);
+                    }
+
+                    if (!Timer.IsRunning)
+                    {
+                        _step++;
+                        _step = int.Clamp(_step, 0, 7);
+
+                        ResetTeamsStatus();
+                        ResetScoresPoint();
+                        LoadSequence(_sequence, _step);
+                    }
+                }
+
+                if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
+                {
+                    ShuffleTeamsTotalPoint();
+                }
+
+                if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
+                {
+                    //PhasePool1.ResetTeamsStatus();
+                    LoadSequence(_sequence, _step = 0);
+                    ResetTeamsTotalPoint();
                 }
 
             }
@@ -260,6 +289,8 @@ namespace VolleyBallTournament
                     batch.CenterStringXY(Static.FontMain, $"{_step + 1}", pos, Color.Red);
                 }
             }
+
+            batch.RightMiddleString(Static.FontMini, "Rotation", position + Vector2.UnitX * 400 - Vector2.UnitY * 24, Color.White);
         }
     }
 }

@@ -183,7 +183,7 @@ namespace VolleyBallTournament
         private void ProcessAddPoint(NetPeer peer, NetPacketReader reader)
         {
             int points = reader.GetInt();
-            _screenPlay.PhasePool1.GetMatch(0).ScorePanel.AddPointA(points);
+            _screenPlay.PhasePool1.GetMatch(0).AddPointA(points);
         }
 
         // Mettre à jour le serveur (appelé dans Game.Update)

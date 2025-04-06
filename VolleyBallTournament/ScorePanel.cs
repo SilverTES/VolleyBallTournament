@@ -9,104 +9,41 @@ namespace VolleyBallTournament
 {
     public class ScorePanel : Node
     {
-        public Match Match;
-        public Court Court;
-
-        public Team TeamA;
-        public Team TeamB;
-        
-
-        public int NbSetToWin = 2;
-
-        public int SetA;
-        public int SetB;
-        public int ScoreB;
-        public int ScoreA;
-
         Container _div;
+
+        private Match _match;
+        private int NbSetToWin = 2;
 
         public Vector2 SetAPos;
         public Vector2 SetBPos;
-
         public Vector2 ScoreAPos;
         public Vector2 ScoreBPos;
-
         public Vector2 TeamAPos;
         public Vector2 TeamBPos;
-        
 
-        public ScorePanel(Team teamA, Team teamB)
+        public ScorePanel(Match match)
         {
-            TeamA = teamA;
-            TeamB = teamB;
-
-            TeamA.ScorePanel = this;
-            TeamB.ScorePanel = this;
-
-            TeamA.IsPlaying = true;
-            TeamB.IsPlaying = true;
+            SetMatch(match);
 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
             SetSize(560, 120);
         }
-        public void AddPointA(int points = 1)
+        public void SetMatch(Match match)
         {
-            if (Court.State.CurState == Court.States.Play)
-            {
-                if (points == 0) return;
-
-                if (points > 0)
-                {
-                    if (!Court.ServiceSide)
-                        Court.ChangeServiceSide();
-                    else
-                        Court.SetServiceSideA();
-                }
-
-                if (points < 0) 
-                    Court.CancelChangeServiceSide();
-
-                TeamA.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreAPos - Vector2.UnitY * 64).AppendTo(Match._parent);
-                new FxExplose(ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
-
-                Static.SoundPoint.Play(.25f, .01f, 0f);
-            }
-            else
-            {
-                Court.SetServiceSideA();
-            }
+            ResetScore();
+            _match = match;
         }
-        public void AddPointB(int points = 1)
+        public void ResetScore()
         {
-            if (Court.State.CurState == Court.States.Play)
-            {
-                if (points == 0) return;
+            if (_match == null) return;
 
-                if (points > 0)
-                {
-                    if (Court.ServiceSide)
-                        Court.ChangeServiceSide();
-                    else
-                        Court.SetServiceSideB();
-                }
-
-                if (points < 0) 
-                    Court.CancelChangeServiceSide();
-
-                TeamB.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(ScoreBPos - Vector2.UnitY * 64).AppendTo(Match._parent);
-                new FxExplose(ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(Match._parent);
-
-                Static.SoundPoint.Play(.25f, .01f, 0f);
-            }
-            else
-            {
-                Court.SetServiceSideB();
-            }
+            _match.TeamA.SetScoreSet(0);
+            _match.TeamB.SetScoreSet(0);
+            _match.TeamA.SetScorePoint(0);
+            _match.TeamB.SetScorePoint(0);
+            
         }
-
         public void SetNbSetToWin(int nbSetToWin)
         {
             NbSetToWin = nbSetToWin;
@@ -115,11 +52,11 @@ namespace VolleyBallTournament
         {
             UpdateRect();
 
-            ScoreA = TeamA.Score;
-            ScoreB = TeamB.Score;
+            //ScoreA = TeamA.ScorePoint;
+            //ScoreB = TeamB.ScorePoint;
 
-            SetA = TeamA.Set;
-            SetB = TeamB.Set;
+            //SetA = TeamA.ScoreSet;
+            //SetB = TeamB.ScoreSet;
 
             SetAPos = AbsRectF.Center - Vector2.UnitX * 20;
             SetBPos = AbsRectF.Center + Vector2.UnitX * 20;
@@ -142,23 +79,23 @@ namespace VolleyBallTournament
                 //batch.Rectangle(AbsRectF, Color.Gray, 3f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
-                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
-                batch.LeftMiddleString(Static.FontMain, TeamA.TeamName, TeamAPos, Color.Yellow);
+                batch.LeftMiddleString(Static.FontMain, _match.TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, _match.TeamA.TeamName, TeamAPos, Color.GreenYellow);
 
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
-                batch.RightMiddleString(Static.FontMain, TeamB.TeamName, TeamBPos , Color.Yellow);
+                batch.RightMiddleString(Static.FontMain, _match.TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, _match.TeamB.TeamName, TeamBPos , Color.GreenYellow);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
 
                 if (NbSetToWin > 1)
                 {
-                    batch.CenterBorderedStringXY(Static.FontMain, SetA.ToString(), SetAPos, Color.Cyan, Color.Black);
-                    batch.CenterBorderedStringXY(Static.FontMain, SetB.ToString(), SetBPos, Color.Cyan, Color.Black);
+                    batch.CenterBorderedStringXY(Static.FontMain, _match.TeamA.ScoreSet.ToString(), SetAPos, Color.Cyan, Color.Black);
+                    batch.CenterBorderedStringXY(Static.FontMain, _match.TeamB.ScoreSet.ToString(), SetBPos, Color.Cyan, Color.Black);
                 }
 
-                batch.CenterBorderedStringXY(Static.FontMain3, ScoreA.ToString(), ScoreAPos, Color.Gold, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontMain3, ScoreB.ToString(), ScoreBPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), ScoreAPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), ScoreBPos, Color.Gold, Color.Black);
 
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter + Vector2.One * 6, Color.Black, Color.Black);
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter, Color.Gold, Color.Black);
