@@ -40,6 +40,7 @@ namespace VolleyBallTournament
         public void FocusNextTextBox()
         {   
             var textBoxs = GroupOf<TextBox>();
+            bool oneFocus = false;
             // search focused textBox
             for (int i = 0;i < textBoxs.Count;i++)
             {
@@ -57,13 +58,17 @@ namespace VolleyBallTournament
                         textBox.SetFocus(false);
                         textBoxs[0].SetFocus(true);
                     }
+                    oneFocus = true;
                     break;
                 }
             }
+            if (!oneFocus)
+                textBoxs[0].SetFocus(true);
         }
         public void FocusPrevTextBox()
         {
             var textBoxs = GroupOf<TextBox>();
+            bool oneFocus = false;
             // search focused textBox
             for (int i = 0; i < textBoxs.Count; i++)
             {
@@ -81,9 +86,12 @@ namespace VolleyBallTournament
                         textBox.SetFocus(false);
                         textBoxs[textBoxs.Count-1].SetFocus(true);
                     }
+                    oneFocus = true;
                     break;
                 }
             }
+            if (!oneFocus)
+                textBoxs[0].SetFocus(true);
         }
         public override Node Update(GameTime gameTime)
         {
