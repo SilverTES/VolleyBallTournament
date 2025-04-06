@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<phasePool>
+
+  <step time = "120">
+    <match teamA = "A1" teamB = "B1" referee = "A4"/>
+    <match teamA = "A2" teamB = "B2" referee = "B4"/>
+    <match teamA = "A3" teamB = "B3" referee = "C4"/>
+  </step>
+  <step time = "120">
+    <match teamA = "A4" teamB = "B4" referee = "A1"/>
+    <match teamA = "C2" teamB = "D2" referee = "B1"/>
+    <match teamA = "C3" teamB = "D3" referee = "C1"/>
+  </step>
+  <step time = "120">
+    <match teamA = "C1" teamB = "D1" referee = "A2"/>
+    <match teamA = "C4" teamB = "D4" referee = "B2"/>
+    <match teamA = "A3" teamB = "C3" referee = "C2"/>
+  </step>
+  <step time = "120">
+    <match teamA = "A1" teamB = "C1" referee = "A3"/>
+    <match teamA = "A2" teamB = "C2" referee = "B3"/>
+    <match teamA = "A4" teamB = "C4" referee = "C3"/>
+  </step>
+
+  <step time = "120">
+    <match teamA = "B4" teamB = "D4" referee = "A4"/>
+    <match teamA = "A2" teamB = "D2" referee = "B4"/>
+    <match teamA = "B3" teamB = "D3" referee = "C4"/>
+  </step>
+  <step time = "120">
+    <match teamA = "B4" teamB = "D4" referee = "A1"/>
+    <match teamA = "A2" teamB = "D2" referee = "B1"/>
+    <match teamA = "A3" teamB = "D3" referee = "C1"/>
+  </step>
+  <step time = "120">
+    <match teamA = "A1" teamB = "D1" referee = "A2"/>
+    <match teamA = "A4" teamB = "D4" referee = "B2"/>
+    <match teamA = "B3" teamB = "C3" referee = "C2"/>
+  </step>
+  <step time = "120">
+    <match teamA = "B1" teamB = "C1" referee = "A3"/>
+    <match teamA = "B2" teamB = "C2" referee = "B3"/>
+    <match teamA = "B4" teamB = "C4" referee = "C3"/>
+  </step>
+
+</phasePool>
+

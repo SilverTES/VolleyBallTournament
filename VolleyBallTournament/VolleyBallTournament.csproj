@@ -33,6 +33,11 @@
       <HintPath>..\..\..\Dev\Mugen\Mugen\bin\Release\net8.0\Mugen.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="SetupPool.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />

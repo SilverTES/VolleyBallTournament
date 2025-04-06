@@ -96,7 +96,7 @@ namespace VolleyBallTournament
                 batch.FillRectangle(AbsRectF.Extend(-4f), Color.DarkSlateBlue * .5f);
                 
                 if (IsPlaying)
-                    batch.Rectangle(AbsRectF.Extend(-4f), Color.Green, 3f);
+                    batch.Rectangle(AbsRectF.Extend(-4f), Color.White, 3f);
 
                 batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, IsPlaying ? Color.Yellow : Color.White);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);

@@ -100,6 +100,10 @@ namespace VolleyBallTournament
                 group.Refresh();
             }
         }
+        public Team[] GetTeams()
+        {
+            return _teams;
+        }
         public Team GetTeam(int index)
         {
             return _teams[index];

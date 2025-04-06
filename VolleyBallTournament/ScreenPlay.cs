@@ -14,6 +14,8 @@ namespace VolleyBallTournament
         public PhasePool PhasePool1;
         public PhasePool PhasePool2;
 
+        public Sequence Sequence;
+
         KeyboardState _key;
 
         Animate _animate;
@@ -21,6 +23,9 @@ namespace VolleyBallTournament
         float _cameraX;
 
         Vector2 _versionPos;
+
+
+
         public ScreenPlay(Game game) 
         {
             SetSize(Screen.Width, Screen.Height);
@@ -44,12 +49,16 @@ namespace VolleyBallTournament
                 textBox.OnChange += (t) => 
                 { 
                     PhasePool1.GetTeam(t.Id).TeamName = textBox.Text;
+                    PhasePool2.GetTeam(t.Id).TeamName = textBox.Text;
                 };
             }
 
             //Debug
             //_cameraX = -Screen.Width;
             //SetPosition(-Screen.Width, 0);
+            Sequence = new Sequence();
+            Sequence.Init("SetupPool.xml", PhasePool1.GetTeams());
+
         }
         public override Node Update(GameTime gameTime)
         {
