@@ -23,8 +23,8 @@
   </step>
 
   <step time = "120">
-    <match teamA = "B4" teamB = "D4" referee = "A4"/>
-    <match teamA = "A2" teamB = "D2" referee = "B4"/>
+    <match teamA = "B1" teamB = "D1" referee = "A4"/>
+    <match teamA = "B2" teamB = "D2" referee = "B4"/>
     <match teamA = "B3" teamB = "D3" referee = "C4"/>
   </step>
   <step time = "120">

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mugen.Animation;
 using Mugen.Core;
 using Mugen.GFX;
+using Mugen.Physics;
 using System;
 
 
@@ -21,6 +22,7 @@ namespace VolleyBallTournament
         public int Set = 0;
 
         public bool IsPlaying = false;
+        public bool IsReferee = false;
         public int TotalPoint = 0; EasingValue _easePointTotal = new(0);
         public int BonusPoint = 0;
         public int NbMatchWin = 0;
@@ -43,6 +45,12 @@ namespace VolleyBallTournament
         public Team AddPointTotal(int points)
         { 
             TotalPoint += points; 
+            _easePointTotal.SetValue(TotalPoint);
+            return this;
+        }
+        public Team SetPointTotal(int points)
+        {
+            TotalPoint = points;
             _easePointTotal.SetValue(TotalPoint);
             return this;
         }
@@ -93,30 +101,44 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF.Extend(-4f), Color.DarkSlateBlue * .5f);
+                batch.FillRectangle(AbsRectF.Extend(-4f), !(IsPlaying || IsReferee) ? Color.DarkSlateBlue * .5f: Color.Black * .5f);
                 
-                if (IsPlaying)
-                    batch.Rectangle(AbsRectF.Extend(-4f), Color.White, 3f);
 
-                batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, IsPlaying ? Color.Yellow : Color.White);
+                batch.LeftMiddleString(Static.FontMain, $"{TeamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, IsPlaying ? Color.Yellow : IsReferee ? Color.White : Color.Gray);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
                 batch.RightMiddleString(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
                 batch.LeftMiddleString(Static.FontMain, $"+{BonusPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10, Color.Green);
 
-                for (int i = 0; i < NbMatchPlayed; i++)
+                DrawVictory(batch);
+
+                if (IsPlaying)
                 {
-                    var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
-                    
-                    //batch.Circle(pos, 10, 16, Color.White, 2f);
-                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
-                    
-                    if ( i < NbMatchWin)
-                        batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
-                        //batch.Point(pos, 10, Color.Gold);
+                    //batch.Rectangle(AbsRectF.Extend(-4f), Color.White, 3f);
+                }
+
+                if (IsReferee)
+                {
+                    //batch.Rectangle(AbsRectF.Extend(-4f), Color.Yellow, 3f);
+                    batch.Draw(Static.TexReferee, Color.White, 0, AbsRectF.Center + Vector2.UnitX * 10, Position.CENTER, Vector2.One / 4);
                 }
             }   
 
             return base.Draw(batch, gameTime, indexLayer);
+        }
+
+        private void DrawVictory(SpriteBatch batch)
+        {
+            for (int i = 0; i < NbMatchPlayed; i++)
+            {
+                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
+
+                //batch.Circle(pos, 10, 16, Color.White, 2f);
+                batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
+
+                if (i < NbMatchWin)
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
+                //batch.Point(pos, 10, Color.Gold);
+            }
         }
     }
 }

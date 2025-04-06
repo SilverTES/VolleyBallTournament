@@ -26,7 +26,7 @@ namespace VolleyBallTournament
     {
         public int Time;
 
-        Grid2D<Match> _gridMatch = new Grid2D<Match>(3, 8);
+        Grid2D<Set> _grid;
 
         public static Dictionary<string, int> Indexs { get; private set; } = new Dictionary<string, int>()
         {
@@ -38,22 +38,30 @@ namespace VolleyBallTournament
 
         public Sequence() 
         {
-
+            _grid = new Grid2D<Set>(3, 8);
         }
 
+        public List<Set> GetList(int step)
+        {
+            var list = new List<Set>();
+            list.Add(_grid.Get(0, step));
+            list.Add(_grid.Get(1, step));
+            list.Add(_grid.Get(2, step));
+
+            return list;
+        }
         public void Init(string xmlFile, Team[] teams)
         {
             XmlTextReader reader = new XmlTextReader(xmlFile);
 
             int index = 0;
             int step = 0;
+
             while (reader.Read())
             {
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element: // Le nœud est un élément.
-
-                        //Console.Write("<" + reader.Name);
 
                         if (reader.Name == "match")
                         {
@@ -61,19 +69,24 @@ namespace VolleyBallTournament
 
                             while (reader.MoveToNextAttribute()) // Lire les attributs.
                             {
-                                //Console.Write(" " + reader.Name + "='" + reader.Value + "'");
-
                                 if (reader.Name == "teamA") set.TeamA = teams[Indexs[reader.Value]];
                                 if (reader.Name == "teamB") set.TeamB = teams[Indexs[reader.Value]];
                                 if (reader.Name == "referee") set.TeamReferee = teams[Indexs[reader.Value]];
                             }
 
-                            Console.WriteLine($"{set.TeamA.TeamName} vs {set.TeamB.TeamName} = {set.TeamReferee.TeamName}");
 
-                            ScorePanel scorePanel = new ScorePanel(set.TeamA, set.TeamB);
-                            Court court = new Court($"Terrain {index + 1}", set.TeamReferee);
+                            Console.WriteLine($"<<{set.TeamA.TeamName} vs {set.TeamB.TeamName}>> = {set.TeamReferee.TeamName}");
 
-                            _gridMatch.Set(index, step, new Match(scorePanel, court));
+
+                            Misc.Log($"({index} : {step-1})");
+                            //Misc.Log($"{_grid.IsInGrid(index, step)}");
+
+                            _grid.Set(index, step-1, set);
+
+                            //var s = _grid.Get(index, step);
+
+                            //Console.WriteLine($"<<{s.TeamA.TeamName} vs {s.TeamB.TeamName}>> = {s.TeamReferee.TeamName}");
+
 
                             index++;
                         }
@@ -84,11 +97,9 @@ namespace VolleyBallTournament
                             Console.WriteLine($"Temps = {reader.Value}");
 
                             index = 0;
+
                             step++;
                         }
-
-
-                        //Console.WriteLine("/>");
 
                         break;
                     case XmlNodeType.Text: // Afficher le texte dans chaque élément.
@@ -103,6 +114,20 @@ namespace VolleyBallTournament
                         break;
                 }
             }
+
+            //for (int j = 0; j < _grid.Height; j++)
+            //{
+            //    for (int i = 0; i < _grid.Width; i++)
+            //    {
+            //        var set = _grid.Get(i, j);
+
+            //        if (set != null)
+            //            Console.Write($"<{set.TeamA.TeamName}x{set.TeamB.TeamName}={set.TeamReferee.TeamName}>");
+            //        else
+            //            Console.WriteLine($"null {i},{j}");
+            //    }
+            //    Console.WriteLine();        
+            //}
         }
     }
 }

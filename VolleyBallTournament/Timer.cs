@@ -66,7 +66,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .25f, 0);
+                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .5f, 0);
                 //batch.CenterStringXY(Static.FontDigitMonoBG, GetFormattedTime(), AbsXY + OXY, Color.Black);
                 batch.CenterStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.Orange);
             }

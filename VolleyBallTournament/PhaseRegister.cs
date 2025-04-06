@@ -9,6 +9,7 @@ namespace VolleyBallTournament
 {
     public class PhaseRegister : Node   
     {
+        public bool IsPaused = false;
         private string _title = "Enregistrement des équipes";
         private KeyboardState _key;
         public PhaseRegister(Game game) 
@@ -95,15 +96,31 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
-            _key = Static.Key;
             UpdateRect();
 
-            if (ButtonControl.OnePress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
-            if (ButtonControl.OnePress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
-            if (ButtonControl.OnePress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
-            if (ButtonControl.OnePress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
+            if (IsPaused)
+            {
+                var textBoxs = GroupOf<TextBox>();
+                for (int i = 0; i < textBoxs.Count; i++)
+                {
+                    var textBox = textBoxs[i];
+                    textBox.SetFocus(false);
+                }
+            }
+
+            if (!IsPaused)
+            {
+                _key = Static.Key;
+
+                if (ButtonControl.OnePress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
+                if (ButtonControl.OnePress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
+                if (ButtonControl.OnePress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
+                if (ButtonControl.OnePress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
+
+            }
 
             UpdateChilds(gameTime);
+
             return base.Update(gameTime);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
@@ -122,8 +139,8 @@ namespace VolleyBallTournament
                     batch.CenterStringXY(Static.FontMain, $"Groupe {i+1}", AbsXY + new Vector2(i * 480 + 40 + 200, 280), Color.White);
                 }
 
-                batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
-                batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
+                batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
+                batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
