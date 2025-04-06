@@ -22,7 +22,7 @@ namespace VolleyBallTournament
             _elapsedTime = 0;
             _isRunning = false;
 
-            SetSize(360, 120);
+            SetSize(480, 160);
             SetPivot(Mugen.Physics.Position.CENTER);
         }
         public void StartTimer()

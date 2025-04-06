@@ -31,7 +31,7 @@ namespace VolleyBallTournament
             _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(80, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
 
-            _divTimer = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.HORIZONTAL);
+            _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             int teamNumber = 0;
             for (int i = 0; i < _groups.Length; i++)
@@ -78,14 +78,14 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            _teams[0].TeamName = "The Little Giant";
-            _teams[0].NbMatchWin = 2;
+            //_teams[0].TeamName = "The Little Giant";
+            //_teams[0].NbMatchWin = 2;
 
-            _teams[1].TeamName = "Les nuls du volley";
-            _teams[1].NbMatchWin = 1;
+            //_teams[1].TeamName = "Les nuls du volley";
+            //_teams[1].NbMatchWin = 1;
 
-            _teams[2].TeamName = "Lili Hina";
-            _teams[2].NbMatchWin = 3;
+            //_teams[2].TeamName = "Lili Hina";
+            //_teams[2].NbMatchWin = 3;
         }
         public void ShuffleTeamsTotalPoint()
         {
@@ -141,8 +141,8 @@ namespace VolleyBallTournament
 
             if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
             {
-                _teams[3].AddPointTotal(1);
-                _groups[0].Refresh();
+                //_teams[3].AddPointTotal(1);
+                //_groups[0].Refresh();
 
                 _timer.ToggleTimer();
                 Misc.Log("Toggle Timer");
@@ -174,18 +174,17 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 //batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
-                //batch.Draw(Static.TexBG00, AbsRect, Color.White);
+                
                 batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
 
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Black * .5f, 1f);
 
-                batch.CenterBorderedStringXY(Static.FontMain, $"{_title}", AbsRectF.TopCenter + Vector2.UnitY * 32, Color.White, Color.Black);
+                batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
+                batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
             }
 
             if (indexLayer == (int)Layers.Debug)
             {
-                batch.RightMiddleString(Static.FontMain, $"V{0}.{1}", AbsRectF.BottomRight - Vector2.One * 32, Color.White);
-                
                 batch.LeftMiddleString(Static.FontMain, "Classement par nombre de victoires + bonus écart de point à la fin des matchs en cas d'égalité", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.Gray);
 
                 //Static.DrawRoundedRectangle(batch, Static.TexLine, new Rectangle(100, 100, 800, 400),  Color.White, 30, 30, 30, 80, 3, 24);

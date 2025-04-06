@@ -19,8 +19,12 @@ namespace VolleyBallTournament
         Animate _animate;
 
         float _cameraX;
+
+        Vector2 _versionPos;
         public ScreenPlay(Game game) 
         {
+            SetSize(Screen.Width, Screen.Height);
+
             PhaseRegister = new PhaseRegister(game).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
             PhasePool1 = new PhasePool("Phase de pool 1").SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             PhasePool2 = new PhasePool("Phase de pool 2").SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
@@ -28,6 +32,8 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("SlideLeft");
             _animate.Add("SlideRight");
+
+            _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
 
             //Debug
             //_cameraX = -Screen.Width;
@@ -77,9 +83,15 @@ namespace VolleyBallTournament
         {
             batch.GraphicsDevice.Clear(Color.Transparent);
 
-            //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 20, Color.White);
+            if (indexLayer == (int)Layers.Debug)
+            { 
+                batch.RightMiddleString(Static.FontMini, $"©SilverTES V{0}.{1}", _versionPos, Color.White);
+            }
 
+            //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 20, Color.White);
             DrawChilds(batch, gameTime, indexLayer);
+
+
             return base.Draw(batch, gameTime, indexLayer);
         }
     }

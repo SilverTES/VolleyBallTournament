@@ -13,15 +13,23 @@ public class TextBox : Node
 {
     private Game _game;
 
+    public int Id => _id;
+    private int _id;
+    public string Title => _title;
+    private string _title = "";
+    
+    private string _prevText = "";
     private string _text = "";
-    private Color _textColor = Color.Black;
-    private Color _curcorColor = Color.Black;
-    private Color _bgColor = Color.Gray;
+    private Color _colorTitle = Color.Black;
+    private Color _colorText = Color.Black;
+    private Color _colorCursor = Color.Black;
+    private Color _colorBg = Color.Gray;
 
     private int _cursorPosition = 0; // Position du curseur
     private int? _selectionStart = null; // Début de la sélection (null si pas de sélection)
     private Rectangle _bounds;
     private SpriteFont _font;
+    private SpriteFont _fontTitle;
     public bool IsFocus => _isFocus;
     private bool _isFocus = false;
     private float _blinkTimer = 0f;
@@ -35,6 +43,7 @@ public class TextBox : Node
     private const float MOVE_DELAY = 0.1f; // Délai en secondes entre chaque déplacement (ajustable)
     private bool _isMoving = false; // Nouvelle variable pour suivre le déplacement
 
+    public Action<TextBox> OnChange;
     //private string ClipboardText = "";
 
     private Point? _mouseStartPosition = null; // Nouvelle variable pour suivre la position initiale du clic
@@ -45,10 +54,12 @@ public class TextBox : Node
 
         _game = game;
         _bounds = bounds;
+        _rect = bounds;
         _font = font;
-        _bgColor = bgColor;
-        _textColor = textColor;
-        _curcorColor = cursorColor;
+        _fontTitle = font;
+        _colorBg = bgColor;
+        _colorText = textColor;
+        _colorCursor = cursorColor;
         _maxLength = maxLength;
 
         SetPosition(bounds.Location.ToVector2());
@@ -58,6 +69,16 @@ public class TextBox : Node
     private void Window_TextInput(object sender, TextInputEventArgs e)
     {
         HandleTextInput(e);
+    }
+    public void SetId(int id)
+    { 
+        _id = id; 
+    }
+    public void SetTitle(string title, Color color, SpriteFont font)
+    {
+        _title = title;
+        _colorTitle = color;
+        _fontTitle = font;
     }
     public void SetFocus(bool isFocus)
     {
@@ -139,6 +160,7 @@ public class TextBox : Node
             _blinkTimer = 0f;
         }
 
+
         HandleKeyboardInput(Static.Key);
 
         return base.Update(gameTime);
@@ -147,6 +169,8 @@ public class TextBox : Node
     public void HandleTextInput(TextInputEventArgs e)
     {
         if (!_isFocus) return;
+
+        _prevText = _text;
 
         // Supprimer la sélection ou un caractère avec Backspace
         if (e.Key == Keys.Back && _text.Length > 0)
@@ -189,6 +213,9 @@ public class TextBox : Node
             _selectionStart = null;
             AdjustScroll();
         }
+
+        if (OnChange != null && _prevText != _text)
+            OnChange(this);
     }
 
     private void HandleKeyboardInput(KeyboardState keyboardState)
@@ -407,9 +434,9 @@ public class TextBox : Node
         if (indexLayer == (int)Layers.HUD)
         {
             // Dessiner le fond du champ
-            batch.Draw(GFX._whitePixel, _bounds, _bgColor);
+            batch.Draw(GFX._whitePixel, _bounds, _colorBg);
 
-            batch.Rectangle(_bounds, _isFocus ? Color.White : Color.Black);
+            batch.Rectangle(_bounds, _isFocus ? Color.White : Color.Black, 3f);
 
             // Sauvegarder l'état actuel du ScissorRectangle
             Rectangle? originalScissor = batch.GraphicsDevice.ScissorRectangle;
@@ -434,7 +461,7 @@ public class TextBox : Node
             }
 
             // Dessiner le texte
-            batch.DrawString(_font, _text, textPosition, _textColor);
+            batch.DrawString(_font, _text, textPosition, _colorText);
 
             // Dessiner le curseur si actif
             if (_isFocus && _cursorVisible)
@@ -444,12 +471,14 @@ public class TextBox : Node
 
                 batch.Draw(GFX._whitePixel,
                     new Rectangle((int)cursorX, _bounds.Y + 5, 3, (int)_font.MeasureString(" ").Y - 5),
-                    _curcorColor);
+                    _colorCursor);
             }
 
             // Restaurer l'état du ScissorRectangle (optionnel, selon le contexte)
             if (originalScissor.HasValue)
                 batch.GraphicsDevice.ScissorRectangle = originalScissor.Value;
+
+            batch.CenterStringXY(_fontTitle, _title, AbsRectF.TopCenter - Vector2.UnitY * 20, _colorTitle);
         }
 
 
