@@ -5,11 +5,18 @@ using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
+using System.Collections.Generic;
+using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
 {
     public class PhasePool : Node
     {
+        public State<States> State { get; private set; } = new State<States>(States.Ready);
+
+        private List<int> _process = Enums.GetList<States>();
+        private int _ticProcess = 0;
+
         public bool IsPaused = false;
         private readonly string _title;
         private readonly Container _divMain;
@@ -54,6 +61,28 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
+            State.Set(States.Pause);
+
+            State.On(States.Play, () => 
+            {
+                Timer.StartTimer();
+                Misc.Log("On Play");
+            });
+            State.Off(States.Play, () =>
+            {
+                Timer.StopTimer();
+                Misc.Log("Off Play");
+            });
+
+            State.On(States.Pause, () =>
+            {
+                _step++;
+                _step = int.Clamp(_step, 0, 7);
+
+                ResetTeamsStatus();
+                ResetScoresPoint();
+                LoadSequence(_sequence, _step);
+            });
         }
         public void CreateTeams()
         {
@@ -170,63 +199,118 @@ namespace VolleyBallTournament
         {
             return _groups[index];
         }
+        private void RunState()
+        {
+            switch (State.CurState)
+            {
+                case States.Ready:
+
+                    break;
+                case States.Pause:
+
+                    break;
+                case States.Finish:
+
+                    break;
+                case States.LastPoint:
+
+                    break;
+                case States.WarmUp:
+                    break;
+
+                case States.Play:
+
+                    for (int i = 0; i < _matchs.Length; i++)
+                    {
+                        var match = _matchs[i];
+
+                        if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
+                        {
+                            match.AddPointA(+1);
+                        }
+                        if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
+                        {
+                            match.AddPointA(-1);
+                        }
+                        if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
+                        {
+                            match.AddPointB(-1);
+                        }
+                        if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
+                        {
+                            match.AddPointB(+1);
+                        }
+                    }
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();
+
             if (!IsPaused)
             {
-                for (int i = 0; i < _matchs.Length; i++)
-                {
-                    var match = _matchs[i];
+                RunState();
 
-                    if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
-                    {
-                        match.AddPointA(+1);
-                    }
-                    if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
-                    {
-                        match.AddPointA(-1);
-                    }
-                    if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
-                    {
-                        match.AddPointB(-1);
-                    }
-                    if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
-                    {
-                        match.AddPointB(+1);
-                    }
-                }
-
-                if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
+                if (ButtonControl.OnePress("Process", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
-                    Timer.ToggleTimer();
+                    States nextState = (States)_process[_ticProcess];
+
+                    State.Set(nextState);
 
                     var matchs = GetMatchs();
-
                     for (int i = 0; i < matchs.Length; i++)
                     {
-                        matchs[i].State.Set(Timer.IsRunning ? Match.States.Play : Match.States.Ready);
+                        matchs[i].State.Set(nextState);
                     }
 
-                    if (!Timer.IsRunning)
-                    {
-                        _step++;
-                        _step = int.Clamp(_step, 0, 7);
 
-                        ResetTeamsStatus();
-                        ResetScoresPoint();
-                        LoadSequence(_sequence, _step);
-                    }
+                    // Using the modulus operator
+                    _ticProcess = (_ticProcess + 1) % Enums.Count<States>();
+
                 }
 
-                if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
-                {
-                    ShuffleTeamsTotalPoint();
-                }
+                // Debug
+                //if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
+                //{
+                //    Timer.ToggleTimer();
+
+                //    var matchs = GetMatchs();
+
+                //    for (int i = 0; i < matchs.Length; i++)
+                //    {
+                //        matchs[i].State.Set(Timer.IsRunning ? Match.States.Play : Match.States.Ready);
+                //    }
+
+                //    if (!Timer.IsRunning)
+                //    {
+                //        _step++;
+                //        _step = int.Clamp(_step, 0, 7);
+
+                //        ResetTeamsStatus();
+                //        ResetScoresPoint();
+                //        LoadSequence(_sequence, _step);
+
+                //        State.Set(States.Ready);
+                //    }
+                //    else
+                //    {
+                //        State.Set(States.Play);
+                //    }
+                //}
+
+                //if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
+                //{
+                //    ShuffleTeamsTotalPoint();
+                //}
 
                 if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
-                    //PhasePool1.ResetTeamsStatus();
+                    ResetTeamsStatus();
                     LoadSequence(_sequence, _step = 0);
                     ResetTeamsTotalPoint();
                 }
@@ -264,6 +348,7 @@ namespace VolleyBallTournament
                 //batch.LineTexture(Static.TexLine, Vector2.Zero, Static.MousePos, 9, Color.Gold);
 
                 //Static.DrawArcFilled(batch, Vector2.One * 600, 1200, Geo.RAD_0, Geo.RAD_90, Color.Red);
+                batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState}", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

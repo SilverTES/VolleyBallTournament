@@ -107,8 +107,7 @@ namespace VolleyBallTournament
                     textBox.SetFocus(false);
                 }
             }
-
-            if (!IsPaused)
+            else
             {
                 _key = Static.Key;
 

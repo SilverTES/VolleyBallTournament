@@ -11,10 +11,10 @@ namespace VolleyBallTournament
     {
         public enum States
         {
+            Pause,
             WarmUp,
             Ready,
             Play,
-            Pause,
             Finish,
             LastPoint,
         }
@@ -22,12 +22,12 @@ namespace VolleyBallTournament
 
         public Dictionary<States, string> Infos = new Dictionary<States, string>()
         {
+            {States.Pause, "En attente"},
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
             {States.Play, "Match en cours"},
-            {States.Pause, "En attente"},
-            {States.Finish, "Fin du match"},
             {States.LastPoint, "Dernière balle"},
+            {States.Finish, "Fin du match"},
 
         };
 
@@ -67,7 +67,7 @@ namespace VolleyBallTournament
 
             SetSize(_div._rect.Width, _div._rect.Height);
 
-            State.Set(States.WarmUp);
+            State.Set(States.Pause);
         }
         public Team GetTeamOppenent(Team team)
         {
@@ -149,7 +149,7 @@ namespace VolleyBallTournament
                 _court.SetServiceSideB();
             }
         }
-        public void RunState()
+        private void RunState()
         {
             switch (State.CurState)
             {

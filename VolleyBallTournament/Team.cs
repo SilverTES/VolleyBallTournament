@@ -44,6 +44,15 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
+        public void ResetAll()
+        {
+            _scoreSet = 0;
+            _scorePoint = 0;
+            _totalPoint = 0;
+            _bonusPoint = 0;
+            _nbMatchWin = 0;
+            _nbMatchPlayed = 0;
+        }
         public void SetIsPlaying(bool isPlaying)
         {
             _isPlaying = isPlaying;
@@ -143,7 +152,7 @@ namespace VolleyBallTournament
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
                 batch.RightMiddleString(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
                 
-                batch.LeftMiddleString(Static.FontMain, _bonusPoint > 0 ? $"+{_bonusPoint}": $"{_bonusPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10, _bonusPoint > 0 ? Color.GreenYellow : Color.OrangeRed);
+                batch.LeftMiddleString(Static.FontMini, _bonusPoint > 0 ? $"+{_bonusPoint}": $"{_bonusPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10, _bonusPoint > 0 ? Color.GreenYellow : Color.OrangeRed);
 
                 DrawVictory(batch);
 
@@ -168,7 +177,6 @@ namespace VolleyBallTournament
             {
                 var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * _nbMatchPlayed), AbsRectF.Center.Y);
 
-                //batch.Circle(pos, 10, 16, Color.White, 2f);
                 batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
 
                 if (i < _nbMatchWin)
