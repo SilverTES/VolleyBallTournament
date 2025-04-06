@@ -103,7 +103,7 @@ public class TextBox : Node
 
     public override Node Update(GameTime gameTime)
     {
-        _ticExtend += .2f;
+        _ticExtend += .25f;
         _extend = (float)Math.Sin(_ticExtend) * 2f;
 
         UpdateRect();

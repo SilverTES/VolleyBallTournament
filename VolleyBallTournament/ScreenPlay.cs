@@ -35,6 +35,18 @@ namespace VolleyBallTournament
 
             _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
 
+            var textBoxs = PhaseRegister.GroupOf<TextBox>();
+
+            for (int i = 0; i < textBoxs.Count; i++)
+            {
+                var textBox = textBoxs[i];
+
+                textBox.OnChange += (t) => 
+                { 
+                    PhasePool1.GetTeam(t.Id).TeamName = textBox.Text;
+                };
+            }
+
             //Debug
             //_cameraX = -Screen.Width;
             //SetPosition(-Screen.Width, 0);
