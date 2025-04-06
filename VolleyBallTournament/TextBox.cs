@@ -440,7 +440,7 @@ public class TextBox : Node
             // Dessiner le fond du champ
             batch.Draw(GFX._whitePixel, _bounds, _colorBg);
 
-            batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.White : Color.Black, 3f);
+            batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.Gray : Color.Transparent, 3f);
 
             // Sauvegarder l'état actuel du ScissorRectangle
             Rectangle? originalScissor = batch.GraphicsDevice.ScissorRectangle;
@@ -482,7 +482,7 @@ public class TextBox : Node
             if (originalScissor.HasValue)
                 batch.GraphicsDevice.ScissorRectangle = originalScissor.Value;
 
-            batch.CenterStringXY(_fontTitle, _title, AbsRectF.TopCenter - Vector2.UnitY * 20, _colorTitle);
+            batch.CenterStringXY(_fontTitle, _title, AbsRectF.TopCenter - Vector2.UnitY * 20, _isFocus ? _colorTitle : _colorTitle *.5f);
         }
 
 

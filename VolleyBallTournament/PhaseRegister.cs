@@ -20,14 +20,14 @@ namespace VolleyBallTournament
             {
                 for (int j = 0; j < 4; j++)
                 {
-                    var textBox = new TextBox(game, new Rectangle(80 + i * 480, 400 + j * 120, 320, 64), Static.FontMain, Color.Black * .5f, Color.Yellow, Color.Gold, 50).AppendTo(this).This<TextBox>();
+                    var textBox = new TextBox(game, new Rectangle(80 + i * 480, 400 + j * 120, 320, 64), Static.FontMain, Color.Black * .75f, Color.Yellow, Color.Gold, 50).AppendTo(this).This<TextBox>();
                     textBox.SetTitle($"Equipe {index+1}", Color.White, Static.FontMini);
                     textBox.SetId(index);
 
-                    textBox.OnChange += (tb) => 
-                    { 
-                        Misc.Log($"{tb.Id} : {tb.Title} : {tb.Text}"); 
-                    };
+                    //textBox.OnChange += (tb) => 
+                    //{ 
+                    //    Misc.Log($"{tb.Id} : {tb.Title} : {tb.Text}"); 
+                    //};
                     
                     if (index == 0)
                         textBox.SetFocus(true);
@@ -111,9 +111,16 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 batch.Draw(Static.TexBG00, AbsRect, Color.White);
-                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .25f);
+                batch.FillRectangle(AbsRectF, Color.Black * .25f);
 
                 //batch.Grid(AbsXY + Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Black * .5f);
+                for (int i = 0; i < 4; i++)
+                {
+                    batch.FillRectangle(AbsXY + new Vector2(i * 480 + 40, 280), new Vector2(400, 600), Color.DarkSlateBlue * .5f);
+
+                    batch.CenterStringXY(Static.FontMain, $"Groupe {i+1}", AbsXY + new Vector2(i * 480 + 40 + 200, 280) + Vector2.One * 6, Color.Black *.5f);
+                    batch.CenterStringXY(Static.FontMain, $"Groupe {i+1}", AbsXY + new Vector2(i * 480 + 40 + 200, 280), Color.White);
+                }
 
                 batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
                 batch.LeftTopString(Static.FontMain2, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
