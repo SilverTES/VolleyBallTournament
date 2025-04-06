@@ -48,6 +48,9 @@ public class TextBox : Node
 
     private Point? _mouseStartPosition = null; // Nouvelle variable pour suivre la position initiale du clic
 
+    float _extend = 0f;
+    float _ticExtend = 0f;
+
     public TextBox(Game game, Rectangle bounds, SpriteFont font, Color bgColor, Color textColor, Color cursorColor, int maxLength = 50)
     {
         _type = UID.Get<TextBox>();
@@ -100,10 +103,11 @@ public class TextBox : Node
 
     public override Node Update(GameTime gameTime)
     {
+        _ticExtend += .2f;
+        _extend = (float)Math.Sin(_ticExtend) * 2f;
+
         UpdateRect();
         _bounds.Location = AbsXY.ToPoint();
-        //var mouseState = Mouse.GetState();
-        //var keyboardState = Keyboard.GetState();
 
         if (_moveCooldown > 0)
             _moveCooldown -= (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -436,7 +440,7 @@ public class TextBox : Node
             // Dessiner le fond du champ
             batch.Draw(GFX._whitePixel, _bounds, _colorBg);
 
-            batch.Rectangle(_bounds, _isFocus ? Color.White : Color.Black, 3f);
+            batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.White : Color.Black, 3f);
 
             // Sauvegarder l'état actuel du ScissorRectangle
             Rectangle? originalScissor = batch.GraphicsDevice.ScissorRectangle;

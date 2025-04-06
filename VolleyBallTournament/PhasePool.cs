@@ -30,7 +30,6 @@ namespace VolleyBallTournament
             _divMain = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
             _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(80, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
-
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             int teamNumber = 0;
