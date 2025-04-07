@@ -5,10 +5,19 @@ using Mugen.Core;
 using Mugen.GFX;
 using Mugen.Physics;
 using System;
+using System.Collections.Generic;
+using System.IO.Pipes;
 
 
 namespace VolleyBallTournament
 {
+    public enum Result
+    {
+        Null,
+        Win,
+        Loose,
+    }
+
     public class Team : Node  
     {
         private Match _match = null;
@@ -26,11 +35,15 @@ namespace VolleyBallTournament
         public int TotalPoint => _totalPoint;
         private int _totalPoint = 0; EasingValue _easePointTotal = new(0);
         private int _currentBonusPoint = 0;
+        public int BonusPoint => _bonusPoint;
         private int _bonusPoint = 0;
-        private int _nbMatchWin = 0;
-        private int _nbMatchNull = 0;
-        public int NbMatchPlayed => _nbMatchPlayed;
-        private int _nbMatchPlayed = 0;
+        //private int _nbMatchWin = 0;
+        //private int _nbMatchNull = 0;
+        //public int NbMatchPlayed => _nbMatchPlayed;
+        //private int _nbMatchPlayed = 0;
+
+        public int NbMatchPlayed => _results.Count;
+        private List<Result> _results = new List<Result>();
         public string TeamName => _teamName;
         private string _teamName;
 
@@ -68,16 +81,24 @@ namespace VolleyBallTournament
             _match = match;
 
             if (match == null) return;
-            
-            AddMatchPlayed();
+
+            //AddMatchPlayed();
         }
         public void SetTeamName(string teamName) { _teamName = teamName; }
-        public void SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; }
-        public void AddMatchWin(int nb = 1) { _nbMatchWin+=nb; }
-        public void AddMatchNull(int nb = 1) { _nbMatchNull+=nb; }
-        public void AddMatchPlayed(int nb = 1) { _nbMatchPlayed+=nb; }
-        public void SetNbMatchNull(int nbMatchNull) { _nbMatchNull = nbMatchNull; }
-        public void SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; }
+        public void ResetResult()
+        {
+            _results.Clear();
+        }
+        public void AddResult(Result result)
+        {
+            _results.Add(result);
+        }
+        //public void SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; }
+        //public void AddMatchWin(int nb = 1) { _nbMatchWin+=nb; }
+        //public void AddMatchNull(int nb = 1) { _nbMatchNull+=nb; }
+        //public void AddMatchPlayed(int nb = 1) { _nbMatchPlayed+=nb; }
+        //public void SetNbMatchNull(int nbMatchNull) { _nbMatchNull = nbMatchNull; }
+        //public void SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; }
         public Team AddTotalPoint(int points)
         { 
             _totalPoint += points; 
@@ -93,6 +114,7 @@ namespace VolleyBallTournament
         public void ValidBonusPoint()
         {
             _bonusPoint += _currentBonusPoint;
+            _currentBonusPoint = 0;
         }
         public void AddPoint(int points) { _scorePoint += points; }
         public void SetScorePoint(int points) { _scorePoint = points; }
@@ -173,14 +195,24 @@ namespace VolleyBallTournament
 
         private void DrawVictory(SpriteBatch batch)
         {
-            for (int i = 0; i < _nbMatchPlayed; i++)
+            for (int i = 0; i < NbMatchPlayed; i++)
             {
-                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * _nbMatchPlayed), AbsRectF.Center.Y);
+                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
 
                 batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
 
-                if (i < _nbMatchWin)
+                if (_results[i] == Result.Null)
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
+
+                if (_results[i] == Result.Win)
                     batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
+
+                if (_results[i] == Result.Loose)
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Red);
+
+
+                //if (i < NbMatchWin)
+                //    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
                 //batch.Point(pos, 10, Color.Gold);
             }
         }

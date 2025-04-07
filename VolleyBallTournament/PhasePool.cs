@@ -90,7 +90,6 @@ namespace VolleyBallTournament
             State.Off(States.ValidPoints, () =>
             {
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
-
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Length; i++)
                 {
@@ -103,10 +102,15 @@ namespace VolleyBallTournament
                             Misc.Log("Match Null");
                             match.TeamA.AddTotalPoint(1);
                             match.TeamB.AddTotalPoint(1);
+
+                            match.TeamA.AddResult(Result.Null);
+                            match.TeamB.AddResult(Result.Null);
                         }
                         else
                         {
                             match.GetWinner().AddTotalPoint(3);
+                            match.GetWinner().AddResult(Result.Win);
+                            match.GetLooser().AddResult(Result.Loose);
                         }
 
                         match.TeamA.ValidBonusPoint();
@@ -212,8 +216,8 @@ namespace VolleyBallTournament
             {
                 var team = _teams[i];
                 team.SetTotalPoint(0);
-                team.SetNbMatchWin(0);
-                team.SetNbMatchPlayed(0);
+                team.ResetResult();
+                //team.SetNbMatchPlayed(0);
             }
             for (int i = 0; i < _groups.Length; i++)
             {
