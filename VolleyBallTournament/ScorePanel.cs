@@ -101,6 +101,16 @@ namespace VolleyBallTournament
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter, Color.Gold, Color.Black);
             }
 
+            if (indexLayer == (int)Layers.Debug)
+            {
+                string result = "Match Nul";
+                var winner = _match.GetWinner();
+                if (winner != null)
+                    result = $"Vainqueur {winner.TeamName}";
+
+                batch.CenterStringXY(Static.FontMini, result, AbsRectF.TopCenter - Vector2.UnitY * 40, Color.ForestGreen);
+            }
+
             return base.Draw(batch, gameTime, indexLayer);
         }
     }

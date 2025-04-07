@@ -16,7 +16,8 @@ namespace VolleyBallTournament
             Ready,
             Play,
             Finish,
-            LastPoint,
+            ValidPoints,
+            //LastPoint,
         }
         public State<States> State { get; private set; } = new State<States>(States.Ready);
 
@@ -26,8 +27,9 @@ namespace VolleyBallTournament
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
             {States.Play, "Match en cours"},
-            {States.LastPoint, "Dernière balle"},
             {States.Finish, "Fin du match"},
+            {States.ValidPoints, "Validation des Points"},
+            //{States.LastPoint, "Dernière balle"},
 
         };
 
@@ -68,6 +70,18 @@ namespace VolleyBallTournament
             SetSize(_div._rect.Width, _div._rect.Height);
 
             State.Set(States.Pause);
+        }
+        public Team GetWinner()
+        {
+            if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
+            
+            return _teamA.ScorePoint > _teamB.ScorePoint ? _teamA : _teamB;
+        }
+        public Team GetLooser()
+        {
+            if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
+
+            return _teamA.ScorePoint < _teamB.ScorePoint ? _teamA : _teamB;
         }
         public Team GetTeamOppenent(Team team)
         {
@@ -116,7 +130,7 @@ namespace VolleyBallTournament
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
-            else
+            else if (State.CurState == States.Ready)
             {
                 _court.SetServiceSideA();
             }
@@ -144,7 +158,7 @@ namespace VolleyBallTournament
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
-            else
+            else if (State.CurState == States.Ready)
             {
                 _court.SetServiceSideB();
             }
@@ -160,9 +174,6 @@ namespace VolleyBallTournament
 
                     break;
                 case States.Finish:
-
-                    break;
-                case States.LastPoint:
 
                     break;
                 case States.WarmUp:

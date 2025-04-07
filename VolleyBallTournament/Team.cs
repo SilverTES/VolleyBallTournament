@@ -25,8 +25,10 @@ namespace VolleyBallTournament
         private bool _isReferee = false;
         public int TotalPoint => _totalPoint;
         private int _totalPoint = 0; EasingValue _easePointTotal = new(0);
+        private int _currentBonusPoint = 0;
         private int _bonusPoint = 0;
         private int _nbMatchWin = 0;
+        private int _nbMatchNull = 0;
         public int NbMatchPlayed => _nbMatchPlayed;
         private int _nbMatchPlayed = 0;
         public string TeamName => _teamName;
@@ -44,15 +46,15 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
-        public void ResetAll()
-        {
-            _scoreSet = 0;
-            _scorePoint = 0;
-            _totalPoint = 0;
-            _bonusPoint = 0;
-            _nbMatchWin = 0;
-            _nbMatchPlayed = 0;
-        }
+        //public void ResetAll()
+        //{
+        //    _scoreSet = 0;
+        //    _scorePoint = 0;
+        //    _totalPoint = 0;
+        //    _bonusPoint = 0;
+        //    _nbMatchWin = 0;
+        //    _nbMatchPlayed = 0;
+        //}
         public void SetIsPlaying(bool isPlaying)
         {
             _isPlaying = isPlaying;
@@ -67,42 +69,38 @@ namespace VolleyBallTournament
 
             if (match == null) return;
             
-            _nbMatchPlayed++;
+            AddMatchPlayed();
         }
-        public void SetTeamName(string teamName)
-        {
-            _teamName = teamName;
-        }
-        public Team AddPointTotal(int points)
+        public void SetTeamName(string teamName) { _teamName = teamName; }
+        public void SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; }
+        public void AddMatchWin(int nb = 1) { _nbMatchWin+=nb; }
+        public void AddMatchNull(int nb = 1) { _nbMatchNull+=nb; }
+        public void AddMatchPlayed(int nb = 1) { _nbMatchPlayed+=nb; }
+        public void SetNbMatchNull(int nbMatchNull) { _nbMatchNull = nbMatchNull; }
+        public void SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; }
+        public Team AddTotalPoint(int points)
         { 
             _totalPoint += points; 
             _easePointTotal.SetValue(_totalPoint);
             return this;
         }
-        public Team SetPointTotal(int points)
+        public Team SetTotalPoint(int points)
         {
             _totalPoint = points;
             _easePointTotal.SetValue(_totalPoint);
             return this;
         }
-        public Team AddPoint(int points) 
-        { 
-            _scorePoint += points; 
-            return this; 
-        }
-        public void SetScorePoint(int points)
+        public void ValidBonusPoint()
         {
-            _scorePoint = points;
+            _bonusPoint += _currentBonusPoint;
         }
-        public void SetScoreSet(int points)
-        {
-            _scoreSet = points;
-        }
+        public void AddPoint(int points) { _scorePoint += points; }
+        public void SetScorePoint(int points) { _scorePoint = points; }
+        public void SetScoreSet(int points) { _scoreSet = points; }
         public void MoveToRank(int rank)
         {
             if (rank == _rank) 
                 return;
-
             _newRank = rank;
         }
         public void MoveToPosition(Vector2 position, int duration = 32)
@@ -136,7 +134,7 @@ namespace VolleyBallTournament
             if (_match != null)
                 if (_match.ScorePanel != null)
                 {
-                    _bonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
+                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
                 }
 
             return base.Update(gameTime);
@@ -145,14 +143,16 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .5f: Color.Black * .5f);
+                batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .5f: Color.DarkSlateBlue * .75f);
                 
 
                 batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
                 batch.RightMiddleString(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
                 
-                batch.LeftMiddleString(Static.FontMini, _bonusPoint > 0 ? $"+{_bonusPoint}": $"{_bonusPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10, _bonusPoint > 0 ? Color.GreenYellow : Color.OrangeRed);
+                int bonus = _bonusPoint + _currentBonusPoint;
+
+                batch.LeftMiddleString(Static.FontMini, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
 
                 DrawVictory(batch);
 

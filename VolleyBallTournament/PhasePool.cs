@@ -66,22 +66,62 @@ namespace VolleyBallTournament
             State.On(States.Play, () => 
             {
                 Timer.StartTimer();
-                Misc.Log("On Play");
+                //Misc.Log("On Play");
             });
             State.Off(States.Play, () =>
             {
                 Timer.StopTimer();
-                Misc.Log("Off Play");
+                //Misc.Log("Off Play");
             });
 
             State.On(States.Pause, () =>
             {
-                _step++;
-                _step = int.Clamp(_step, 0, 7);
-
                 ResetTeamsStatus();
                 ResetScoresPoint();
                 LoadSequence(_sequence, _step);
+
+            });
+
+            State.Off(States.Finish, () =>
+            {
+
+            });
+
+            State.Off(States.ValidPoints, () =>
+            {
+                // On retribut les points dans les team respectif qui viennent de finir de jouer
+
+                var matchs = GetMatchs();
+                for (int i = 0; i < matchs.Length; i++)
+                {
+                    var match = matchs[i];
+
+                    if (match != null)
+                    {
+                        if (match.GetWinner() == null)
+                        {
+                            Misc.Log("Match Null");
+                            match.TeamA.AddTotalPoint(1);
+                            match.TeamB.AddTotalPoint(1);
+                        }
+                        else
+                        {
+                            match.GetWinner().AddTotalPoint(3);
+                        }
+
+                        match.TeamA.ValidBonusPoint();
+                        match.TeamB.ValidBonusPoint();
+                    }
+                }
+
+                for (int i = 0; i < _groups.Length; i++)
+                {
+                    var group = _groups[i];
+                    group.Refresh();
+                }
+
+                _step++;
+                _step = int.Clamp(_step, 0, _nbStep - 1);
             });
         }
         public void CreateTeams()
@@ -95,7 +135,7 @@ namespace VolleyBallTournament
                 {
                     var team = new Team($"Team {teamNumber + 1}");
                     _teams[teamNumber] = team;
-                    team.AddPointTotal(Misc.Rng.Next(0, 0));
+                    team.AddTotalPoint(Misc.Rng.Next(0, 0));
 
                     _groups[i].AddTeam(team);
 
@@ -152,26 +192,28 @@ namespace VolleyBallTournament
                 _matchs[i].SetTeam(set.TeamA, set.TeamB, set.TeamReferee);
             }
         }
-        public void ShuffleTeamsTotalPoint()
-        {
-            for (int i = 0; i < _teams.Length; i++)
-            {
-                var team = _teams[i];
-                team.SetPointTotal(0);
-                team.AddPointTotal(Misc.Rng.Next(0, 9));
-            }
-            for (int i = 0; i < _groups.Length; i++)
-            {
-                var group = _groups[i];
-                group.Refresh();
-            }
-        }
+        //public void ShuffleTeamsTotalPoint()
+        //{
+        //    for (int i = 0; i < _teams.Length; i++)
+        //    {
+        //        var team = _teams[i];
+        //        team.SetPointTotal(0);
+        //        team.AddPointTotal(Misc.Rng.Next(0, 9));
+        //    }
+        //    for (int i = 0; i < _groups.Length; i++)
+        //    {
+        //        var group = _groups[i];
+        //        group.Refresh();
+        //    }
+        //}
         public void ResetTeamsTotalPoint()
         {
             for (int i = 0; i < _teams.Length; i++)
             {
                 var team = _teams[i];
-                team.SetPointTotal(0);
+                team.SetTotalPoint(0);
+                team.SetNbMatchWin(0);
+                team.SetNbMatchPlayed(0);
             }
             for (int i = 0; i < _groups.Length; i++)
             {
@@ -206,46 +248,38 @@ namespace VolleyBallTournament
                 case States.Ready:
 
                     break;
+
                 case States.Pause:
 
                     break;
+
                 case States.Finish:
 
                     break;
-                case States.LastPoint:
 
-                    break;
                 case States.WarmUp:
                     break;
 
                 case States.Play:
 
-                    for (int i = 0; i < _matchs.Length; i++)
-                    {
-                        var match = _matchs[i];
-
-                        if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
-                        {
-                            match.AddPointA(+1);
-                        }
-                        if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
-                        {
-                            match.AddPointA(-1);
-                        }
-                        if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
-                        {
-                            match.AddPointB(-1);
-                        }
-                        if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
-                        {
-                            match.AddPointB(+1);
-                        }
-                    }
-
                     break;
 
                 default:
                     break;
+            }
+        }
+        private void SetTicProcess(int ticProcess)
+        {
+            _ticProcess = ticProcess;
+
+            States nextState = (States)_process[_ticProcess];
+
+            State.Set(nextState);
+
+            var matchs = GetMatchs();
+            for (int i = 0; i < matchs.Length; i++)
+            {
+                matchs[i].State.Set(nextState);
             }
         }
         public override Node Update(GameTime gameTime)
@@ -258,20 +292,19 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress("Process", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
-                    States nextState = (States)_process[_ticProcess];
-
-                    State.Set(nextState);
-
-                    var matchs = GetMatchs();
-                    for (int i = 0; i < matchs.Length; i++)
-                    {
-                        matchs[i].State.Set(nextState);
-                    }
-
-
                     // Using the modulus operator
-                    _ticProcess = (_ticProcess + 1) % Enums.Count<States>();
+                    //_ticProcess = (_ticProcess + 1) % Enums.Count<States>();
 
+                    //States nextState = (States)_process[_ticProcess];
+
+                    //State.Set(nextState);
+
+                    //var matchs = GetMatchs();
+                    //for (int i = 0; i < matchs.Length; i++)
+                    //{
+                    //    matchs[i].State.Set(nextState);
+                    //}
+                    SetTicProcess((_ticProcess + 1) % Enums.Count<States>());
                 }
 
                 // Debug
@@ -310,9 +343,32 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
+                    SetTicProcess(0);
                     ResetTeamsStatus();
-                    LoadSequence(_sequence, _step = 0);
                     ResetTeamsTotalPoint();
+                    LoadSequence(_sequence, _step = 0);
+                }
+
+                for (int i = 0; i < _matchs.Length; i++)
+                {
+                    var match = _matchs[i];
+
+                    if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
+                    {
+                        match.AddPointA(+1);
+                    }
+                    if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
+                    {
+                        match.AddPointA(-1);
+                    }
+                    if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
+                    {
+                        match.AddPointB(-1);
+                    }
+                    if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
+                    {
+                        match.AddPointB(+1);
+                    }
                 }
 
             }
