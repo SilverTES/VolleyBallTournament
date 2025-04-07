@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using Mugen.Core;
 using System;
 using System.Collections.Generic;
+using static Mugen.GUI.Gui;
 
 namespace VolleyBallTournament
 {
@@ -48,6 +49,7 @@ namespace VolleyBallTournament
         Unknown = 0,
         Message,
         AddPoint,
+        Update,
     }
 
     public class NetworkServer
@@ -183,7 +185,21 @@ namespace VolleyBallTournament
         private void ProcessAddPoint(NetPeer peer, NetPacketReader reader)
         {
             int points = reader.GetInt();
-            _screenPlay.PhasePool1.GetMatch(0).AddPointA(points);
+            int matchIndex = reader.GetInt();
+            int team = reader.GetInt();
+
+            var match = _screenPlay.PhasePool1.GetMatch(matchIndex);
+
+            if (team == 0) match.AddPointA(points);
+            if (team == 1) match.AddPointB(points);
+
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((byte)MessageType.Update); // Identifiant de type
+            writer.Put(match.TeamA.ScorePoint);
+            writer.Put(match.TeamB.ScorePoint);
+            writer.Put(match.TeamA.TeamName);
+            writer.Put(match.TeamB.TeamName);
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
 
         // Mettre à jour le serveur (appelé dans Game.Update)

@@ -37,10 +37,6 @@ namespace VolleyBallTournament
         private int _currentBonusPoint = 0;
         public int BonusPoint => _bonusPoint;
         private int _bonusPoint = 0;
-        //private int _nbMatchWin = 0;
-        //private int _nbMatchNull = 0;
-        //public int NbMatchPlayed => _nbMatchPlayed;
-        //private int _nbMatchPlayed = 0;
 
         public int NbMatchPlayed => _results.Count;
         private List<Result> _results = new List<Result>();
@@ -81,8 +77,6 @@ namespace VolleyBallTournament
             _match = match;
 
             if (match == null) return;
-
-            //AddMatchPlayed();
         }
         public void SetTeamName(string teamName) { _teamName = teamName; }
         public void ResetResult()
@@ -93,12 +87,6 @@ namespace VolleyBallTournament
         {
             _results.Add(result);
         }
-        //public void SetNbMatchWin(int nbMatchWin) { _nbMatchWin = nbMatchWin; }
-        //public void AddMatchWin(int nb = 1) { _nbMatchWin+=nb; }
-        //public void AddMatchNull(int nb = 1) { _nbMatchNull+=nb; }
-        //public void AddMatchPlayed(int nb = 1) { _nbMatchPlayed+=nb; }
-        //public void SetNbMatchNull(int nbMatchNull) { _nbMatchNull = nbMatchNull; }
-        //public void SetNbMatchPlayed(int nbMatchPlayed) { _nbMatchPlayed = nbMatchPlayed; }
         public Team AddTotalPoint(int points)
         { 
             _totalPoint += points; 
@@ -165,7 +153,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .5f: Color.DarkSlateBlue * .75f);
+                batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .25f: Color.DarkSlateBlue * .75f);
                 
 
                 batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);
@@ -197,18 +185,27 @@ namespace VolleyBallTournament
         {
             for (int i = 0; i < NbMatchPlayed; i++)
             {
-                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 24 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
+                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 28 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
 
-                batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
+                batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
 
                 if (_results[i] == Result.Null)
-                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
+                {
+                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
+                    batch.CenterStringXY(Static.FontMini, "N", pos, Color.White);
+                }
 
                 if (_results[i] == Result.Win)
-                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
+                {
+                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Green);
+                    batch.CenterStringXY(Static.FontMini, "G", pos, Color.White);
+                }
 
                 if (_results[i] == Result.Loose)
-                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Red);
+                {
+                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Red);
+                    batch.CenterStringXY(Static.FontMini, "P", pos, Color.White);
+                }
 
 
                 //if (i < NbMatchWin)
