@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <phasePool>
-
+  
   <step time = "120">
     <match teamA = "A1" teamB = "B1" referee = "A4"/>
     <match teamA = "A2" teamB = "B2" referee = "B4"/>

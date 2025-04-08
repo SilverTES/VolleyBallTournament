@@ -49,18 +49,9 @@ namespace VolleyBallTournament
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(40, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
-            CreatePhasePool(phaseRegister.NbGroup, phaseRegister.NbTeamPerGroup, phaseRegister.NbMatch);
+            InsertGroups(phaseRegister);
 
-            // Associe les textBox avec les TeanName des joueurs venant d'être créer !
-            var textBoxs = phaseRegister.GetTexBoxs();
-            for (int i = 0; i < textBoxs.Count; i++)
-            {
-                var textBox = textBoxs[i];
-                textBox.OnChange += (t) =>
-                {
-                    GetTeam(t.Id).SetTeamName(textBox.Text);
-                };
-            }
+            CreateMatchs(phaseRegister.NbMatch);
 
             _timer = (Timer)new Timer().AppendTo(this);
             _divTimer.Insert(_timer);
@@ -84,7 +75,6 @@ namespace VolleyBallTournament
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
-
             State.On(States.Pause, () =>
             {
                 ResetTeamsStatus();
@@ -92,12 +82,10 @@ namespace VolleyBallTournament
                 SetRotation(_step);
 
             });
-
             State.Off(States.Finish, () =>
             {
 
             });
-
             State.Off(States.ValidPoints, () =>
             {
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
@@ -139,29 +127,19 @@ namespace VolleyBallTournament
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
         }
-        public void CreatePhasePool(int nbGroup, int nbTeamPerGroup, int nbMatch)
+        public void InsertGroups(PhaseRegister phaseRegister)
         {
-            int teamNumber = 0;
-            for (int i = 0; i < nbGroup; i++)
+            _teams = phaseRegister.GetTeams();
+            _groups = phaseRegister.GetGroups();
+
+            for (int i = 0; i < phaseRegister.NbGroup; i++)
             {
-                var group = (Group)new Group($"{i + 1}").AppendTo(this);
-                _groups.Add(group);
-
-                for (int t = 0; t < nbTeamPerGroup; t++)
-                {
-                    var team = new Team($"Team {teamNumber + 1}");
-                    _teams.Add(team);
-
-                    team.AddTotalPoint(Misc.Rng.Next(0, 0));
-
-                    group.AddTeam(team);
-
-                    teamNumber++;
-                }
-
+                var group = _groups[i].AppendTo(this).This<Group>();
                 _divGroup.Insert(group);
             }
-
+        }
+        public void CreateMatchs(int nbMatch)
+        {
             for (int i = 0; i < nbMatch; i++)
             {
                 var teamA = new Team("TeamA");
@@ -204,7 +182,12 @@ namespace VolleyBallTournament
             for (int i = 0; i < sets.Count; i++)
             {
                 var set = sets[i];
-                _matchs[i].SetTeam(set.TeamA, set.TeamB, set.TeamReferee);
+
+                if (i > _matchs.Count-1) 
+                    break;
+
+                var match = _matchs[i];
+                match.SetTeam(set.TeamA, set.TeamB, set.TeamReferee);
             }
         }
         //public void ShuffleTeamsTotalPoint()

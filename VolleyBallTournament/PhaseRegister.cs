@@ -7,6 +7,7 @@ using Mugen.GUI;
 using Mugen.Input;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace VolleyBallTournament
 {
@@ -32,7 +33,6 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
-            //UpdateRect();
             _div.SetPosition(XY);
 
             UpdateChilds(gameTime);
@@ -79,15 +79,16 @@ namespace VolleyBallTournament
         public int NbMatch => _nbMatch;
         private int _nbMatch;
 
-        public Rotation Rotation => _rotation;
-        private Rotation _rotation;
+        private List<Team> _teams = [];
+        private List<Group> _groups = [];
 
-        public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch, Rotation rotation)
+        public Rotation Rotation => _rotation;
+        private Rotation _rotation = new Rotation();
+        public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch)
         {
             _nbGroup = nbGroup;
             _nbTeamPerGroup = nbTeamPerGroup;
             _nbMatch = nbMatch;
-            _rotation = rotation;
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -102,11 +103,52 @@ namespace VolleyBallTournament
 
             _div.SetPosition((Screen.Width - _div.Rect.Width) / 2, (Screen.Height - _div.Rect.Height) / 2);
             _div.Refresh();
+
+            CreateGroups();
+
+            // Associe les textBox avec les TeamName des joueurs venant d'être créer !
+            var textBoxs = GetTexBoxs();
+            for (int i = 0; i < textBoxs.Count; i++)
+            {
+                Misc.Log("Mdsgijdsophds");
+
+                var textBox = textBoxs[i];
+                textBox.OnChange += (t) =>
+                {
+                    _teams[t.Id].SetTeamName(textBox.Text);
+                };
+            }
+
+        }
+        public void LoadRotationFile(string rotationFile)
+        {
+            _rotation.LoadFile(rotationFile, _teams);
+        }
+        public List<Team> GetTeams() { return _teams; }
+        public List<Group> GetGroups() { return _groups; }
+        private void CreateGroups()
+        {
+            int teamNumber = 0;
+            for (int i = 0; i < _nbGroup; i++)
+            {
+                var group = new Group($"{i + 1}");
+                _groups.Add(group);
+
+                for (int t = 0; t < _nbTeamPerGroup; t++)
+                {
+                    var team = new Team($"Team {teamNumber + 1}");
+                    _teams.Add(team);
+
+                    group.AddTeam(team);
+
+                    teamNumber++;   
+                }
+            }
         }
         public List<TextBox> GetTexBoxs()
         {
             var texBoxs = new List<TextBox>();
-
+            
             for (int i = 0; i < _groupRegister.Count; i++)
             {
                 var textBoxs = _groupRegister[i].GroupOf<TextBox>();
