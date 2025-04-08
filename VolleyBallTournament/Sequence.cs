@@ -60,7 +60,7 @@ namespace VolleyBallTournament
 
             return list;
         }
-        public void Init(string xmlFile, Team[] teams)
+        public void Init(string xmlFile, List<Team> teams)
         {
             XmlTextReader reader = new XmlTextReader(xmlFile);
 

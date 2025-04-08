@@ -70,7 +70,7 @@ namespace VolleyBallTournament
             {
                 Color color = Color.White * .25f;
 
-                batch.FillRectangle(AbsRectF.Extend(8f), Color.MonoGameOrange * .25f);
+                batch.FillRectangle(AbsRectF.Extend(8f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play ? .25f : .1f));
                 batch.Rectangle(AbsRectF, color, 3f);
 
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, color, 3f);
