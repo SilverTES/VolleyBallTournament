@@ -27,7 +27,7 @@ public class TextBox : Node
 
     private int _cursorPosition = 0; // Position du curseur
     private int? _selectionStart = null; // Début de la sélection (null si pas de sélection)
-    private Rectangle _bounds;
+    //private Rectangle _bounds;
     private SpriteFont _font;
     private SpriteFont _fontTitle;
     public bool IsFocus => _isFocus;
@@ -44,7 +44,6 @@ public class TextBox : Node
     private bool _isMoving = false; // Nouvelle variable pour suivre le déplacement
 
     public Action<TextBox> OnChange;
-    //private string ClipboardText = "";
 
     private Point? _mouseStartPosition = null; // Nouvelle variable pour suivre la position initiale du clic
 
@@ -56,7 +55,7 @@ public class TextBox : Node
         _type = UID.Get<TextBox>();
 
         _game = game;
-        _bounds = bounds;
+        //_bounds = bounds;
         _rect = bounds;
         _font = font;
         _fontTitle = font;
@@ -107,12 +106,11 @@ public class TextBox : Node
         _extend = (float)Math.Sin(_ticExtend) * 2f;
 
         UpdateRect();
-        _bounds.Location = AbsXY.ToPoint();
 
         if (_moveCooldown > 0)
             _moveCooldown -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        if (_bounds.Contains(Static.MousePos))
+        if (AbsRect.Contains(Static.MousePos))
         {
             if (Static.Mouse.LeftButton == ButtonState.Pressed)
             {
@@ -342,7 +340,7 @@ public class TextBox : Node
     private void UpdateCursorFromMouse(Point mousePosition)
     {
         float textWidth = _font.MeasureString(_text).X;
-        float mouseXRelative = mousePosition.X - (_bounds.X + 5) + _scrollOffset; // Position relative au texte
+        float mouseXRelative = mousePosition.X - (AbsRect.X + 5) + _scrollOffset; // Position relative au texte
 
         if (mouseXRelative > textWidth) // Si clic à droite du texte
         {
@@ -368,7 +366,7 @@ public class TextBox : Node
     private void UpdateSelectionFromMouse(Point mousePosition)
     {
         float textWidth = _font.MeasureString(_text).X;
-        float mouseXRelative = mousePosition.X - (_bounds.X + 5) + _scrollOffset; // Position relative au texte
+        float mouseXRelative = mousePosition.X - (AbsRect.X + 5) + _scrollOffset; // Position relative au texte
 
         if (mouseXRelative > textWidth) // Si clic à droite du texte
         {
@@ -409,7 +407,7 @@ public class TextBox : Node
     {
         float textWidth = _font.MeasureString(_text).X;
         float cursorX = _font.MeasureString(_text.Substring(0, _cursorPosition)).X;
-        float visibleWidth = _bounds.Width - 10;
+        float visibleWidth = _rect.Width - 10;
 
         if (textWidth <= visibleWidth)
         {
@@ -438,7 +436,7 @@ public class TextBox : Node
         if (indexLayer == (int)Layers.HUD)
         {
             // Dessiner le fond du champ
-            batch.Draw(GFX._whitePixel, _bounds, _colorBg);
+            batch.Draw(GFX._whitePixel, AbsRect, _colorBg);
 
             batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.Gray : Color.Transparent, 3f);
 
@@ -446,21 +444,21 @@ public class TextBox : Node
             Rectangle? originalScissor = batch.GraphicsDevice.ScissorRectangle;
 
             // Appliquer le clipping sans sortir du SpriteBatch
-            batch.GraphicsDevice.ScissorRectangle = _bounds;
+            batch.GraphicsDevice.ScissorRectangle = AbsRect;
 
             // Position avec défilement
-            Vector2 textPosition = new Vector2(_bounds.X + 5 - _scrollOffset, _bounds.Y);
+            Vector2 textPosition = new Vector2(AbsRect.X + 5 - _scrollOffset, AbsRect.Y);
 
             // Dessiner la sélection si elle existe
             if (_selectionStart.HasValue && _selectionStart.Value != _cursorPosition)
             {
                 int start = Math.Min(_selectionStart.Value, _cursorPosition);
                 int end = Math.Max(_selectionStart.Value, _cursorPosition);
-                float selectionX = _bounds.X + 5 + _font.MeasureString(_text.Substring(0, start)).X - _scrollOffset;
+                float selectionX = AbsRect.X + 5 + _font.MeasureString(_text.Substring(0, start)).X - _scrollOffset;
                 float selectionWidth = _font.MeasureString(_text.Substring(start, end - start)).X;
 
                 batch.Draw(GFX._whitePixel,
-                    new Rectangle((int)selectionX, _bounds.Y + 5, (int)selectionWidth, (int)_font.MeasureString(" ").Y),
+                    new Rectangle((int)selectionX, AbsRect.Y + 5, (int)selectionWidth, (int)_font.MeasureString(" ").Y),
                     Color.LightBlue);
             }
 
@@ -471,10 +469,10 @@ public class TextBox : Node
             if (_isFocus && _cursorVisible)
             {
                 float cursorAbsoluteX = _font.MeasureString(_text.Substring(0, _cursorPosition)).X;
-                float cursorX = _bounds.X + 5 + MathHelper.Clamp(cursorAbsoluteX - _scrollOffset, 0, _bounds.Width - 10);
+                float cursorX = AbsRect.X + 5 + MathHelper.Clamp(cursorAbsoluteX - _scrollOffset, 0, AbsRect.Width - 10);
 
                 batch.Draw(GFX._whitePixel,
-                    new Rectangle((int)cursorX, _bounds.Y + 5, 3, (int)_font.MeasureString(" ").Y - 5),
+                    new Rectangle((int)cursorX, AbsRect.Y + 5, 3, (int)_font.MeasureString(" ").Y - 5),
                     _colorCursor);
             }
 

@@ -5,6 +5,8 @@ using Mugen.Animation;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.Input;
+using System.IO;
+using System;
 
 namespace VolleyBallTournament
 {
@@ -29,15 +31,25 @@ namespace VolleyBallTournament
 
         int _step = 0;
 
-        public ScreenPlay(Game game) 
+        public ScreenPlay(Game game)
         {
+
+            var files = GetFilesInDirectory(Directory.GetCurrentDirectory(), "*.xml");
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                var file = files[i];
+                Misc.Log($"-> {file} ");
+            }
+
             SetSize(Screen.Width, Screen.Height);
 
             _sequence = new Sequence();
 
-            _phaseRegister = new PhaseRegister(game).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
-            _phasePool1 = new PhasePool("Phase de pool 1", _sequence).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            _phasePool2 = new PhasePool("Phase de pool 2", _sequence).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _phaseRegister = new PhaseRegister(game, 4, 4, 3, _sequence).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+
+            _phasePool1 = new PhasePool("Phase de pool 1", _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool("Phase de pool 2", _phaseRegister).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
             _sequence.Init("SetupPool.xml", _phasePool1.GetTeams());
             _phasePool1.LoadSequence(_sequence, _step);
@@ -48,21 +60,38 @@ namespace VolleyBallTournament
 
             _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
 
-            var textBoxs = _phaseRegister.GroupOf<TextBox>();
-            for (int i = 0; i < textBoxs.Count; i++)
-            {
-                var textBox = textBoxs[i];
-                textBox.OnChange += (t) => 
-                { 
-                    _phasePool1.GetTeam(t.Id).SetTeamName(textBox.Text);
-                    _phasePool2.GetTeam(t.Id).SetTeamName(textBox.Text);
-                };
-            }
+            //var textBoxs = _phaseRegister.GetTexBoxs();
+            //for (int i = 0; i < textBoxs.Count; i++)
+            //{
+            //    var textBox = textBoxs[i];
+            //    textBox.OnChange += (t) => 
+            //    { 
+            //        _phasePool1.GetTeam(t.Id).SetTeamName(textBox.Text);
+            //        _phasePool2.GetTeam(t.Id).SetTeamName(textBox.Text);
+            //    };
+            //}
 
             //Debug
-            _cameraX = -Screen.Width;
-            SetPosition(-Screen.Width, 0);
+            //_cameraX = -Screen.Width;
+            //SetPosition(-Screen.Width, 0);
         }
+        public static string[] GetFilesInDirectory(string directoryPath, string filter)
+        {
+            try
+            {
+                if (Directory.Exists(directoryPath))
+                {
+                    return Directory.GetFiles(directoryPath, filter); // Filtre personnalisable
+                }
+                return new string[0];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erreur : {ex.Message}");
+                return new string[0];
+            }
+        }
+
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();

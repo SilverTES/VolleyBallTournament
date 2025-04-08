@@ -6,6 +6,7 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
 using System.Collections.Generic;
+
 using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
@@ -33,13 +34,13 @@ namespace VolleyBallTournament
 
         private int _step = 0;
         private int _nbStep = 8;
+
         private Sequence _sequence;
 
-
-        public PhasePool(string title, Sequence sequence)
+        public PhasePool(string title, PhaseRegister phaseRegister)
         {
             _title = title;
-            _sequence = sequence;
+            _sequence = phaseRegister.Sequence;
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -48,8 +49,18 @@ namespace VolleyBallTournament
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(40, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
-            CreateTeams(16, 4);
-            CreateMatchs(3);
+            CreatePhasePool(phaseRegister.NbGroup, phaseRegister.NbTeamPerGroup, phaseRegister.NbMatch);
+
+            // Associe les textBox avec les TeanName des joueurs venant d'être créer !
+            var textBoxs = phaseRegister.GetTexBoxs();
+            for (int i = 0; i < textBoxs.Count; i++)
+            {
+                var textBox = textBoxs[i];
+                textBox.OnChange += (t) =>
+                {
+                    GetTeam(t.Id).SetTeamName(textBox.Text);
+                };
+            }
 
             _timer = (Timer)new Timer().AppendTo(this);
             _divTimer.Insert(_timer);
@@ -128,7 +139,7 @@ namespace VolleyBallTournament
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
         }
-        public void CreateTeams(int nbTeam, int nbGroup)
+        public void CreatePhasePool(int nbGroup, int nbTeamPerGroup, int nbMatch)
         {
             int teamNumber = 0;
             for (int i = 0; i < nbGroup; i++)
@@ -136,7 +147,7 @@ namespace VolleyBallTournament
                 var group = (Group)new Group($"{i + 1}").AppendTo(this);
                 _groups.Add(group);
 
-                for (int t = 0; t < 4; t++)
+                for (int t = 0; t < nbTeamPerGroup; t++)
                 {
                     var team = new Team($"Team {teamNumber + 1}");
                     _teams.Add(team);
@@ -150,10 +161,7 @@ namespace VolleyBallTournament
 
                 _divGroup.Insert(group);
             }
-        }
-        public void CreateMatchs(int nbMatch)
-        {
-            int group = 0;
+
             for (int i = 0; i < nbMatch; i++)
             {
                 var teamA = new Team("TeamA");
@@ -165,7 +173,6 @@ namespace VolleyBallTournament
                 _matchs.Add(match);
 
                 _divMatch.Insert(_matchs[i]);
-                group++;
             }
         }
         public void ResetTeamsStatus()
