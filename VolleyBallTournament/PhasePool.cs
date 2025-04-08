@@ -35,12 +35,12 @@ namespace VolleyBallTournament
         private int _step = 0;
         private int _nbStep = 8;
 
-        private Sequence _sequence;
+        private Rotation _rotation;
 
         public PhasePool(string title, PhaseRegister phaseRegister)
         {
             _title = title;
-            _sequence = phaseRegister.Sequence;
+            _rotation = phaseRegister.Rotation;
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -89,7 +89,7 @@ namespace VolleyBallTournament
             {
                 ResetTeamsStatus();
                 ResetScoresPoint();
-                LoadSequence(_sequence, _step);
+                SetRotation(_step);
 
             });
 
@@ -168,7 +168,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = (Match)new Match($"{i + 1}", teamA, teamB, teamReferee, _sequence).AppendTo(this);
+                var match = (Match)new Match($"{i + 1}", teamA, teamB, teamReferee, _rotation).AppendTo(this);
 
                 _matchs.Add(match);
 
@@ -193,13 +193,13 @@ namespace VolleyBallTournament
                 _matchs[i].ResetScore();
             }
         }
-        public void LoadSequence(Sequence sequence, int step)
+        public void SetRotation(int step)
         {
-            if (sequence == null) return;
-            if (step >= sequence.NbStep()) return;
+            if (_rotation == null) return;
+            if (step >= _rotation.NbStep()) return;
 
             _step = step;
-            var sets = sequence.GetList(step);
+            var sets = _rotation.GetList(step);
 
             for (int i = 0; i < sets.Count; i++)
             {
@@ -363,7 +363,7 @@ namespace VolleyBallTournament
                     SetTicProcess(0);
                     ResetTeamsStatus();
                     ResetTeamsTotalPoint();
-                    LoadSequence(_sequence, _step = 0);
+                    SetRotation(_step = 0);
                 }
 
                 for (int i = 0; i < _matchs.Count; i++)

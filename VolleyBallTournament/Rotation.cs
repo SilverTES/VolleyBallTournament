@@ -28,7 +28,7 @@ namespace VolleyBallTournament
         }
     }
 
-    public class Sequence
+    public class Rotation
     {
         public int Time;
 
@@ -42,7 +42,7 @@ namespace VolleyBallTournament
             { "A4", 12},{ "B4", 13},{ "C4", 14},{ "D4", 15},
         };
 
-        public Sequence() 
+        public Rotation() 
         {
             _grid = new Grid2D<Set>(3, 8);
         }

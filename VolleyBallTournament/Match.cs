@@ -33,7 +33,7 @@ namespace VolleyBallTournament
 
         };
 
-        private Sequence _sequence;
+        private Rotation _sequence;
 
         public ScorePanel ScorePanel => _scorePanel;
         private ScorePanel _scorePanel;
@@ -49,7 +49,7 @@ namespace VolleyBallTournament
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
         
-        public Match(string courtName, Team teamA, Team teamB, Team teamReferee, Sequence sequence)
+        public Match(string courtName, Team teamA, Team teamB, Team teamReferee, Rotation sequence)
         {
             _sequence = sequence;
 

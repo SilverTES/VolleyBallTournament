@@ -79,15 +79,15 @@ namespace VolleyBallTournament
         public int NbMatch => _nbMatch;
         private int _nbMatch;
 
-        public Sequence Sequence => _sequence;
-        private Sequence _sequence;
+        public Rotation Rotation => _rotation;
+        private Rotation _rotation;
 
-        public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch, Sequence sequence)
+        public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch, Rotation rotation)
         {
             _nbGroup = nbGroup;
             _nbTeamPerGroup = nbTeamPerGroup;
             _nbMatch = nbMatch;
-            _sequence = sequence;
+            _rotation = rotation;
 
             SetSize(Screen.Width, Screen.Height);
 

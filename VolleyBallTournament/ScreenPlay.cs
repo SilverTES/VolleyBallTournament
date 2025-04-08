@@ -19,7 +19,7 @@ namespace VolleyBallTournament
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
 
-        private Sequence _sequence;
+        private Rotation _rotation;
 
         KeyboardState _key;
 
@@ -44,32 +44,21 @@ namespace VolleyBallTournament
 
             SetSize(Screen.Width, Screen.Height);
 
-            _sequence = new Sequence();
+            _rotation = new Rotation();
 
-            _phaseRegister = new PhaseRegister(game, 4, 4, 3, _sequence).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+            _phaseRegister = new PhaseRegister(game, 4, 4, 3, _rotation).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
 
             _phasePool1 = new PhasePool("Phase de pool 1", _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             _phasePool2 = new PhasePool("Phase de pool 2", _phaseRegister).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            _sequence.Init("SetupPool.xml", _phasePool1.GetTeams());
-            _phasePool1.LoadSequence(_sequence, _step);
+            _rotation.Init("SetupPool.xml", _phasePool1.GetTeams());
+            _phasePool1.SetRotation(_step = 0);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
             _animate.Add("SlideRight");
 
             _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
-
-            //var textBoxs = _phaseRegister.GetTexBoxs();
-            //for (int i = 0; i < textBoxs.Count; i++)
-            //{
-            //    var textBox = textBoxs[i];
-            //    textBox.OnChange += (t) => 
-            //    { 
-            //        _phasePool1.GetTeam(t.Id).SetTeamName(textBox.Text);
-            //        _phasePool2.GetTeam(t.Id).SetTeamName(textBox.Text);
-            //    };
-            //}
 
             //Debug
             //_cameraX = -Screen.Width;
@@ -110,7 +99,7 @@ namespace VolleyBallTournament
             {
                 if (_cameraX < 0)
                 {
-                    Misc.Log("Slide Left");
+                    //Misc.Log("Slide Left");
 
                     _animate.SetMotion("SlideLeft", Easing.QuadraticEaseOut, _cameraX, _cameraX = _cameraX + Screen.Width, 24);
 
@@ -122,7 +111,7 @@ namespace VolleyBallTournament
             {
                 if (_cameraX > -Screen.Width * 2)
                 {
-                    Misc.Log("Slide Right");
+                    //Misc.Log("Slide Right");
 
                     _animate.SetMotion("SlideRight", Easing.QuadraticEaseOut, _cameraX, _cameraX = _cameraX - Screen.Width, 24);
 
