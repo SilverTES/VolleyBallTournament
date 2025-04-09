@@ -34,8 +34,7 @@ namespace VolleyBallTournament
 
     public class RotationManager
     {
-        public int Duration => _duration;
-        private int _duration;
+        private List<double>_durations = [];
         public int NbGroup => _nbGroup;
         private int _nbGroup;
         public int NbTeamPerGroup => _nbTeamPerGroup;
@@ -90,6 +89,10 @@ namespace VolleyBallTournament
 
             return list;
         }
+        public double GetDuration(int rotation)
+        {
+            return _durations[rotation];
+        }
         public void LoadFile(string xmlFile, List<Team> teams, List<Match> matchs)
         {
             //XmlTextReader reader = new XmlTextReader(xmlFile);
@@ -120,7 +123,7 @@ namespace VolleyBallTournament
             {
                 int temps = int.Parse(rotation.Attribute("temps").Value);
                 Console.WriteLine($"Rotation {rotation} - Temps : {temps}s");
-                _duration = temps;
+                _durations.Add(temps);
 
                 int indexMatch = 0;
                 foreach (var match in rotation.Elements("match"))

@@ -24,6 +24,8 @@ namespace VolleyBallTournament
 
     public struct Static
     {
+        public static float VolumeMaster = 0.5f;
+
         public static NetworkServer Server;
 
         public static KeyboardState Key;
@@ -46,6 +48,8 @@ namespace VolleyBallTournament
         public static Texture2D TexLine;
 
         public static SoundEffect SoundPoint;
+        public static SoundEffect SoundCountDown;
+        public static SoundEffect SoundStart;
 
         public static void DrawRoundedRectangle(SpriteBatch batch, Texture2D texLine, Rectangle rect, Color color, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius, int thickness, int segments = 4)
         {
@@ -141,6 +145,8 @@ namespace VolleyBallTournament
             Static.TexReferee = Content.Load<Texture2D>("Images/referee00");
 
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
+            Static.SoundCountDown = Content.Load<SoundEffect>("Sounds/countdown");
+            Static.SoundStart = Content.Load<SoundEffect>("Sounds/race-start");
 
             Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
             Static.TexLine = GFX.CreateLineTextureAA(GraphicsDevice, 100, 15, 7);

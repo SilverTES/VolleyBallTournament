@@ -13,20 +13,51 @@ namespace VolleyBallTournament
     public class Timer : Node
     {
         private double _elapsedTime;
+        private double _durationTime;
+
         public bool IsRunning => _isRunning;
         private bool _isRunning;
 
-        public TimeSpan ElapsedTime => TimeSpan.FromSeconds(_elapsedTime);
-        public Timer() 
+        private bool _onRemainingTime = false;
+        public TimeSpan ElapsedTime => TimeSpan.FromSeconds(_durationTime) - TimeSpan.FromSeconds(_elapsedTime);
+        public Timer(double durationInSeconds = 120) 
         {
             _elapsedTime = 0;
+            _durationTime = durationInSeconds;
             _isRunning = false;
 
             SetSize(480, 160);
             SetPivot(Mugen.Physics.Position.CENTER);
         }
+        public bool IsFinish()
+        {
+            return _durationTime - _elapsedTime <= 0;
+        }
+        public bool OnRemaingTime(double time)
+        {
+            //Misc.Log($"{(int)_durationTime - (int)_elapsedTime}");
+
+            if (_onRemainingTime) 
+                return false;
+
+
+            if ((int)_durationTime - (int)_elapsedTime == time)
+            {
+                Misc.Log("On Remaining Time");
+                _onRemainingTime = true;
+                return true;
+            }
+
+            return false;
+
+        }
+        public void SetDuration(double durationInSeconds)
+        { 
+            _durationTime = durationInSeconds; 
+        }
         public void StartTimer()
         {
+            _onRemainingTime = false;
             _isRunning = true;
         }
 

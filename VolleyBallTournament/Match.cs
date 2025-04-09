@@ -14,6 +14,7 @@ namespace VolleyBallTournament
             Pause,
             WarmUp,
             Ready,
+            CountDown,
             Play,
             Finish,
             ValidPoints,
@@ -26,6 +27,7 @@ namespace VolleyBallTournament
             {States.Pause, "Prochain match"},
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
+            {States.CountDown, "Début du Match"},
             {States.Play, "Match en cours"},
             {States.Finish, "Fin du match"},
             {States.ValidPoints, "Validation des Points"},
@@ -49,6 +51,8 @@ namespace VolleyBallTournament
         private Team _teamB;
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
+
+        Timer _timerCountDown;
         
         public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee)
         {
@@ -71,6 +75,9 @@ namespace VolleyBallTournament
             SetSize(_div._rect.Width, _div._rect.Height);
 
             State.Set(States.Pause);
+
+            //_timerCountDown = new Timer();
+            //_timerCountDown.Start();
         }
         public Team GetWinner()
         {

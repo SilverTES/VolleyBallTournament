@@ -91,6 +91,12 @@
 /processorParam:TextureFormat=Color
 /build:Images/vballmini.png
 
+#begin Sounds/countdown.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/countdown.wav
+
 #begin Sounds/picked-coin-echo.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
@@ -102,6 +108,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/race-start.wav
+
+#begin Sounds/robotic-countdown.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/robotic-countdown.wav
 
 #begin Sounds/simple-clean-logo.wav
 /importer:WavImporter

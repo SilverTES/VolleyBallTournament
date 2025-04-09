@@ -37,8 +37,9 @@ namespace VolleyBallTournament
             //_teams = _teams.OrderByDescending(p => p.TotalPoint).ToList();
 
             _teams = _teams
-                .OrderByDescending(e => e.TotalPoint)
+                .OrderByDescending(e => e.RankingPoint)
                 .ThenByDescending(e => e.BonusPoint)
+                .ThenByDescending(e => e.TotalPoint)
                 .ToList();
 
             for (int i = 0; i < _teams.Count; i++)

@@ -71,21 +71,36 @@ namespace VolleyBallTournament
 
             State.Set(States.Pause);
 
+            State.On(States.CountDown, () =>
+            {
+                Static.SoundCountDown.Play(0.25f * Static.VolumeMaster, .1f, 0f);
+                Timer.SetDuration(3);
+                Timer.StartTimer();
+            });
+
             State.On(States.Play, () => 
             {
+                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                Timer.SetDuration(_rotationManager.GetDuration(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.Play, () =>
             {
+                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
             State.On(States.Pause, () =>
             {
                 ResetTeamsStatus();
-                ResetScoresPoint();
+                ResetScorePanels();
                 SetRotation(_currentRotation);
+
+            });
+            State.Off(States.Ready, () =>
+            {
+                
 
             });
             State.Off(States.Finish, () =>
@@ -105,15 +120,15 @@ namespace VolleyBallTournament
                         if (match.GetWinner() == null)
                         {
                             Misc.Log("Match Null");
-                            match.TeamA.AddTotalPoint(1);
-                            match.TeamB.AddTotalPoint(1);
+                            match.TeamA.AddRankingPoint(1);
+                            match.TeamB.AddRankingPoint(1);
 
                             match.TeamA.AddResult(Result.Null);
                             match.TeamB.AddResult(Result.Null);
                         }
                         else
                         {
-                            match.GetWinner().AddTotalPoint(3);
+                            match.GetWinner().AddRankingPoint(3);
                             match.GetWinner().AddResult(Result.Win);
                             match.GetLooser().AddResult(Result.Loose);
                         }
@@ -213,15 +228,15 @@ namespace VolleyBallTournament
                 var team = _teams[i];
                 team.SetIsPlaying(false);
                 team.SetIsReferee(false);
-
                 team.SetMatch(null);
             }
         }
-        public void ResetScoresPoint()
+        public void ResetScorePanels()
         {
             for (int i = 0; i < _matchs.Count; i++)
             {
-                _matchs[i].ResetScore();
+                var match = _matchs[i];
+                match.ResetScore();
             }
         }
         //public void ShuffleTeamsTotalPoint()
@@ -256,6 +271,7 @@ namespace VolleyBallTournament
             for (int i = 0; i < _teams.Count; i++)
             {
                 var team = _teams[i];
+                team.SetRankingPoint(0);
                 team.SetTotalPoint(0);
                 team.ResetResult();
                 team.ResetAllPoints();
@@ -307,8 +323,32 @@ namespace VolleyBallTournament
 
                 case States.Play:
 
+                    if (Timer.OnRemaingTime(3))
+                    {
+                        Static.SoundCountDown.Play(.25f * Static.VolumeMaster, .1f, 0f);
+                    }
+
+                    if (Timer.IsFinish())
+                    {
+                        Misc.Log("Finish CountDown");
+                        Timer.StopTimer();
+                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
+                    }
+
+                    break;
+                case States.CountDown:
+
+                    if (Timer.IsFinish())
+                    {
+                        Misc.Log("Finish CountDown");
+                        Timer.StopTimer();
+                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
+                    }
+
                     break;
 
+                case States.ValidPoints:
+                    break;
                 default:
                     break;
             }

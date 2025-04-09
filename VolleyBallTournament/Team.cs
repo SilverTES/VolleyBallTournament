@@ -31,11 +31,14 @@ namespace VolleyBallTournament
 
         private bool _isPlaying = false;
         private bool _isReferee = false;
-        public int TotalPoint => _totalPoint;
-        private int _totalPoint = 0; EasingValue _easePointTotal = new(0);
+        public int RankingPoint => _rankingPoint;
+        private int _rankingPoint = 0; EasingValue _easeRankingPoint = new(0);
         private int _currentBonusPoint = 0;
         public int BonusPoint => _bonusPoint;
         private int _bonusPoint = 0;
+
+        public int TotalPoint => _totalPoint;
+        private int _totalPoint = 0; EasingValue _easeTotalPoint = new(0);
 
         public int NbMatchPlayed => _results.Count;
         private List<Result> _results = new List<Result>();
@@ -58,8 +61,9 @@ namespace VolleyBallTournament
         {
             _rank = 0;
             _scorePoint = 0;
-            _totalPoint = 0;
+            _rankingPoint = 0;
             _bonusPoint = 0;
+            _totalPoint = 0;
         }
         public void SetIsPlaying(bool isPlaying)
         {
@@ -84,16 +88,28 @@ namespace VolleyBallTournament
         {
             _results.Add(result);
         }
-        public Team AddTotalPoint(int points)
+        public Team AddRankingPoint(int points)
         { 
-            _totalPoint += points; 
-            _easePointTotal.SetValue(_totalPoint);
+            _rankingPoint += points; 
+            _easeRankingPoint.SetValue(_rankingPoint);
+            return this;
+        }
+        public Team SetRankingPoint(int points)
+        {
+            _rankingPoint = points;
+            _easeRankingPoint.SetValue(_rankingPoint);
+            return this;
+        }
+        public Team AddTotalPoint(int points)
+        {
+            _totalPoint += points;
+            _easeTotalPoint.SetValue(_totalPoint);
             return this;
         }
         public Team SetTotalPoint(int points)
         {
             _totalPoint = points;
-            _easePointTotal.SetValue(_totalPoint);
+            _easeTotalPoint.SetValue(_totalPoint);
             return this;
         }
         public void ValidBonusPoint()
@@ -101,7 +117,7 @@ namespace VolleyBallTournament
             _bonusPoint += _currentBonusPoint;
             _currentBonusPoint = 0;
         }
-        public void AddPoint(int points) { _scorePoint += points; }
+        public void AddPoint(int points) { _scorePoint += points; AddTotalPoint(points); }
         public void SetScorePoint(int points) { _scorePoint = points; }
         public void SetScoreSet(int points) { _scoreSet = points; }
         public void SetRank(int rank)
@@ -154,11 +170,12 @@ namespace VolleyBallTournament
 
                 batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
-                batch.RightMiddleString(Static.FontMain, $"{_easePointTotal.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
+                batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
                 
                 int bonus = _bonusPoint + _currentBonusPoint;
 
-                batch.LeftMiddleString(Static.FontMini, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
+                batch.LeftMiddleString(Static.FontMini, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 16, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
+                batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 16, Color.Yellow);
 
                 DrawVictory(batch);
 
@@ -186,7 +203,7 @@ namespace VolleyBallTournament
         {
             for (int i = 0; i < NbMatchPlayed; i++)
             {
-                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 28 - (24 * NbMatchPlayed), AbsRectF.Center.Y);
+                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 30 - (28 * NbMatchPlayed), AbsRectF.Center.Y);
 
                 batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
 
