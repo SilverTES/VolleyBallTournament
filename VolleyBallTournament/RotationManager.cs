@@ -34,7 +34,8 @@ namespace VolleyBallTournament
 
     public class RotationManager
     {
-        public int Time;
+        public int Duration => _duration;
+        private int _duration;
         public int NbGroup => _nbGroup;
         private int _nbGroup;
         public int NbTeamPerGroup => _nbTeamPerGroup;
@@ -59,7 +60,7 @@ namespace VolleyBallTournament
         {
 
         }
-        private void CreateIndexs(int nbGroup, int nbTeamPerGroup)
+        private void CreateTeamsIndex(int nbGroup, int nbTeamPerGroup)
         {
             int indexTeam = 0;
             for (int i = 0; i < nbGroup; i++)
@@ -76,91 +77,96 @@ namespace VolleyBallTournament
             }
         }
 
-        public List<MatchConfig> GetMatchs(int step)
+        public List<MatchConfig> GetMatchConfigs(int rotation)
         {
+            //Misc.Log("GET MATCH CONFIG ************");
             var list = new List<MatchConfig>();
+
             for (int i = 0; i < _grid.Width; i++)
             {
-                list.Add(_grid.Get(i, step));
-                Misc.Log($"Load Match {i}");
+                list.Add(_grid.Get(i, rotation));
+                //Misc.Log($"Load Match {i} : {_grid.Get(i, rotation).IdTerrain}");
             }
+
             return list;
         }
         public void LoadFile(string xmlFile, List<Team> teams, List<Match> matchs)
         {
-            XmlTextReader reader = new XmlTextReader(xmlFile);
+            //XmlTextReader reader = new XmlTextReader(xmlFile);
 
             XDocument doc = XDocument.Load(xmlFile);
             int nbRotation = doc.Descendants("rotation").Count();
             _nbRotation = nbRotation;
 
-            Misc.Log($"nbRotation = {nbRotation}");
+            //Misc.Log($"nbRotation = {nbRotation}");
 
-            int index = 0;
-            int step = 0;
+            // Lire la config
+            var config = doc.Root.Element("config");
+            int nGroupe = int.Parse(config.Attribute("nGroupe").Value);
+            int nEquipeParGroupe = int.Parse(config.Attribute("nEquipeParGroupe").Value);
+            int nTerrain = int.Parse(config.Attribute("nTerrain").Value);
 
-            while (reader.Read())
+            _grid = new Grid2D<MatchConfig>(_nbTerrain = nTerrain, _nbRotation = nbRotation);
+            CreateTeamsIndex(_nbGroup = nGroupe, _nbTeamPerGroup = nEquipeParGroupe);
+
+
+            Console.WriteLine($"Config : {nGroupe} groupes, {nEquipeParGroupe} équipes/groupe, {nTerrain} terrains\n");
+
+            // Lire les rotations
+            var rotations = doc.Root.Elements("rotation");
+
+            int indexRotation = 0;
+            foreach (var rotation in rotations)
             {
-                switch (reader.NodeType)
+                int temps = int.Parse(rotation.Attribute("temps").Value);
+                Console.WriteLine($"Rotation {rotation} - Temps : {temps}s");
+
+                int indexMatch = 0;
+                foreach (var match in rotation.Elements("match"))
                 {
-                    case XmlNodeType.Element: // Le nœud est un élément.
+                    MatchConfig matchConfig = new();
 
-                        if (reader.Name == "config")
-                        {
-                            while (reader.MoveToNextAttribute()) // Lire les attributs.
-                            {
-                                if (reader.Name == "ngroupe") _nbGroup = int.Parse(reader.Value);
-                                if (reader.Name == "nequipeParGroupe") _nbTeamPerGroup = int.Parse(reader.Value);
-                                if (reader.Name == "nterrain") _nbTerrain = int.Parse(reader.Value);
-                            }
+                    int terrain = int.Parse(match.Attribute("terrain").Value); 
+                    string equipes = match.Attribute("equipes").Value;
+                    string arbitre = match.Attribute("arbitre").Value;
 
-                            _grid = new Grid2D<MatchConfig>(_nbTerrain, _nbRotation);
-                            CreateIndexs(_nbGroup, _nbTeamPerGroup);
-                        }
+                    matchConfig.IdTerrain = terrain - 1;
 
-                        if (reader.Name == "match")
-                        {
-                            MatchConfig matchConfig = new();
+                    var opponents = equipes.Split(':');
+                    //Misc.Log($"{opponents[0]} vs {opponents[1]}");
+                    matchConfig.TeamA = teams[Indexs[opponents[0]]];
+                    matchConfig.TeamB = teams[Indexs[opponents[1]]];
 
-                            while (reader.MoveToNextAttribute()) // Lire les attributs.
-                            {
-                                if (reader.Name == "terrain") matchConfig.IdTerrain = matchs[int.Parse(reader.Value) - 1].IdTerrain;
-                                if (reader.Name == "teamA") matchConfig.TeamA = teams[Indexs[reader.Value]];
-                                if (reader.Name == "teamB") matchConfig.TeamB = teams[Indexs[reader.Value]];
-                                if (reader.Name == "referee") matchConfig.TeamReferee = teams[Indexs[reader.Value]];
-                            }
+                    matchConfig.TeamReferee = teams[Indexs[arbitre]];
 
-                            //Console.WriteLine($"<<{set.TeamA.TeamName} vs {set.TeamB.TeamName}>> = {set.TeamReferee.TeamName}");
 
-                            _grid.Set(index, step-1, matchConfig); // Important le step-1 , parceque le tableau débute à Zero et step est déja 1 quand il renconte l'élément "<step>"
+                    Console.WriteLine($"  Terrain {terrain} : {equipes} (Arbitre : {arbitre})");
 
-                            index++;
-                        }
+                    _grid.Set(indexMatch, indexRotation, matchConfig); // Important le rotation-1 , parceque le tableau débute à Zero et rotation est déja 1 quand il renconte l'élément "<rotation>"
 
-                        if (reader.Name == "rotation")
-                        {
-                            reader.MoveToNextAttribute();
-                            Console.WriteLine($"Temps = {reader.Value}");
-
-                            index = 0;
-
-                            step++;
-                        }
-
-                        break;
-
-                    case XmlNodeType.Text: // Afficher le texte dans chaque élément.
-
-                        Console.WriteLine(reader.Value);
-
-                        break;
-
-                    case XmlNodeType.EndElement: // Afficher la fin de l'élément.
-
-                        //Console.Write("/>");
-
-                        break;
+                    indexMatch++;
                 }
+
+                indexRotation++;
+
+                Console.WriteLine();
+            }
+
+            for (int r = 0; r < _grid.Height; r++)
+            {
+                for (int c = 0; c < _grid.Width; c++)
+                {
+                    var match = _grid.Get(c, r);
+                    if (match != null)
+                    {
+                        Console.Write($"{_grid.Get(c, r).IdTerrain}");
+                    }
+                    else
+                    {
+                        Console.Write($"x");
+                    }
+                }
+                Console.WriteLine();
             }
 
         }

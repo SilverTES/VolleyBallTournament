@@ -184,13 +184,20 @@ namespace VolleyBallTournament
             if (rotation >= _rotationManager.NbRotation) return;
 
             _currentRotation = rotation;
-            var matchConfigs = _rotationManager.GetMatchs(rotation);
+            var matchConfigs = _rotationManager.GetMatchConfigs(rotation);
 
             for (int i = 0; i < matchConfigs.Count; i++)
             {
                 var matchConfig = matchConfigs[i];
-                var match = _matchs[matchConfig.IdTerrain];
-                match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
+                if (matchConfig !=  null)
+                {
+                    
+                    //Misc.Log($"SET ROTATION : {matchConfig.IdTerrain}");
+
+                    var match = _matchs[matchConfig.IdTerrain];
+
+                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
+                }
             }
         }
         //public void ShuffleTeamsTotalPoint()
@@ -413,7 +420,7 @@ namespace VolleyBallTournament
                 //batch.LineTexture(Static.TexLine, Vector2.Zero, Static.MousePos, 9, Color.Gold);
 
                 //Static.DrawArcFilled(batch, Vector2.One * 600, 1200, Geo.RAD_0, Geo.RAD_90, Color.Red);
-                batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState}", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
+                batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState} Temps = {_rotationManager.Duration}s", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
