@@ -16,8 +16,8 @@ namespace VolleyBallTournament
         private PhaseRegister _phaseRegister;
         public PhasePool PhasePool1 => _phasePool1;
         private PhasePool _phasePool1;
-        //public PhasePool PhasePool2 => _phasePool2;
-        //private PhasePool _phasePool2;
+        public PhasePool PhasePool2 => _phasePool2;
+        private PhasePool _phasePool2;
 
         private RotationManager _rotationManager;
 
@@ -36,19 +36,25 @@ namespace VolleyBallTournament
 
             var files = GetFilesInDirectory(Directory.GetCurrentDirectory(), "*.xml");
 
+
             for (int i = 0; i < files.Length; i++)
             {
                 var file = files[i];
                 Misc.Log($"-> {file} ");
             }
+            var configFile = files[0];
+
+
 
             SetSize(Screen.Width, Screen.Height);
 
             _phaseRegister = new PhaseRegister(game, 4, 4, 3).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
-            _phaseRegister.LoadRotationFile("SetupPool.xml");
 
-            _phasePool1 = new PhasePool("Phase de pool 1", _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            //_phasePool2 = new PhasePool("Phase de pool 2", _phaseRegister).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _rotationManager = new RotationManager();
+            _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
+
+            _phasePool1 = new PhasePool("Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool("Phase de poule Finale", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
             _phasePool1.SetRotation(_rotation = 0);
 
@@ -85,11 +91,11 @@ namespace VolleyBallTournament
 
             _phaseRegister.IsPaused = true;
             _phasePool1.IsPaused = true;
-            //_phasePool2.IsPaused = true;
+            _phasePool2.IsPaused = true;
 
             if (_cameraX == -_phaseRegister._x) _phaseRegister.IsPaused = false;
             if (_cameraX == -_phasePool1._x) _phasePool1.IsPaused = false;
-            //if (_cameraX == -_phasePool2._x) _phasePool2.IsPaused = false;
+            if (_cameraX == -_phasePool2._x) _phasePool2.IsPaused = false;
 
             _key = Keyboard.GetState();
 

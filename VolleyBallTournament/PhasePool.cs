@@ -36,10 +36,10 @@ namespace VolleyBallTournament
 
         private RotationManager _rotationManager;
 
-        public PhasePool(string title, PhaseRegister phaseRegister)
+        public PhasePool(string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
             _title = title;
-            _rotationManager = phaseRegister.RotationManager;
+            _rotationManager = rotationManager;
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -48,8 +48,16 @@ namespace VolleyBallTournament
             _divGroup = new Container(Style.Space.One * 10, new Style.Space(40, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
-            InsertGroups(phaseRegister);
-            InsertMatchs(phaseRegister);
+            if (phaseRegister != null)
+            {
+                ImportGroups(phaseRegister);
+                ImportMatchs(phaseRegister);
+            }
+            else
+            {
+                CreateGroups(nbGroup, nbTeamPerGroup);
+                CreateMatchs(nbMatch);
+            }
 
             _timer = (Timer)new Timer().AppendTo(this);
             _divTimer.Insert(_timer);
@@ -125,7 +133,38 @@ namespace VolleyBallTournament
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
         }
-        public void InsertGroups(PhaseRegister phaseRegister)
+        private void CreateGroups(int nbGroup, int nbTeamPerGroup)
+        {
+            for (int i = 0;i < nbGroup;i++)
+            {
+                var group = (Group)new Group($"{i+1}").AppendTo(this);
+                _groups.Add(group);
+
+                _divGroup.Insert(group);
+                for (int t = 0; t < nbTeamPerGroup; t++)
+                {
+                    var team = (Team)new Team($"Team{i * nbTeamPerGroup + t}").AppendTo(this);
+                    _teams.Add(team);
+
+                    group.AddTeam(team);
+                }
+            }
+        }
+        private void CreateMatchs(int nbMatch)
+        {
+            for(int i = 0;i < nbMatch ; i++)
+            {
+                var teamA = new Team("TeamA");
+                var teamB = new Team("TeamB");
+                var teamReferee = new Team("TeamR");
+
+                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this);
+                _matchs.Add(match);
+
+                _divMatch.Insert(match);
+            }
+        }
+        private void ImportGroups(PhaseRegister phaseRegister)
         {
             _teams = phaseRegister.GetTeams();
             _groups = phaseRegister.GetGroups();
@@ -136,46 +175,13 @@ namespace VolleyBallTournament
                 _divGroup.Insert(group);
             }
         }
-        private void InsertMatchs(PhaseRegister phaseRegister)
+        private void ImportMatchs(PhaseRegister phaseRegister)
         {
             _matchs = phaseRegister.GetMatchs();
             for (int i = 0; i < phaseRegister.NbMatch; i++)
             {
                 var match = _matchs[i].AppendTo(this).This<Match>();
                 _divMatch.Insert(match);
-            }
-        }
-        //public void CreateMatchs(int nbMatch)
-        //{
-        //    for (int i = 0; i < nbMatch; i++)
-        //    {
-        //        var teamA = new Team("TeamA");
-        //        var teamB = new Team("TeamB");
-        //        var teamReferee = new Team("TeamR");
-
-        //        var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _rotation).AppendTo(this);
-
-        //        _matchs.Add(match);
-
-        //        _divMatch.Insert(_matchs[i]);
-        //    }
-        //}
-        public void ResetTeamsStatus()
-        {
-            for (int i = 0; i < _teams.Count; i++)
-            {
-                var team = _teams[i];
-                team.SetIsPlaying(false);
-                team.SetIsReferee(false);
-
-                team.SetMatch(null);
-            }
-        }
-        public void ResetScoresPoint()
-        {
-            for (int i = 0; i < _matchs.Count; i++)
-            {
-                _matchs[i].ResetScore();
             }
         }
         public void SetRotation(int rotation)
@@ -200,6 +206,24 @@ namespace VolleyBallTournament
                 }
             }
         }
+        public void ResetTeamsStatus()
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                team.SetIsPlaying(false);
+                team.SetIsReferee(false);
+
+                team.SetMatch(null);
+            }
+        }
+        public void ResetScoresPoint()
+        {
+            for (int i = 0; i < _matchs.Count; i++)
+            {
+                _matchs[i].ResetScore();
+            }
+        }
         //public void ShuffleTeamsTotalPoint()
         //{
         //    for (int i = 0; i < _teams.Length; i++)
@@ -214,6 +238,19 @@ namespace VolleyBallTournament
         //        group.Refresh();
         //    }
         //}
+        public void ShuffleTeamsPoint()
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                team.SetScorePoint(Misc.Rng.Next(8, 20));
+            }
+            //for (int i = 0; i < _groups.Count; i++)
+            //{
+            //    var group = _groups[i];
+            //    group.Refresh();
+            //}
+        }
         public void ResetTeamsTotalPoint()
         {
             for (int i = 0; i < _teams.Count; i++)
@@ -221,7 +258,7 @@ namespace VolleyBallTournament
                 var team = _teams[i];
                 team.SetTotalPoint(0);
                 team.ResetResult();
-                //team.SetNbMatchPlayed(0);
+                team.ResetAllPoints();
             }
             for (int i = 0; i < _groups.Count; i++)
             {
@@ -348,6 +385,12 @@ namespace VolleyBallTournament
                 //    }
                 //}
 
+                if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
+                {
+                    if (State.CurState == States.Play)
+                        ShuffleTeamsPoint();
+                }
+
                 //if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
                 //{
                 //    ShuffleTeamsTotalPoint();
@@ -358,7 +401,7 @@ namespace VolleyBallTournament
                     SetTicRotation(0);
                     ResetTeamsStatus();
                     ResetTeamsTotalPoint();
-                    SetRotation(_currentRotation = 0);
+                    SetRotation(0);
                 }
 
                 for (int i = 0; i < _matchs.Count; i++)
@@ -420,7 +463,8 @@ namespace VolleyBallTournament
                 //batch.LineTexture(Static.TexLine, Vector2.Zero, Static.MousePos, 9, Color.Gold);
 
                 //Static.DrawArcFilled(batch, Vector2.One * 600, 1200, Geo.RAD_0, Geo.RAD_90, Color.Red);
-                batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState} Temps = {_rotationManager.Duration}s", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
+
+                //batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState} Temps = {_rotationManager.Duration}s", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

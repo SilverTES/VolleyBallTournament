@@ -23,7 +23,6 @@ namespace VolleyBallTournament
         private Match _match = null;
 
         private int _rank = 0;
-        private int _newRank = 0;
         private Vector2 _newPosition = Vector2.Zero;
         public int ScorePoint => _scorePoint;
         private int _scorePoint = 0;
@@ -55,15 +54,13 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
-        //public void ResetAll()
-        //{
-        //    _scoreSet = 0;
-        //    _scorePoint = 0;
-        //    _totalPoint = 0;
-        //    _bonusPoint = 0;
-        //    _nbMatchWin = 0;
-        //    _nbMatchPlayed = 0;
-        //}
+        public void ResetAllPoints()
+        {
+            _rank = 0;
+            _scorePoint = 0;
+            _totalPoint = 0;
+            _bonusPoint = 0;
+        }
         public void SetIsPlaying(bool isPlaying)
         {
             _isPlaying = isPlaying;
@@ -107,11 +104,9 @@ namespace VolleyBallTournament
         public void AddPoint(int points) { _scorePoint += points; }
         public void SetScorePoint(int points) { _scorePoint = points; }
         public void SetScoreSet(int points) { _scoreSet = points; }
-        public void MoveToRank(int rank)
+        public void SetRank(int rank)
         {
-            if (rank == _rank) 
-                return;
-            _newRank = rank;
+            _rank = rank;
         }
         public void MoveToPosition(Vector2 position, int duration = 32)
         {
@@ -177,7 +172,12 @@ namespace VolleyBallTournament
                     //batch.Rectangle(AbsRectF.Extend(-4f), Color.Yellow, 3f);
                     batch.Draw(Static.TexReferee, Color.White, 0, AbsRectF.Center + Vector2.UnitX * 10, Position.CENTER, Vector2.One / 4);
                 }
-            }   
+            }
+            
+            if (indexLayer == (int)Layers.Debug)
+            {
+                //batch.CenterStringXY(Static.FontMini, $"{_rank}", AbsRectF.LeftMiddle + Vector2.UnitX * 10, Color.Cyan);
+            }
 
             return base.Draw(batch, gameTime, indexLayer);
         }

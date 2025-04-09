@@ -80,7 +80,7 @@ namespace VolleyBallTournament
                 batch.Line(AbsRectF.TopCenter - threeMeter, AbsRectF.BottomCenter - threeMeter, color, 3f);
                 batch.Line(AbsRectF.TopCenter + threeMeter, AbsRectF.BottomCenter + threeMeter, color, 3f);
 
-                //if (State.CurState == States.Play)
+                if (_match.State.CurState == Match.States.Play || _match.State.CurState == Match.States.Ready)
                     DrawVBall(batch);
 
 

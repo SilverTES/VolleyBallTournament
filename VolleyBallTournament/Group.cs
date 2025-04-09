@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Mugen.Core;
 using Mugen.GFX;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace VolleyBallTournament
@@ -29,6 +28,10 @@ namespace VolleyBallTournament
 
             SetSize(team._rect.Width, team._rect.Height * _teams.Count);
         }
+        public Team GetTeam(int index)
+        {
+            return _teams[index];
+        }
         public void Refresh()
         {
             //_teams = _teams.OrderByDescending(p => p.TotalPoint).ToList();
@@ -42,8 +45,7 @@ namespace VolleyBallTournament
             {
                 var team = _teams[i];
 
-                team.MoveToRank(i + 1);
-                //team.Rank = i + 1;
+                team.SetRank(i + 1);
                 team.MoveToPosition(new Vector2(0, team._rect.Height * i));
                 //team.SetPosition(0, team._rect.Height * i);
             }

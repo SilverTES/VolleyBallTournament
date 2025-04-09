@@ -102,15 +102,15 @@ namespace VolleyBallTournament
 
             // Lire la config
             var config = doc.Root.Element("config");
-            int nGroupe = int.Parse(config.Attribute("nGroupe").Value);
-            int nEquipeParGroupe = int.Parse(config.Attribute("nEquipeParGroupe").Value);
-            int nTerrain = int.Parse(config.Attribute("nTerrain").Value);
+            int nbGroupe = int.Parse(config.Attribute("nbGroupe").Value);
+            int nbEquipeParGroupe = int.Parse(config.Attribute("nbEquipeParGroupe").Value);
+            int nbTerrain = int.Parse(config.Attribute("nbTerrain").Value);
 
-            _grid = new Grid2D<MatchConfig>(_nbTerrain = nTerrain, _nbRotation = nbRotation);
-            CreateTeamsIndex(_nbGroup = nGroupe, _nbTeamPerGroup = nEquipeParGroupe);
+            _grid = new Grid2D<MatchConfig>(_nbTerrain = nbTerrain, _nbRotation = nbRotation);
+            CreateTeamsIndex(_nbGroup = nbGroupe, _nbTeamPerGroup = nbEquipeParGroupe);
 
 
-            Console.WriteLine($"Config : {nGroupe} groupes, {nEquipeParGroupe} équipes/groupe, {nTerrain} terrains\n");
+            Console.WriteLine($"Config : {nbGroupe} groupes, {nbEquipeParGroupe} équipes/groupe, {nbTerrain} terrains\n");
 
             // Lire les rotations
             var rotations = doc.Root.Elements("rotation");
@@ -120,6 +120,7 @@ namespace VolleyBallTournament
             {
                 int temps = int.Parse(rotation.Attribute("temps").Value);
                 Console.WriteLine($"Rotation {rotation} - Temps : {temps}s");
+                _duration = temps;
 
                 int indexMatch = 0;
                 foreach (var match in rotation.Elements("match"))

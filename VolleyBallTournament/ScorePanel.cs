@@ -108,7 +108,7 @@ namespace VolleyBallTournament
                 if (winner != null)
                     result = $"Vainqueur {winner.TeamName}";
 
-                batch.CenterStringXY(Static.FontMini, result, AbsRectF.TopCenter - Vector2.UnitY * 40, Color.ForestGreen);
+                //batch.CenterStringXY(Static.FontMini, result, AbsRectF.TopCenter - Vector2.UnitY * 40, Color.ForestGreen);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

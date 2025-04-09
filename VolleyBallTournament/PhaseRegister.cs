@@ -74,10 +74,10 @@ namespace VolleyBallTournament
             }
 
         }
-        public void LoadRotationFile(string rotationFile)
-        {
-            _rotationManager.LoadFile(rotationFile, _teams, _matchs);
-        }
+        //public void LoadRotationFile(string rotationFile)
+        //{
+        //    _rotationManager.LoadFile(rotationFile, _teams, _matchs);
+        //}
         public List<Team> GetTeams() { return _teams; }
         public List<Group> GetGroups() { return _groups; }
         public List<Match> GetMatchs() { return _matchs; }
@@ -108,7 +108,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _rotationManager).AppendTo(this);
+                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this);
 
                 _matchs.Add(match);
             }
