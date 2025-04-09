@@ -8,23 +8,25 @@ using Mugen.Input;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
 {
     public class GroupRegister : Node
     {
-        int _groupId = 0;
+        public int IdGroupRegister => _idGroupRegister;
+        int _idGroupRegister = 0;
         Container _div;
         public GroupRegister(Game game, int nbTeam, int groupId)
         {
-            _groupId = groupId;
+            _idGroupRegister = groupId;
             _div = new Container(Style.Space.One * 20, new Style.Space(30, 20, 10, 10), Mugen.Physics.Position.VERTICAL);
 
             for (int i = 0; i < nbTeam; i++)
             {
                 var textBox = new TextBox(game, new Rectangle(0, 0, 320, 64), Static.FontMain, Color.Black * .75f, Color.Yellow, Color.Gold, 50).AppendTo(this).This<TextBox>();
-                textBox.SetTitle($"Equipe {i + 1}", Color.White, Static.FontMini);
-                textBox.SetId(_groupId * nbTeam + i);
+                textBox.SetTitle($"Equipe {i + 1 + groupId * nbTeam}", Color.White, Static.FontMini);
+                textBox.SetId(_idGroupRegister * nbTeam + i);
 
                 _div.Insert(textBox);
             }
@@ -47,8 +49,8 @@ namespace VolleyBallTournament
 
                 batch.Rectangle(AbsRectF, Color.DarkSlateBlue * 1f);
 
-                batch.CenterStringXY(Static.FontMain, $"Groupe {_groupId + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20 + Vector2.One * 6, Color.Black * .5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {_groupId + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20, Color.White);
+                batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20 + Vector2.One * 6, Color.Black * .5f);
+                batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20, Color.White);
             }
 
             if (indexLayer == (int)Layers.Debug)
@@ -70,7 +72,7 @@ namespace VolleyBallTournament
 
         Container _div;
 
-        List<GroupRegister> _groupRegister = [];
+        List<GroupRegister> _groupRegisters = [];
 
         public int NbGroup => _nbGroup;
         private int _nbGroup;
@@ -84,6 +86,8 @@ namespace VolleyBallTournament
 
         public Rotation Rotation => _rotation;
         private Rotation _rotation = new Rotation();
+
+        private TextBox _currentTextBox = null;
         public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch)
         {
             _nbGroup = nbGroup;
@@ -98,7 +102,7 @@ namespace VolleyBallTournament
             {
                 var groupRegister = new GroupRegister(game, nbTeamPerGroup, i).AppendTo(this).This<GroupRegister>();
                 _div.Insert(groupRegister);
-                _groupRegister.Add(groupRegister);
+                _groupRegisters.Add(groupRegister);
             }
 
             _div.SetPosition((Screen.Width - _div.Rect.Width) / 2, (Screen.Height - _div.Rect.Height) / 2);
@@ -110,12 +114,16 @@ namespace VolleyBallTournament
             var textBoxs = GetTexBoxs();
             for (int i = 0; i < textBoxs.Count; i++)
             {
-                Misc.Log("Mdsgijdsophds");
+                //Misc.Log("Mdsgijdsophds");
 
                 var textBox = textBoxs[i];
                 textBox.OnChange += (t) =>
                 {
                     _teams[t.Id].SetTeamName(textBox.Text);
+                };
+                textBox.OnFocus += (t) => 
+                { 
+                    _currentTextBox = t;
                 };
             }
 
@@ -149,9 +157,9 @@ namespace VolleyBallTournament
         {
             var texBoxs = new List<TextBox>();
             
-            for (int i = 0; i < _groupRegister.Count; i++)
+            for (int i = 0; i < _groupRegisters.Count; i++)
             {
-                var textBoxs = _groupRegister[i].GroupOf<TextBox>();
+                var textBoxs = _groupRegisters[i].GroupOf<TextBox>();
 
                 for (int t = 0; t < textBoxs.Count; t++)
                 {
@@ -161,6 +169,64 @@ namespace VolleyBallTournament
             }
 
             return texBoxs;
+        }
+        public void FocusPrevGroupRegister(TextBox textBox)
+        {
+            if (textBox == null) return;
+
+            if (!textBox.IsCursorAtHome) return;
+
+            if (_groupRegisters.Count == 0) return;
+
+            var groupRegister = textBox._parent.This<GroupRegister>();
+
+            int idGroupRegister = groupRegister.IdGroupRegister;
+
+            int idPrevGroupRegister = idGroupRegister - 1;
+
+            if (idGroupRegister == 0)
+            {
+                idPrevGroupRegister = _groupRegisters.Count - 1;
+            }
+
+            var prevGroupRegister = _groupRegisters[idPrevGroupRegister];
+            // Va dans le group précédent
+            var textBoxs = prevGroupRegister.GroupOf<TextBox>();
+
+            int idPrevTextBox = _currentTextBox.Id % NbTeamPerGroup;
+
+            _currentTextBox.SetFocus(false);
+            _currentTextBox = textBoxs[idPrevTextBox].SetFocus(true);
+
+        }
+        public void FocusNextGroupRegister(TextBox textBox)
+        {
+            if (textBox == null) return;
+
+            if (!textBox.IsCursorAtEnd) return;
+
+            if (_groupRegisters.Count == 0) return;
+
+            var groupRegister = textBox._parent.This<GroupRegister>();
+
+            int idGroupRegister = groupRegister.IdGroupRegister;
+
+            int idNextGroupRegister = idGroupRegister + 1;
+
+            if (idGroupRegister > _groupRegisters.Count - 2 ) 
+            {
+                idNextGroupRegister = 0;
+            }
+
+            var nextGroupRegister = _groupRegisters[idNextGroupRegister];
+            // Va dans le group suivant
+            var textBoxs = nextGroupRegister.GroupOf<TextBox>();
+
+            int idNextTextBox = _currentTextBox.Id % NbTeamPerGroup;
+
+            _currentTextBox.SetFocus(false);
+            _currentTextBox = textBoxs[idNextTextBox].SetFocus(true);
+
         }
         public void FocusNextTextBox()
         {   
@@ -179,19 +245,19 @@ namespace VolleyBallTournament
                     if (i < textBoxs.Count - 1)
                     {
                         textBox.SetFocus(false);
-                        textBoxs[i + 1].SetFocus(true);
+                        _currentTextBox = textBoxs[i + 1].SetFocus(true);
                     }
                     else
                     {
                         textBox.SetFocus(false);
-                        textBoxs[0].SetFocus(true);
+                        _currentTextBox = textBoxs[0].SetFocus(true);
                     }
                     oneFocus = true;
                     break;
                 }
             }
             if (!oneFocus)
-                textBoxs[0].SetFocus(true);
+                _currentTextBox = textBoxs[0].SetFocus(true);
         }
         public void FocusPrevTextBox()
         {
@@ -210,19 +276,19 @@ namespace VolleyBallTournament
                     if (i > 0)
                     {
                         textBox.SetFocus(false);
-                        textBoxs[i - 1].SetFocus(true);
+                        _currentTextBox = textBoxs[i - 1].SetFocus(true);
                     }
                     else
                     {
                         textBox.SetFocus(false);
-                        textBoxs[textBoxs.Count-1].SetFocus(true);
+                        _currentTextBox = textBoxs[textBoxs.Count - 1].SetFocus(true);
                     }
                     oneFocus = true;
                     break;
                 }
             }
             if (!oneFocus)
-                textBoxs[0].SetFocus(true);
+                _currentTextBox = textBoxs[0].SetFocus(true);
         }
         public override Node Update(GameTime gameTime)
         {
@@ -241,10 +307,13 @@ namespace VolleyBallTournament
             {
                 _key = Static.Key;
 
-                if (ButtonControl.OnePress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
-                if (ButtonControl.OnePress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
-                if (ButtonControl.OnePress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
-                if (ButtonControl.OnePress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
+                if (ButtonControl.OnPress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
+                if (ButtonControl.OnPress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
+                if (ButtonControl.OnPress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
+                if (ButtonControl.OnPress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
+
+                if (ButtonControl.OnPress("Left", _key.IsKeyDown(Keys.Left))) FocusPrevGroupRegister(_currentTextBox);
+                if (ButtonControl.OnPress("Right", _key.IsKeyDown(Keys.Right))) FocusNextGroupRegister(_currentTextBox);
 
             }
 
@@ -270,6 +339,12 @@ namespace VolleyBallTournament
 
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
+            }
+
+            if (indexLayer == (int)Layers.Debug)
+            {
+                if (_currentTextBox != null)
+                    batch.CenterStringXY(Static.FontMini, $"{_currentTextBox.Id}", _currentTextBox.AbsRectF.BottomCenter, Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

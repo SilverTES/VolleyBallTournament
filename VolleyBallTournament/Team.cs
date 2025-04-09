@@ -154,6 +154,7 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .25f: Color.DarkSlateBlue * .75f);
+                batch.Rectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * .25f: Color.Gray * 1f, 1f);
                 
 
                 batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);

@@ -42,8 +42,13 @@ public class TextBox : Node
     private float _moveCooldown = 0f; // Temps restant avant le prochain déplacement
     private const float MOVE_DELAY = 0.1f; // Délai en secondes entre chaque déplacement (ajustable)
     private bool _isMoving = false; // Nouvelle variable pour suivre le déplacement
+    public bool IsCursorAtEnd => _isCursorAtEnd;
+    private bool _isCursorAtEnd = true;
+    public bool IsCursorAtHome => _isCursorAtHome;
+    private bool _isCursorAtHome = true;
 
     public Action<TextBox> OnChange;
+    public Action<TextBox> OnFocus;
 
     private Point? _mouseStartPosition = null; // Nouvelle variable pour suivre la position initiale du clic
 
@@ -67,24 +72,34 @@ public class TextBox : Node
         SetPosition(bounds.Location.ToVector2());
 
         game.Window.TextInput += Window_TextInput;
+
+        OnFocus += (t) =>
+        {
+
+        };
+
     }
     private void Window_TextInput(object sender, TextInputEventArgs e)
     {
         HandleTextInput(e);
     }
-    public void SetId(int id)
+    public TextBox SetId(int id)
     { 
         _id = id; 
+        return this;
     }
-    public void SetTitle(string title, Color color, SpriteFont font)
+    public TextBox SetTitle(string title, Color color, SpriteFont font)
     {
         _title = title;
         _colorTitle = color;
         _fontTitle = font;
+
+        return this;
     }
-    public void SetFocus(bool isFocus)
+    public TextBox SetFocus(bool isFocus)
     {
         _isFocus = isFocus;
+        return this;
     }
     public string Text
     {
@@ -117,6 +132,7 @@ public class TextBox : Node
                 if (!_mouseStartPosition.HasValue)
                 {
                     _isFocus = true;
+                    OnFocus(this);
                     UpdateCursorFromMouse(Static.MousePos.ToPoint()); // Déplace le curseur au clic initial
                     _mouseStartPosition = Static.MousePos.ToPoint(); // Enregistre la position initiale
                     _selectionStart = null;
@@ -162,8 +178,13 @@ public class TextBox : Node
             _blinkTimer = 0f;
         }
 
+        _isCursorAtEnd = false;
+        _isCursorAtHome = false;
 
         HandleKeyboardInput(Static.Key);
+
+        _isCursorAtHome = _cursorPosition == 0;
+        _isCursorAtEnd = _cursorPosition == _text.Length;
 
         return base.Update(gameTime);
     }
@@ -481,6 +502,11 @@ public class TextBox : Node
                 batch.GraphicsDevice.ScissorRectangle = originalScissor.Value;
 
             batch.CenterStringXY(_fontTitle, _title, AbsRectF.TopCenter - Vector2.UnitY * 20, _isFocus ? _colorTitle : _colorTitle *.5f);
+        }
+
+        if (indexLayer == (int)Layers.Debug)
+        {
+            //batch.CenterStringXY(Static.FontMini, $"{_isCursorAtHome}-{_cursorPosition}:{_text.Length}-{_isCursorAtEnd}", AbsRectF.BottomCenter, Color.GreenYellow);
         }
 
 

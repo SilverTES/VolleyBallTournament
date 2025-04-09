@@ -396,7 +396,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                DrawStep(batch, AbsXY + new Vector2((Screen.Width - 700)/2, 50));
+                DrawRotation(batch, AbsXY + new Vector2((Screen.Width - 700)/2, 40));
             }
 
             if (indexLayer == (int)Layers.Debug)
@@ -416,7 +416,7 @@ namespace VolleyBallTournament
             return base.Draw(batch, gameTime, indexLayer);
         }
 
-        private void DrawStep(SpriteBatch batch, Vector2 position)
+        private void DrawRotation(SpriteBatch batch, Vector2 position)
         {
             for (int i = 0; i < _nbStep; i++)
             {
@@ -424,10 +424,10 @@ namespace VolleyBallTournament
                 var pos2 = new Vector2(position.X + (i+1) * 100, position.Y);
 
                 if (i == 0)
-                    batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 20, Color.White);
+                    batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 30, Color.Yellow);
 
                 if (i == _nbStep - 2)
-                    batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 20, Color.White);
+                    batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 30, Color.Yellow);
 
 
                 if (i < _nbStep - 1)
@@ -442,7 +442,7 @@ namespace VolleyBallTournament
                 }
             }
 
-            batch.RightMiddleString(Static.FontMini, "Rotation", position + Vector2.UnitX * 400 - Vector2.UnitY * 32, Color.White);
+            //batch.RightMiddleString(Static.FontMini, "Rotation", position + Vector2.UnitX * 400 - Vector2.UnitY * 32, Color.White);
         }
     }
 }

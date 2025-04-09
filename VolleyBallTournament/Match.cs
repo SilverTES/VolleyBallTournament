@@ -23,7 +23,7 @@ namespace VolleyBallTournament
 
         public Dictionary<States, string> Infos = new Dictionary<States, string>()
         {
-            {States.Pause, "En attente"},
+            {States.Pause, "Prochain match"},
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
             {States.Play, "Match en cours"},

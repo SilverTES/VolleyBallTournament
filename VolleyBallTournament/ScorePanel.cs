@@ -76,7 +76,7 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .75f);
-                //batch.Rectangle(AbsRectF, Color.Gray, 3f);
+                batch.Rectangle(AbsRectF, Color.Gray, 1f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
                 batch.LeftMiddleString(Static.FontMain, _match.TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);

@@ -59,8 +59,8 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
 
             //Debug
-            _cameraX = -Screen.Width;
-            SetPosition(-Screen.Width, 0);
+            //_cameraX = -Screen.Width;
+            //SetPosition(-Screen.Width, 0);
         }
         public static string[] GetFilesInDirectory(string directoryPath, string filter)
         {
