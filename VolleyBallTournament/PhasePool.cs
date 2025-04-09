@@ -16,7 +16,7 @@ namespace VolleyBallTournament
         public State<States> State { get; private set; } = new State<States>(States.Ready);
 
         private List<int> _process = Enums.GetList<States>();
-        private int _ticProcess = 0;
+        private int _ticRotation = 0;
 
         public bool IsPaused = false;
         private readonly string _title;
@@ -32,15 +32,14 @@ namespace VolleyBallTournament
         public Timer Timer => _timer;
         private readonly Timer _timer;
 
-        private int _step = 0;
-        private int _nbStep = 8;
+        private int _currentRotation = 0;
 
-        private Rotation _rotation;
+        private RotationManager _rotationManager;
 
         public PhasePool(string title, PhaseRegister phaseRegister)
         {
             _title = title;
-            _rotation = phaseRegister.Rotation;
+            _rotationManager = phaseRegister.RotationManager;
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -50,8 +49,7 @@ namespace VolleyBallTournament
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             InsertGroups(phaseRegister);
-
-            CreateMatchs(phaseRegister.NbMatch);
+            InsertMatchs(phaseRegister);
 
             _timer = (Timer)new Timer().AppendTo(this);
             _divTimer.Insert(_timer);
@@ -79,7 +77,7 @@ namespace VolleyBallTournament
             {
                 ResetTeamsStatus();
                 ResetScoresPoint();
-                SetRotation(_step);
+                SetRotation(_currentRotation);
 
             });
             State.Off(States.Finish, () =>
@@ -123,7 +121,7 @@ namespace VolleyBallTournament
                     group.Refresh();
                 }
 
-                _step++;
+                _currentRotation++;
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
         }
@@ -138,21 +136,30 @@ namespace VolleyBallTournament
                 _divGroup.Insert(group);
             }
         }
-        public void CreateMatchs(int nbMatch)
+        private void InsertMatchs(PhaseRegister phaseRegister)
         {
-            for (int i = 0; i < nbMatch; i++)
+            _matchs = phaseRegister.GetMatchs();
+            for (int i = 0; i < phaseRegister.NbMatch; i++)
             {
-                var teamA = new Team("TeamA");
-                var teamB = new Team("TeamB");
-                var teamReferee = new Team("TeamR");
-
-                var match = (Match)new Match($"{i + 1}", teamA, teamB, teamReferee, _rotation).AppendTo(this);
-
-                _matchs.Add(match);
-
-                _divMatch.Insert(_matchs[i]);
+                var match = _matchs[i].AppendTo(this).This<Match>();
+                _divMatch.Insert(match);
             }
         }
+        //public void CreateMatchs(int nbMatch)
+        //{
+        //    for (int i = 0; i < nbMatch; i++)
+        //    {
+        //        var teamA = new Team("TeamA");
+        //        var teamB = new Team("TeamB");
+        //        var teamReferee = new Team("TeamR");
+
+        //        var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _rotation).AppendTo(this);
+
+        //        _matchs.Add(match);
+
+        //        _divMatch.Insert(_matchs[i]);
+        //    }
+        //}
         public void ResetTeamsStatus()
         {
             for (int i = 0; i < _teams.Count; i++)
@@ -171,23 +178,19 @@ namespace VolleyBallTournament
                 _matchs[i].ResetScore();
             }
         }
-        public void SetRotation(int step)
+        public void SetRotation(int rotation)
         {
-            if (_rotation == null) return;
-            if (step >= _rotation.NbStep()) return;
+            if (_rotationManager == null) return;
+            if (rotation >= _rotationManager.NbRotation) return;
 
-            _step = step;
-            var sets = _rotation.GetList(step);
+            _currentRotation = rotation;
+            var matchConfigs = _rotationManager.GetMatchs(rotation);
 
-            for (int i = 0; i < sets.Count; i++)
+            for (int i = 0; i < matchConfigs.Count; i++)
             {
-                var set = sets[i];
-
-                if (i > _matchs.Count-1) 
-                    break;
-
-                var match = _matchs[i];
-                match.SetTeam(set.TeamA, set.TeamB, set.TeamReferee);
+                var matchConfig = matchConfigs[i];
+                var match = _matchs[matchConfig.IdTerrain];
+                match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
             }
         }
         //public void ShuffleTeamsTotalPoint()
@@ -266,11 +269,11 @@ namespace VolleyBallTournament
                     break;
             }
         }
-        private void SetTicProcess(int ticProcess)
+        private void SetTicRotation(int ticProcess)
         {
-            _ticProcess = ticProcess;
+            _ticRotation = ticProcess;
 
-            States nextState = (States)_process[_ticProcess];
+            States nextState = (States)_process[_ticRotation];
 
             State.Set(nextState);
 
@@ -303,8 +306,10 @@ namespace VolleyBallTournament
                     //    matchs[i].State.Set(nextState);
                     //}
 
-                    if (_step < _nbStep)
-                        SetTicProcess((_ticProcess + 1) % Enums.Count<States>());
+                    Misc.Log("Rotation");
+
+                    if (_currentRotation < _rotationManager.NbRotation)
+                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
                 }
 
                 // Debug
@@ -343,10 +348,10 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
-                    SetTicProcess(0);
+                    SetTicRotation(0);
                     ResetTeamsStatus();
                     ResetTeamsTotalPoint();
-                    SetRotation(_step = 0);
+                    SetRotation(_currentRotation = 0);
                 }
 
                 for (int i = 0; i < _matchs.Count; i++)
@@ -418,7 +423,7 @@ namespace VolleyBallTournament
 
         private void DrawRotation(SpriteBatch batch, Vector2 position)
         {
-            for (int i = 0; i < _nbStep; i++)
+            for (int i = 0; i < _rotationManager.NbRotation; i++)
             {
                 var pos = new Vector2(position.X + (i+0) * 100, position.Y);
                 var pos2 = new Vector2(position.X + (i+1) * 100, position.Y);
@@ -426,19 +431,19 @@ namespace VolleyBallTournament
                 if (i == 0)
                     batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 30, Color.Yellow);
 
-                if (i == _nbStep - 2)
+                if (i == _rotationManager.NbRotation - 2)
                     batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 30, Color.Yellow);
 
 
-                if (i < _nbStep - 1)
-                    batch.LineTexture(Static.TexLine, pos, pos2, 7f, i >= _step ? Color.Gray * .5f : Color.Gold);
+                if (i < _rotationManager.NbRotation - 1)
+                    batch.LineTexture(Static.TexLine, pos, pos2, 7f, i >= _currentRotation ? Color.Gray * .5f : Color.Gold);
 
-                if (i != _step)
-                    batch.FilledCircle(Static.TexCircle, pos, 16f, i >= _step ? Color.Gray : Color.Gold);
+                if (i != _currentRotation)
+                    batch.FilledCircle(Static.TexCircle, pos, 16f, i >= _currentRotation ? Color.Gray : Color.Gold);
                 else
                 {
                     batch.FilledCircle(Static.TexCircle, pos, 40f, Color.Gold);
-                    batch.CenterStringXY(Static.FontMain, $"{_step + 1}", pos, Color.Red);
+                    batch.CenterStringXY(Static.FontMain, $"{_currentRotation + 1}", pos, Color.Red);
                 }
             }
 

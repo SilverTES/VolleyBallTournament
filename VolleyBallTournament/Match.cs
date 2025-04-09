@@ -33,7 +33,10 @@ namespace VolleyBallTournament
 
         };
 
-        private Rotation _sequence;
+        public int IdTerrain => _idTerrain;
+        private int _idTerrain = Const.NoIndex;
+
+        private RotationManager _sequence;
 
         public ScorePanel ScorePanel => _scorePanel;
         private ScorePanel _scorePanel;
@@ -49,8 +52,9 @@ namespace VolleyBallTournament
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
         
-        public Match(string courtName, Team teamA, Team teamB, Team teamReferee, Rotation sequence)
+        public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee, RotationManager sequence)
         {
+            _idTerrain = idTerrain;
             _sequence = sequence;
 
             _div = new Container(Style.Space.One * 10, new Style.Space(0,40,0,20), Mugen.Physics.Position.VERTICAL);

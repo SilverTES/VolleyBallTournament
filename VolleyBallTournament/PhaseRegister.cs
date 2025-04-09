@@ -5,65 +5,11 @@ using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
-using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
 {
-    public class GroupRegister : Node
-    {
-        public int IdGroupRegister => _idGroupRegister;
-        int _idGroupRegister = 0;
-        Container _div;
-        public GroupRegister(Game game, int nbTeam, int groupId)
-        {
-            _idGroupRegister = groupId;
-            _div = new Container(Style.Space.One * 20, new Style.Space(30, 20, 10, 10), Mugen.Physics.Position.VERTICAL);
-
-            for (int i = 0; i < nbTeam; i++)
-            {
-                var textBox = new TextBox(game, new Rectangle(0, 0, 320, 64), Static.FontMain, Color.Black * .75f, Color.Yellow, Color.Gold, 50).AppendTo(this).This<TextBox>();
-                textBox.SetTitle($"Equipe {i + 1 + groupId * nbTeam}", Color.White, Static.FontMini);
-                textBox.SetId(_idGroupRegister * nbTeam + i);
-
-                _div.Insert(textBox);
-            }
-            _div.Refresh();
-            SetSize(_div.Rect.Width, _div.Rect.Height);
-        }
-        public override Node Update(GameTime gameTime)
-        {
-            _div.SetPosition(XY);
-
-            UpdateChilds(gameTime);
-
-            return base.Update(gameTime);   
-        }
-        public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
-        {
-            if (indexLayer == (int)Layers.Main)
-            {
-                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
-
-                batch.Rectangle(AbsRectF, Color.DarkSlateBlue * 1f);
-
-                batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20 + Vector2.One * 6, Color.Black * .5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20, Color.White);
-            }
-
-            if (indexLayer == (int)Layers.Debug)
-            {
-                //_div.DrawDebug(batch, Color.Red, 3f);
-            }
-
-            DrawChilds(batch, gameTime, indexLayer);
-
-            return base.Draw(batch, gameTime, indexLayer);
-        }
-    }
-
     public class PhaseRegister : Node   
     {
         public bool IsPaused = false;
@@ -83,9 +29,10 @@ namespace VolleyBallTournament
 
         private List<Team> _teams = [];
         private List<Group> _groups = [];
+        private List<Match> _matchs = [];
 
-        public Rotation Rotation => _rotation;
-        private Rotation _rotation = new Rotation();
+        public RotationManager RotationManager => _rotationManager;
+        private RotationManager _rotationManager = new RotationManager();
 
         private TextBox _currentTextBox = null;
         public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch)
@@ -109,13 +56,12 @@ namespace VolleyBallTournament
             _div.Refresh();
 
             CreateGroups();
+            CreateMatchs();
 
             // Associe les textBox avec les TeamName des joueurs venant d'être créer !
             var textBoxs = GetTexBoxs();
             for (int i = 0; i < textBoxs.Count; i++)
             {
-                //Misc.Log("Mdsgijdsophds");
-
                 var textBox = textBoxs[i];
                 textBox.OnChange += (t) =>
                 {
@@ -130,10 +76,11 @@ namespace VolleyBallTournament
         }
         public void LoadRotationFile(string rotationFile)
         {
-            _rotation.LoadFile(rotationFile, _teams);
+            _rotationManager.LoadFile(rotationFile, _teams, _matchs);
         }
         public List<Team> GetTeams() { return _teams; }
         public List<Group> GetGroups() { return _groups; }
+        public List<Match> GetMatchs() { return _matchs; }
         private void CreateGroups()
         {
             int teamNumber = 0;
@@ -151,6 +98,19 @@ namespace VolleyBallTournament
 
                     teamNumber++;   
                 }
+            }
+        }
+        private void CreateMatchs()
+        {
+            for (int i = 0; i < _nbMatch; i++)
+            {
+                var teamA = new Team("TeamA");
+                var teamB = new Team("TeamB");
+                var teamReferee = new Team("TeamR");
+
+                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _rotationManager).AppendTo(this);
+
+                _matchs.Add(match);
             }
         }
         public List<TextBox> GetTexBoxs()
@@ -343,8 +303,8 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Debug)
             {
-                if (_currentTextBox != null)
-                    batch.CenterStringXY(Static.FontMini, $"{_currentTextBox.Id}", _currentTextBox.AbsRectF.BottomCenter, Color.Red);
+                //if (_currentTextBox != null)
+                //    batch.CenterStringXY(Static.FontMini, $"{_currentTextBox.Id}", _currentTextBox.AbsRectF.BottomCenter, Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

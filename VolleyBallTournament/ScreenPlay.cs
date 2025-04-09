@@ -19,7 +19,7 @@ namespace VolleyBallTournament
         //public PhasePool PhasePool2 => _phasePool2;
         //private PhasePool _phasePool2;
 
-        private Rotation _rotation;
+        private RotationManager _rotationManager;
 
         KeyboardState _key;
 
@@ -29,7 +29,7 @@ namespace VolleyBallTournament
 
         Vector2 _versionPos;
 
-        int _step = 0;
+        int _rotation = 0;
 
         public ScreenPlay(Game game)
         {
@@ -50,7 +50,7 @@ namespace VolleyBallTournament
             _phasePool1 = new PhasePool("Phase de pool 1", _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             //_phasePool2 = new PhasePool("Phase de pool 2", _phaseRegister).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            _phasePool1.SetRotation(_step = 0);
+            _phasePool1.SetRotation(_rotation = 0);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
