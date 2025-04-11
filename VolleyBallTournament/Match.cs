@@ -61,7 +61,7 @@ namespace VolleyBallTournament
         {
             _idTerrain = idTerrain;
 
-            _div = new Container(Style.Space.One * 10, new Style.Space(10,60,160,160), Mugen.Physics.Position.VERTICAL);
+            _div = new Container(Style.Space.One * 10, new Style.Space(80,80,160,160), Mugen.Physics.Position.VERTICAL);
 
             //_scorePanel = new ScorePanel(this);
             _court = new Court(courtName, this);
@@ -127,7 +127,7 @@ namespace VolleyBallTournament
         }
         public void AddPointA(int points = 1)
         {
-            if (State.CurState == States.Play)
+            if (State.CurState == States.Play || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 
@@ -155,7 +155,7 @@ namespace VolleyBallTournament
         }
         public void AddPointB(int points = 1)
         {
-            if (State.CurState == States.Play)
+            if (State.CurState == States.Play || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 

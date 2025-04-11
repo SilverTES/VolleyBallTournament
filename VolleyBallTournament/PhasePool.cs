@@ -43,10 +43,10 @@ namespace VolleyBallTournament
 
             SetSize(Screen.Width, Screen.Height);
 
-            _divMain = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
-            _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
-            _divGroup = new Container(Style.Space.One * 10, new Style.Space(20, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
-            _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
+            _divMain = new Container(Style.Space.One * 0, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
+            _divMatch = new Container(Style.Space.One * 10, new Style.Space(20, 20, 40, 40), Mugen.Physics.Position.HORIZONTAL);
+            _divGroup = new Container(Style.Space.One * 10, new Style.Space(80, 0, 50, 50), Mugen.Physics.Position.HORIZONTAL);
+            _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             if (phaseRegister != null)
             {
@@ -482,6 +482,8 @@ namespace VolleyBallTournament
                 
                 batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
 
+                //batch.FillRectangle(_divMatch.Rect.Translate(AbsXY), Color.White * .5f);
+
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Black * .5f, 1f);
 
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
@@ -491,7 +493,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                DrawRotation(batch, AbsXY + new Vector2((Screen.Width - 700)/2, 40));
+                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 40)/2, 80));
             }
 
             if (indexLayer == (int)Layers.Debug)
@@ -516,14 +518,14 @@ namespace VolleyBallTournament
         {
             for (int i = 0; i < _rotationManager.NbRotation; i++)
             {
-                var pos = new Vector2(position.X + (i+0) * 100, position.Y);
-                var pos2 = new Vector2(position.X + (i+1) * 100, position.Y);
+                var pos = new Vector2(position.X + (i+0) * 40, position.Y);
+                var pos2 = new Vector2(position.X + (i+1) * 40, position.Y);
 
                 if (i == 0)
-                    batch.TopCenterString(Static.FontMini, "Debut des Matchs", pos + Vector2.UnitY * 20, Color.Yellow);
+                    batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 30, Color.Yellow);
 
                 if (i == _rotationManager.NbRotation - 2)
-                    batch.TopCenterString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 20, Color.Yellow);
+                    batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 30, Color.Yellow);
 
 
                 if (i < _rotationManager.NbRotation - 1)
@@ -538,7 +540,7 @@ namespace VolleyBallTournament
                 }
             }
 
-            //batch.RightMiddleString(Static.FontMini, "Rotation", position + Vector2.UnitX * 400 - Vector2.UnitY * 32, Color.White);
+            //batch.CenterStringXY(Static.FontMini, "Rotation", position - Vector2.UnitY*32 + Vector2.UnitX * ((_rotationManager.NbRotation - 1) * 40) / 2, Color.White);
         }
     }
 }
