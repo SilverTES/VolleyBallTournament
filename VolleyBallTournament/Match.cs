@@ -14,8 +14,11 @@ namespace VolleyBallTournament
             Pause,
             WarmUp,
             Ready,
-            CountDown,
-            Play,
+            CountDown1,
+            Play1,
+            SwapSide,
+            CountDown2,
+            Play2,
             Finish,
             ValidPoints,
             //LastPoint,
@@ -27,8 +30,11 @@ namespace VolleyBallTournament
             {States.Pause, "Prochain match"},
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
-            {States.CountDown, "Début du Match"},
-            {States.Play, "Match en cours"},
+            {States.CountDown1, "Début du Match"},
+            {States.Play1, "Match en cours"},
+            {States.SwapSide, "Changement de côté"},
+            {States.CountDown2, "Reprise du Match"},
+            {States.Play2, "Match en cours"},
             {States.Finish, "Fin du match"},
             {States.ValidPoints, "Validation des Points"},
             //{States.LastPoint, "Dernière balle"},
@@ -134,7 +140,7 @@ namespace VolleyBallTournament
         }
         public void AddPointA(int points = 1)
         {
-            if (State.CurState == States.Play || State.CurState == States.Finish)
+            if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 
@@ -159,7 +165,7 @@ namespace VolleyBallTournament
         }
         public void AddPointB(int points = 1)
         {
-            if (State.CurState == States.Play || State.CurState == States.Finish)
+            if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 
@@ -198,11 +204,23 @@ namespace VolleyBallTournament
                 case States.WarmUp:
                     break;
 
-                case States.Play:
-
+                case States.Play1:
 
                     break;
+                case States.CountDown1:
+                    break;
 
+                case States.CountDown2:
+                    break;
+
+                case States.SwapSide:
+                    break;
+
+                case States.Play2:
+                    break;
+
+                case States.ValidPoints:
+                    break;
                 default:
                     break;
             }

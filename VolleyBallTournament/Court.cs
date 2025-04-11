@@ -141,7 +141,7 @@ namespace VolleyBallTournament
             _ticWave += 0.1f;
             _waveValue = MathF.Sin(_ticWave) * 4f;
 
-            if (_match.State.CurState == Match.States.Play)
+            if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2)
                 _rotation += .05f;
 
 
@@ -158,7 +158,7 @@ namespace VolleyBallTournament
 
                 _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + TeamRefereePos);
 
-                if (_match.State.CurState == Match.States.Play || _match.State.CurState == Match.States.Ready || _match.State.CurState == Match.States.CountDown)
+                //if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Ready || _match.State.CurState == Match.States.CountDown)
                     DrawVBall(batch, VBallCurrentPos);
 
                 batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", CourtNamePos, Color.Yellow);
@@ -221,7 +221,7 @@ namespace VolleyBallTournament
             Color color = Color.White * .25f;
             float thickness = 3f;
 
-            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play ? .25f : .1f));
+            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? .25f : .1f));
             batch.Rectangle(AbsRectF, color, thickness);
 
             batch.Line(AbsRectF.LeftMiddle, AbsRectF.RightMiddle, color, thickness);
