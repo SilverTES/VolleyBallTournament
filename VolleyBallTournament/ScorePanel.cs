@@ -12,7 +12,6 @@ namespace VolleyBallTournament
         Container _div;
 
         private Match _match;
-        private int NbSetToWin = 2;
 
         public Vector2 SetAPos;
         public Vector2 SetBPos;
@@ -23,31 +22,28 @@ namespace VolleyBallTournament
 
         public ScorePanel(Match match)
         {
-            SetMatch(match);
+            //SetMatch(match);
 
             _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
             SetSize(560, 120);
+            SetVisible(false);
         }
-        public void SetMatch(Match match)
-        {
-            ResetScore();
-            _match = match;
-        }
-        public void ResetScore()
-        {
-            if (_match == null) return;
+        //public void SetMatch(Match match)
+        //{
+        //    ResetScore();
+        //    _match = match;
+        //}
+        //public void ResetScore()
+        //{
+        //    if (_match == null) return;
 
-            _match.TeamA.SetScoreSet(0);
-            _match.TeamB.SetScoreSet(0);
-            _match.TeamA.SetScorePoint(0);
-            _match.TeamB.SetScorePoint(0);
+        //    _match.TeamA.SetScoreSet(0);
+        //    _match.TeamB.SetScoreSet(0);
+        //    _match.TeamA.SetScorePoint(0);
+        //    _match.TeamB.SetScorePoint(0);
             
-        }
-        public void SetNbSetToWin(int nbSetToWin)
-        {
-            NbSetToWin = nbSetToWin;
-        }
+        //}
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();
@@ -88,7 +84,7 @@ namespace VolleyBallTournament
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
 
-                if (NbSetToWin > 1)
+                if (_match.NbSetToWin > 1)
                 {
                     batch.CenterBorderedStringXY(Static.FontMain, _match.TeamA.ScoreSet.ToString(), SetAPos, Color.Cyan, Color.Black);
                     batch.CenterBorderedStringXY(Static.FontMain, _match.TeamB.ScoreSet.ToString(), SetBPos, Color.Cyan, Color.Black);

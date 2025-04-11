@@ -54,7 +54,7 @@ namespace VolleyBallTournament
             _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
 
             _phasePool1 = new PhasePool("Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            _phasePool2 = new PhasePool("Phase de poule Finale", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool("Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
             _phasePool1.SetRotation(_rotation = 0);
 
@@ -62,7 +62,7 @@ namespace VolleyBallTournament
             _animate.Add("SlideLeft");
             _animate.Add("SlideRight");
 
-            _versionPos = AbsRectF.BottomRight - Vector2.One * 24;
+            _versionPos = AbsRectF.BottomRight - Vector2.One * 16;
 
             //Debug
             _cameraX = -Screen.Width;
@@ -141,7 +141,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Debug)
             { 
-                batch.RightMiddleString(Static.FontMini, $"©SilverTES V{0}.{1}", _versionPos, Color.White);
+                batch.RightMiddleString(Static.FontMicro, $"©SilverTES V{0}.{1}", _versionPos, Color.White);
             }
 
             //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 200, Color.White);

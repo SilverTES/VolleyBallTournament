@@ -34,6 +34,7 @@ namespace VolleyBallTournament
 
         public static RasterizerState RasterizerState;
 
+        public static SpriteFont FontMicro;
         public static SpriteFont FontMini;
         public static SpriteFont FontMain;
         public static SpriteFont FontMain2;
@@ -133,6 +134,7 @@ namespace VolleyBallTournament
 
         protected override void LoadContent()
         {
+            Static.FontMicro = Content.Load<SpriteFont>("Fonts/fontMicro");
             Static.FontMini = Content.Load<SpriteFont>("Fonts/fontMini");
             Static.FontMain = Content.Load<SpriteFont>("Fonts/fontMain");
             Static.FontMain2 = Content.Load<SpriteFont>("Fonts/fontMain2");

@@ -35,11 +35,14 @@ namespace VolleyBallTournament
 
         };
 
+        public int NbSetToWin => _nbSetToWin;
+        private int _nbSetToWin = 2;
+
         public int IdTerrain => _idTerrain;
         private int _idTerrain = Const.NoIndex;
 
-        public ScorePanel ScorePanel => _scorePanel;
-        private ScorePanel _scorePanel;
+        //public ScorePanel ScorePanel => _scorePanel;
+        //private ScorePanel _scorePanel;
         public Court Court => _court;
         private Court _court;
 
@@ -58,17 +61,17 @@ namespace VolleyBallTournament
         {
             _idTerrain = idTerrain;
 
-            _div = new Container(Style.Space.One * 10, new Style.Space(0,40,0,20), Mugen.Physics.Position.VERTICAL);
+            _div = new Container(Style.Space.One * 10, new Style.Space(10,60,160,160), Mugen.Physics.Position.VERTICAL);
 
-            _scorePanel = new ScorePanel(this);
+            //_scorePanel = new ScorePanel(this);
             _court = new Court(courtName, this);
-            
-            _scorePanel.AppendTo(this);
+
+            //_scorePanel.AppendTo(this);
             _court.AppendTo(this);
 
             SetTeam(teamA, teamB, teamReferee);
 
-            _div.Insert(_scorePanel);
+            //_div.Insert(_scorePanel);
             _div.Insert(_court);
             _div.Refresh();
 
@@ -78,6 +81,10 @@ namespace VolleyBallTournament
 
             //_timerCountDown = new Timer();
             //_timerCountDown.Start();
+        }
+        public void SetNbSetToWin(int nbSetToWin)
+        {
+            _nbSetToWin = nbSetToWin;
         }
         public Team GetWinner()
         {
@@ -112,8 +119,11 @@ namespace VolleyBallTournament
                 _teamB.SetMatch(this);
         }
         public void ResetScore()
-        { 
-            _scorePanel.ResetScore(); 
+        {
+            TeamA.SetScoreSet(0);
+            TeamB.SetScoreSet(0);
+            TeamA.SetScorePoint(0);
+            TeamB.SetScorePoint(0);
         }
         public void AddPointA(int points = 1)
         {
@@ -133,8 +143,8 @@ namespace VolleyBallTournament
                     _court.CancelChangeServiceSide();
 
                 _teamA.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_scorePanel.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
-                new FxExplose(_scorePanel.ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
+                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
+                new FxExplose(_court.ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
@@ -161,8 +171,8 @@ namespace VolleyBallTournament
                     _court.CancelChangeServiceSide();
 
                 _teamB.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_scorePanel.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
-                new FxExplose(_scorePanel.ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
+                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
+                new FxExplose(_court.ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }

@@ -39,7 +39,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
+                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .75f);
 
                 batch.Rectangle(AbsRectF, Color.DarkSlateBlue * 1f);
 

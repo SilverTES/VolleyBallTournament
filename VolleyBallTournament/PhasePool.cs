@@ -45,7 +45,7 @@ namespace VolleyBallTournament
 
             _divMain = new Container(Style.Space.One * 10, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
             _divMatch = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
-            _divGroup = new Container(Style.Space.One * 10, new Style.Space(40, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
+            _divGroup = new Container(Style.Space.One * 10, new Style.Space(20, 0, 60, 60), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 60, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             if (phaseRegister != null)
@@ -496,7 +496,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Debug)
             {
-                batch.LeftMiddleString(Static.FontMini, "Victoire = 3, Nul = 1, Défaite = 0 + bonus écart de point à la fin du match", AbsRectF.BottomLeft + Vector2.UnitX * 10 - Vector2.UnitY * 20, Color.Gray);
+                //batch.LeftTopString(Static.FontMini, "  Victoire = 3 pts\n  Nul = 1 pts\n  Défaite = 0 pts\n+ Bonus écart et points total", AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.UnitY * 60, Color.Gray);
 
                 //Static.DrawRoundedRectangle(batch, Static.TexLine, new Rectangle(100, 100, 800, 400),  Color.White, 30, 30, 30, 80, 3, 24);
 
@@ -520,10 +520,10 @@ namespace VolleyBallTournament
                 var pos2 = new Vector2(position.X + (i+1) * 100, position.Y);
 
                 if (i == 0)
-                    batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 30, Color.Yellow);
+                    batch.TopCenterString(Static.FontMini, "Debut des Matchs", pos + Vector2.UnitY * 20, Color.Yellow);
 
                 if (i == _rotationManager.NbRotation - 2)
-                    batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 30, Color.Yellow);
+                    batch.TopCenterString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 20, Color.Yellow);
 
 
                 if (i < _rotationManager.NbRotation - 1)

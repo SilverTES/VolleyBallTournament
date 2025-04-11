@@ -48,6 +48,13 @@
 /processorParam:TextureFormat=Compressed
 /build:Fonts/fontMain3.spritefont
 
+#begin Fonts/fontMicro.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/fontMicro.spritefont
+
 #begin Fonts/fontMini.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

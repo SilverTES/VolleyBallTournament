@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using Mugen.Core;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using static Mugen.GUI.Gui;
 
 namespace VolleyBallTournament
@@ -104,7 +105,7 @@ namespace VolleyBallTournament
                     Misc.Log($"Requête de découverte reçue de {remoteEndPoint}");
                     NetDataWriter writer = new NetDataWriter();
                     writer.Put("DISCOVER_RESPONSE");
-                    writer.Put("Mon Serveur Awesome"); // Nom du serveur (personnalisable)
+                    writer.Put("VolleyBall Tournament"); // Nom du serveur (personnalisable)
                     _server.SendUnconnectedMessage(writer, remoteEndPoint);
                     Misc.Log($"Réponse envoyée à {remoteEndPoint}");
                 }
@@ -156,10 +157,15 @@ namespace VolleyBallTournament
                     ProcessMessage(peer, reader);
 
                     break;
-                
+
                 case MessageType.AddPoint:
 
                     ProcessAddPoint(peer, reader);
+
+                    break;
+                case MessageType.Update:
+
+                    ProcessUpdate(peer, reader);
 
                     break;
 
@@ -192,6 +198,20 @@ namespace VolleyBallTournament
 
             if (team == 0) match.AddPointA(points);
             if (team == 1) match.AddPointB(points);
+
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((byte)MessageType.Update); // Identifiant de type
+            writer.Put(match.TeamA.ScorePoint);
+            writer.Put(match.TeamB.ScorePoint);
+            writer.Put(match.TeamA.TeamName);
+            writer.Put(match.TeamB.TeamName);
+            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        private void ProcessUpdate(NetPeer peer, NetPacketReader reader)
+        {
+            int matchIndex = reader.GetInt();
+
+            var match = _screenPlay.PhasePool1.GetMatch(matchIndex);
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)MessageType.Update); // Identifiant de type

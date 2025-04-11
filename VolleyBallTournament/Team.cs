@@ -46,9 +46,17 @@ namespace VolleyBallTournament
         private string _teamName;
 
         Animate _animate;
+
+        public static int Width = 360;
+        public static int Height = 64;
+        public static RectangleF Bound;
+
         public Team(string teamName)//, Match match = null, ScorePanel scorePanel = null, Court court = null)
         {
-            SetSize(360, 64);
+            SetSize(Width, Height);
+
+            Bound = new RectangleF(0, 0, Width, Height);
+
             _teamName = teamName;
             //Match = match;
             //ScorePanel = scorePanel;
@@ -153,10 +161,9 @@ namespace VolleyBallTournament
             _scoreSet = int.Clamp(_scoreSet, 0, 3);
 
             if (_match != null)
-                if (_match.ScorePanel != null)
-                {
-                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
-                }
+            {
+                _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
+            }
 
             return base.Update(gameTime);
         }
@@ -164,18 +171,15 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .25f: Color.DarkSlateBlue * .75f);
-                batch.Rectangle(AbsRectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * .25f: Color.Gray * 1f, 1f);
-                
+                DrawBasicTeam(batch, AbsRectF);
 
-                batch.LeftMiddleString(Static.FontMain, $"{_teamName}", AbsRectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);
                 //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
-                batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Yellow);
+                batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.GreenYellow);
                 
                 int bonus = _bonusPoint + _currentBonusPoint;
 
-                batch.LeftMiddleString(Static.FontMini, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
-                batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 14, Color.Yellow);
+                batch.LeftMiddleString(Static.FontMini, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 12, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
+                batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 12, Color.Yellow);
 
                 DrawVictory(batch);
 
@@ -197,6 +201,13 @@ namespace VolleyBallTournament
             }
 
             return base.Draw(batch, gameTime, indexLayer);
+        }
+
+        public void DrawBasicTeam(SpriteBatch batch, RectangleF rectf)
+        {
+            batch.FillRectangle(rectf.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .25f : Color.DarkSlateBlue * .75f);
+            batch.Rectangle(rectf.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * .25f : Color.Gray * 1f, 1f);
+            batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectf.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.White : Color.Gray);
         }
 
         private void DrawVictory(SpriteBatch batch)
