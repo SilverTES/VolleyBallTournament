@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mugen.Animation;
 using Mugen.Core;
 using Mugen.GFX;
+using Mugen.GUI;
 using Mugen.Physics;
 using System;
 using System.Collections.Generic;
@@ -237,9 +238,9 @@ namespace VolleyBallTournament
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
         {
             batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 6, Color.Black * .75f);
-            batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .5f : Color.DarkSlateBlue * 1f);
+            batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
-            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * .25f : Color.Gray * 1f, 1f);
+            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 2f);
 
             batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
 

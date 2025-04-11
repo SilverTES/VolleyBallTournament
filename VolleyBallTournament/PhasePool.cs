@@ -13,6 +13,18 @@ namespace VolleyBallTournament
 {
     public class PhasePool : Node
     {
+        public enum Buttons
+        {
+            None,
+            Space,
+            Back,
+            Shuffle,
+            AddPointA,
+            AddPointB,
+            SubPointA,
+            SubPointB,
+        }
+
         public State<States> State { get; private set; } = new State<States>(States.Ready);
 
         private List<int> _process = Enums.GetList<States>();
@@ -36,8 +48,14 @@ namespace VolleyBallTournament
 
         private RotationManager _rotationManager;
 
-        public PhasePool(string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
+        private Control<Buttons> _control;
+        private int Id;
+
+        public PhasePool(int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
+            Id = id;
+            _control = new Control<Buttons>();
+
             _title = title;
             _rotationManager = rotationManager;
 
@@ -432,13 +450,7 @@ namespace VolleyBallTournament
             {
                 RunState();
 
-                if (ButtonControl.OnePress("MoveTestA", Keyboard.GetState().IsKeyDown(Keys.A)))
-                {
-                    Misc.Log("Move Test A");
-                    GetMatch(0).Court.SwapTeams();
-                }
-
-                if (ButtonControl.OnePress("Process", Keyboard.GetState().IsKeyDown(Keys.Space)))
+                if (_control.Once(Buttons.Space, Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
                     // Using the modulus operator
                     //_ticProcess = (_ticProcess + 1) % Enums.Count<States>();
@@ -488,7 +500,7 @@ namespace VolleyBallTournament
                 //    }
                 //}
 
-                if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
+                if (_control.Once(Buttons.Shuffle, Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
                 {
                     if (State.CurState == States.Play1)
                         ShuffleTeamsPoint();
@@ -499,7 +511,7 @@ namespace VolleyBallTournament
                 //    ShuffleTeamsTotalPoint();
                 //}
 
-                if (ButtonControl.OnePress("Stop", Keyboard.GetState().IsKeyDown(Keys.Back)))
+                if (_control.Once(Buttons.Back, Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
                     SetTicRotation(0);
                     ResetTeamsStatus();
@@ -511,25 +523,26 @@ namespace VolleyBallTournament
                 {
                     var match = _matchs[i];
 
-                    if (ButtonControl.OnePress($"AddPointA{i}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
+                    if (ButtonControl.OnePress($"AddPointA{i}{Id}", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
                     {
                         match.AddPointA(+1);
                     }
-                    if (ButtonControl.OnePress($"SubPointA{i}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
+                    if (ButtonControl.OnePress($"SubPointA{i}{Id}", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
                     {
                         match.AddPointA(-1);
                     }
-                    if (ButtonControl.OnePress($"AddPointB{i}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
+                    if (ButtonControl.OnePress($"AddPointB{i}{Id}", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
                     {
                         match.AddPointB(-1);
                     }
-                    if (ButtonControl.OnePress($"SubPointB{i}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
+                    if (ButtonControl.OnePress($"SubPointB{i}{Id}", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
                     {
                         match.AddPointB(+1);
                     }
                 }
 
             }
+
 
             UpdateChilds(gameTime);
 

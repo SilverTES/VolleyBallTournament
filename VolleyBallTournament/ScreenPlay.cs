@@ -44,8 +44,6 @@ namespace VolleyBallTournament
             }
             var configFile = files[0];
 
-
-
             SetSize(Screen.Width, Screen.Height);
 
             _phaseRegister = new PhaseRegister(game, 4, 4, 3).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
@@ -53,8 +51,8 @@ namespace VolleyBallTournament
             _rotationManager = new RotationManager();
             _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
 
-            _phasePool1 = new PhasePool("Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            _phasePool2 = new PhasePool("Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
             _phasePool1.SetRotation(_rotation = 0);
 

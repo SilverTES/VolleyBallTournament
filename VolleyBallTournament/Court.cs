@@ -19,28 +19,25 @@ namespace VolleyBallTournament
 
         private bool _changeSide = false;
         public string CourtName => _courtName;
-        string _courtName;
-        float _ticWave = 0;
-        float _waveValue = 0;
-        float _rotation = 0f;
+        private string _courtName;
+        private float _ticWave = 0;
+        private float _waveValue = 0;
+        private float _rotation = 0f;
 
-        public Vector2 SetAPos;
-        public Vector2 SetBPos;
-        public Vector2 ScoreAPos;
-        public Vector2 ScoreBPos;
-        
-        public Vector2 TeamAPos;
-        public Vector2 TeamBPos;
-        public Vector2 TeamRefereePos;
+        private Vector2 SetAPos;
+        private Vector2 SetBPos;
+        private Vector2 ScoreAPos;
+        private Vector2 ScoreBPos;
+        private Vector2 TeamAPos;
+        private Vector2 TeamBPos;
+        private Vector2 TeamRefereePos;
+        private Vector2 VBallAPos;
+        private Vector2 VBallBPos;
+        private Vector2 VBallCurrentPos;
+        private Vector2 InfosPos;
+        private Vector2 CourtNamePos;
 
-        public Vector2 VBallAPos;
-        public Vector2 VBallBPos;
-        public Vector2 VBallCurrentPos;
-
-        public Vector2 InfosPos;
-        public Vector2 CourtNamePos;
-
-        Animate2D _animate2D = new();
+        private Animate2D _animate2D;
 
         public Court(string courtName, Match match) 
         {
@@ -50,6 +47,8 @@ namespace VolleyBallTournament
             SetSize(200, 280);
 
             _rotation = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
+
+            _animate2D = new();
 
             _animate2D.Add("SwapA");
             _animate2D.Add("SwapB");
@@ -83,7 +82,7 @@ namespace VolleyBallTournament
         //}
         public void UpdateTeamsPosition()
         {
-            if (!_animate2D.IsPlay("SwapA"))
+            if (!_animate2D.IsPlay("SwapA") && !_animate2D.IsPlay("SwapB"))
             {
                 if (_changeSide)
                 {
@@ -103,7 +102,7 @@ namespace VolleyBallTournament
 
             }
 
-            if (_animate2D.OnFinish("SwapA"))
+            if (_animate2D.OnFinish("SwapA") && _animate2D.OnFinish("SwapB"))
             {
                 Misc.Log("On Finish Animation2d ");
                 _changeSide = !_changeSide;

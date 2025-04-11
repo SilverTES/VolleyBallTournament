@@ -54,7 +54,7 @@ namespace VolleyBallTournament
 
         private Container _div;
 
-        private int _nbTeamPerGroup = 3;
+        //private int _nbTeamPerGroup = 3;
 
         public Team TeamA => _teamA;
         private Team _teamA;
@@ -63,7 +63,7 @@ namespace VolleyBallTournament
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
 
-        Timer _timerCountDown;
+        //Timer _timerCountDown;
         
         public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
         {
@@ -153,8 +153,8 @@ namespace VolleyBallTournament
                     TeamA.CancelService(TeamB);
 
                 _teamA.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
-                new FxExplose(_court.ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
+                //new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
+                //new FxExplose(_court.ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
@@ -178,8 +178,8 @@ namespace VolleyBallTournament
                     TeamB.CancelService(TeamA);
 
                 _teamB.AddPoint(points);
-                new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
-                new FxExplose(_court.ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
+                //new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
+                //new FxExplose(_court.ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
