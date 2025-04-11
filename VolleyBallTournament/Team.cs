@@ -27,7 +27,7 @@ namespace VolleyBallTournament
         public int ScorePoint => _scorePoint;
         private int _scorePoint = 0;
         public int ScoreSet => _scoreSet;
-        private int _scoreSet = 0;
+        private int _scoreSet = 1;
 
         private bool _isPlaying = false;
         private bool _isReferee = false;
@@ -40,6 +40,10 @@ namespace VolleyBallTournament
         public int TotalPoint => _totalPoint;
         private int _totalPoint = 0; EasingValue _easeTotalPoint = new(0);
 
+        //public int NbMaxMatchPlayed = 3;
+        public bool HasService => _hasService;
+        private bool _hasService = false;
+        private Team _lastTeamHasService = null;
         public int NbMatchPlayed => _results.Count;
         private List<Result> _results = new List<Result>();
         public string TeamName => _teamName;
@@ -72,6 +76,33 @@ namespace VolleyBallTournament
             _rankingPoint = 0;
             _bonusPoint = 0;
             _totalPoint = 0;
+        }
+        public void SetService(bool hasService)
+        { 
+            _hasService = hasService; 
+        }
+        public void TakeService(Team opponent)
+        {
+            if (opponent == null) return;
+
+            if (_hasService) _lastTeamHasService = this;
+            if (opponent.HasService) _lastTeamHasService = opponent;
+
+            _hasService = true;
+            opponent.SetService(false);
+        }
+        public void CancelService(Team opponent)
+        {
+            if (opponent == null) return;
+
+            if (_lastTeamHasService != null)
+            
+            if (_lastTeamHasService == this)
+                TakeService(opponent);
+
+            if (_lastTeamHasService == opponent)
+                opponent.TakeService(this);
+            
         }
         public void SetIsPlaying(bool isPlaying)
         {
@@ -205,7 +236,7 @@ namespace VolleyBallTournament
 
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
         {
-            batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 4, Color.Black * .75f);
+            batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 6, Color.Black * .75f);
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.DarkSlateBlue * .5f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * .25f : Color.Gray * 1f, 1f);
@@ -220,8 +251,11 @@ namespace VolleyBallTournament
             {
                 //batch.Rectangle(AbsRectF.Extend(-4f), Color.Yellow, 3f);
                 //batch.Draw(Static.TexReferee, Color.White, 0, rectF.Center + Vector2.UnitX * 10, Position.CENTER, Vector2.One / 4);
-                batch.CenterStringXY(Static.FontMini, "Arbitre", rectF.TopCenter + Vector2.One * 4, Color.Black *.5f);
-                batch.CenterStringXY(Static.FontMini, "Arbitre", rectF.TopCenter, Color.Orange);
+                if (_match != null)
+                {
+                    batch.CenterStringXY(Static.FontMini, $"Arbitre Terrain {_match.Court.CourtName}", rectF.TopCenter + Vector2.One * 2, Color.Black *.5f);
+                    batch.CenterStringXY(Static.FontMini, $"Arbitre Terrain {_match.Court.CourtName}", rectF.TopCenter, Color.Orange);
+                }
             }
         }
 

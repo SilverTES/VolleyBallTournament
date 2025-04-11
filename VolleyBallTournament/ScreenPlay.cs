@@ -62,7 +62,7 @@ namespace VolleyBallTournament
             _animate.Add("SlideLeft");
             _animate.Add("SlideRight");
 
-            _versionPos = AbsRectF.BottomRight - Vector2.One * 16;
+            _versionPos = AbsRectF.TopRight - Vector2.UnitX * 16 + Vector2.UnitY * 16;
 
             //Debug
             _cameraX = -Screen.Width;

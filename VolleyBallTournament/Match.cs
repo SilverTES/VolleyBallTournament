@@ -48,6 +48,8 @@ namespace VolleyBallTournament
 
         private Container _div;
 
+        private int _nbTeamPerGroup = 3;
+
         public Team TeamA => _teamA;
         private Team _teamA;
         public Team TeamB => _teamB;
@@ -57,7 +59,7 @@ namespace VolleyBallTournament
 
         Timer _timerCountDown;
         
-        public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee)
+        public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
         {
             _idTerrain = idTerrain;
 
@@ -69,7 +71,7 @@ namespace VolleyBallTournament
             //_scorePanel.AppendTo(this);
             _court.AppendTo(this);
 
-            SetTeam(teamA, teamB, teamReferee);
+            SetTeam(teamA, teamB, teamReferee, nbTeamPerGroup);
 
             //_div.Insert(_scorePanel);
             _div.Insert(_court);
@@ -102,7 +104,7 @@ namespace VolleyBallTournament
         {
             return team == _teamA ? _teamB : _teamA;
         }
-        public void SetTeam(Team teamA, Team teamB, Team teamReferee)
+        public void SetTeam(Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
         {
             _teamA = teamA;
             _teamB = teamB;
@@ -112,11 +114,16 @@ namespace VolleyBallTournament
             _teamB.SetIsPlaying(true);
             _teamReferee.SetIsReferee(true);
 
-            if (_teamA.NbMatchPlayed < 3)
+            _teamA.TakeService(_teamB);
+
+            if (_teamA.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamA.SetMatch(this);
             
-            if (_teamB.NbMatchPlayed < 3)
+            if (_teamB.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamB.SetMatch(this);
+
+            if (_teamReferee.NbMatchPlayed < nbTeamPerGroup - 1)
+                _teamReferee.SetMatch(this);
         }
         public void ResetScore()
         {
@@ -133,14 +140,11 @@ namespace VolleyBallTournament
 
                 if (points > 0)
                 {
-                    if (!_court.ServiceSide)
-                        _court.ChangeServiceSide();
-                    else
-                        _court.SetServiceSideA();
+                    TeamA.TakeService(TeamB);
                 }
 
                 if (points < 0)
-                    _court.CancelChangeServiceSide();
+                    TeamA.CancelService(TeamB);
 
                 _teamA.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
@@ -150,7 +154,7 @@ namespace VolleyBallTournament
             }
             else if (State.CurState == States.Ready)
             {
-                _court.SetServiceSideA();
+                TeamA.TakeService(TeamB);
             }
         }
         public void AddPointB(int points = 1)
@@ -161,14 +165,11 @@ namespace VolleyBallTournament
 
                 if (points > 0)
                 {
-                    if (_court.ServiceSide)
-                        _court.ChangeServiceSide();
-                    else
-                        _court.SetServiceSideB();
+                    TeamB.TakeService(TeamA);
                 }
 
                 if (points < 0)
-                    _court.CancelChangeServiceSide();
+                    TeamB.CancelService(TeamA);
 
                 _teamB.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
@@ -178,7 +179,7 @@ namespace VolleyBallTournament
             }
             else if (State.CurState == States.Ready)
             {
-                _court.SetServiceSideB();
+                TeamB.TakeService(TeamA);
             }
         }
         private void RunState()

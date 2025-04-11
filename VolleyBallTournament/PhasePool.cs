@@ -56,7 +56,7 @@ namespace VolleyBallTournament
             else
             {
                 CreateGroups(nbGroup, nbTeamPerGroup);
-                CreateMatchs(nbMatch);
+                CreateMatchs(nbMatch, nbTeamPerGroup);
             }
 
             _timer = (Timer)new Timer().AppendTo(this);
@@ -165,7 +165,7 @@ namespace VolleyBallTournament
                 }
             }
         }
-        private void CreateMatchs(int nbMatch)
+        private void CreateMatchs(int nbMatch, int nbTeamPerGroup)
         {
             for(int i = 0;i < nbMatch ; i++)
             {
@@ -173,7 +173,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this);
+                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, nbTeamPerGroup).AppendTo(this);
                 _matchs.Add(match);
 
                 _divMatch.Insert(match);
@@ -217,7 +217,7 @@ namespace VolleyBallTournament
 
                     var match = _matchs[matchConfig.IdTerrain];
 
-                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
+                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee, _rotationManager.NbTeamPerGroup);
                 }
             }
         }
@@ -374,6 +374,12 @@ namespace VolleyBallTournament
             if (!IsPaused)
             {
                 RunState();
+
+                if (ButtonControl.OnePress("MoveTestA", Keyboard.GetState().IsKeyDown(Keys.A)))
+                {
+                    Misc.Log("Move Test A");
+                    GetMatch(0).Court.SwapTeams();
+                }
 
                 if (ButtonControl.OnePress("Process", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
