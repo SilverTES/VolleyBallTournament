@@ -13,24 +13,12 @@ namespace VolleyBallTournament
 {
     public class PhasePool : Node
     {
-        public enum Buttons
-        {
-            None,
-            Space,
-            Back,
-            Shuffle,
-            AddPointA,
-            AddPointB,
-            SubPointA,
-            SubPointB,
-        }
-
         public State<States> State { get; private set; } = new State<States>(States.Ready);
 
         private List<int> _process = Enums.GetList<States>();
         private int _ticRotation = 0;
 
-        public bool IsPaused = false;
+        public bool IsLocked = false;
         private readonly string _title;
         private readonly Container _divMain;
         private readonly Container _divTimer;
@@ -48,13 +36,11 @@ namespace VolleyBallTournament
 
         private RotationManager _rotationManager;
 
-        private Control<Buttons> _control;
         private int Id;
 
         public PhasePool(int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
             Id = id;
-            _control = new Control<Buttons>();
 
             _title = title;
             _rotationManager = rotationManager;
@@ -62,8 +48,8 @@ namespace VolleyBallTournament
             SetSize(Screen.Width, Screen.Height);
 
             _divMain = new Container(Style.Space.One * 0, Style.Space.Zero, Mugen.Physics.Position.VERTICAL);
-            _divMatch = new Container(Style.Space.One * 10, new Style.Space(20, 20, 40, 40), Mugen.Physics.Position.HORIZONTAL);
-            _divGroup = new Container(Style.Space.One * 10, new Style.Space(80, 0, 50, 50), Mugen.Physics.Position.HORIZONTAL);
+            _divMatch = new Container(Style.Space.One * 10, new Style.Space(20, 0, 40, 40), Mugen.Physics.Position.HORIZONTAL);
+            _divGroup = new Container(Style.Space.One * 10, new Style.Space(20, 80, 50, 50), Mugen.Physics.Position.HORIZONTAL);
             _divTimer = new Container(Style.Space.One * 10, new Style.Space(0, 0, 0, 0), Mugen.Physics.Position.HORIZONTAL);
 
             if (phaseRegister != null)
@@ -201,15 +187,18 @@ namespace VolleyBallTournament
         }
         private void CreateGroups(int nbGroup, int nbTeamPerGroup)
         {
+            Misc.Log($"Create Groups --------------------------");
             for (int i = 0;i < nbGroup;i++)
             {
-                var group = (Group)new Group($"{i+1}").AppendTo(this);
+                var group = new Group($"{i+1}").AppendTo(this).This<Group>();
                 _groups.Add(group);
+
+                Misc.Log($"Create Group {i + 1}");
 
                 _divGroup.Insert(group);
                 for (int t = 0; t < nbTeamPerGroup; t++)
                 {
-                    var team = (Team)new Team($"Team{i * nbTeamPerGroup + t}").AppendTo(this);
+                    var team = new Team($"Team{i * nbTeamPerGroup + t}").AppendTo(this).This<Team>();
                     _teams.Add(team);
 
                     group.AddTeam(team);
@@ -218,14 +207,17 @@ namespace VolleyBallTournament
         }
         private void CreateMatchs(int nbMatch, int nbTeamPerGroup)
         {
-            for(int i = 0;i < nbMatch ; i++)
+            Misc.Log($"Create Matchs --------------------------");
+            for (int i = 0;i < nbMatch ; i++)
             {
                 var teamA = new Team("TeamA");
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, nbTeamPerGroup).AppendTo(this);
+                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee, nbTeamPerGroup).AppendTo(this).This<Match>();
                 _matchs.Add(match);
+
+                Misc.Log($"Create Match {i + 1}");
 
                 _divMatch.Insert(match);
             }
@@ -444,74 +436,29 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
+
+
             UpdateRect();
 
-            if (!IsPaused)
+            if (!IsLocked)
             {
                 RunState();
 
-                if (_control.Once(Buttons.Space, Keyboard.GetState().IsKeyDown(Keys.Space)))
+                if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
-                    // Using the modulus operator
-                    //_ticProcess = (_ticProcess + 1) % Enums.Count<States>();
-
-                    //States nextState = (States)_process[_ticProcess];
-
-                    //State.Set(nextState);
-
-                    //var matchs = GetMatchs();
-                    //for (int i = 0; i < matchs.Length; i++)
-                    //{
-                    //    matchs[i].State.Set(nextState);
-                    //}
-
                     Misc.Log("Rotation");
 
                     if (_currentRotation < _rotationManager.NbRotation)
                         SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
                 }
 
-                // Debug
-                //if (ButtonControl.OnePress("ToggleTimer", Keyboard.GetState().IsKeyDown(Keys.Space)))
-                //{
-                //    Timer.ToggleTimer();
-
-                //    var matchs = GetMatchs();
-
-                //    for (int i = 0; i < matchs.Length; i++)
-                //    {
-                //        matchs[i].State.Set(Timer.IsRunning ? Match.States.Play : Match.States.Ready);
-                //    }
-
-                //    if (!Timer.IsRunning)
-                //    {
-                //        _step++;
-                //        _step = int.Clamp(_step, 0, 7);
-
-                //        ResetTeamsStatus();
-                //        ResetScoresPoint();
-                //        LoadSequence(_sequence, _step);
-
-                //        State.Set(States.Ready);
-                //    }
-                //    else
-                //    {
-                //        State.Set(States.Play);
-                //    }
-                //}
-
-                if (_control.Once(Buttons.Shuffle, Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
+                if (ButtonControl.OnePress($"Shuffle{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
                 {
                     if (State.CurState == States.Play1)
                         ShuffleTeamsPoint();
                 }
 
-                //if (ButtonControl.OnePress("ShuffleTotalPoint", Keyboard.GetState().IsKeyDown(Keys.D1)))
-                //{
-                //    ShuffleTeamsTotalPoint();
-                //}
-
-                if (_control.Once(Buttons.Back, Keyboard.GetState().IsKeyDown(Keys.Back)))
+                if (ButtonControl.OnePress($"Reset{Id}", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
                     SetTicRotation(0);
                     ResetTeamsStatus();
@@ -542,7 +489,6 @@ namespace VolleyBallTournament
                 }
 
             }
-
 
             UpdateChilds(gameTime);
 
@@ -583,6 +529,8 @@ namespace VolleyBallTournament
                 //Static.DrawArcFilled(batch, Vector2.One * 600, 1200, Geo.RAD_0, Geo.RAD_90, Color.Red);
 
                 //batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState} Temps = {_rotationManager.Duration}s", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
+
+                
             }
 
             DrawChilds(batch, gameTime, indexLayer);

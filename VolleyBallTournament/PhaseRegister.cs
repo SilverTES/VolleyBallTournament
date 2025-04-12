@@ -6,13 +6,12 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace VolleyBallTournament
 {
     public class PhaseRegister : Node   
     {
-        public bool IsPaused = false;
+        public bool IsLocked = false;
         private string _title = "Enregistrement des équipes";
         private KeyboardState _key;
 
@@ -108,7 +107,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = (Match)new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _nbTeamPerGroup).AppendTo(this);
+                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _nbTeamPerGroup);
 
                 _matchs.Add(match);
             }
@@ -254,7 +253,7 @@ namespace VolleyBallTournament
         {
             UpdateRect();
 
-            if (IsPaused)
+            if (IsLocked)
             {
                 var textBoxs = GroupOf<TextBox>();
                 for (int i = 0; i < textBoxs.Count; i++)

@@ -18,6 +18,8 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
+        
+        //private PhasePool _phasePool3;
 
         private RotationManager _rotationManager;
 
@@ -31,8 +33,18 @@ namespace VolleyBallTournament
 
         int _rotation = 0;
 
+        private int _nbScreen = 3;
+
+        Vector2 _scrolling = new Vector2(0, Screen.Height - 28);
+
+        SpriteFont _fontScrolling;
+        string _textScrolling = "             -- Bienvenue au Tournoi de VolleyBall de Saint Maurice L'Exil --          Match : Victoire = 3p, Nul = 1p, Défaite = 0p  + Bonus : écart de point et nombre de points marqué total";
+        float _sizeTextScrolling;
+
         public ScreenPlay(Game game)
         {
+            _fontScrolling = Static.FontMini;
+            _sizeTextScrolling = _fontScrolling.MeasureString(_textScrolling).X;
 
             var files = GetFilesInDirectory(Directory.GetCurrentDirectory(), "*.xml");
 
@@ -54,6 +66,8 @@ namespace VolleyBallTournament
             _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
+            //_phasePool3 = new PhasePool(2, "Phase de poule Qualification 2", _rotationManager).SetX(Screen.Width * 3f).AppendTo(this).This<PhasePool>();
+
             _phasePool1.SetRotation(_rotation = 0);
 
             _animate = new Animate();
@@ -63,8 +77,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 16 + Vector2.UnitY * 16;
 
             //Debug
-            _cameraX = -Screen.Width;
-            SetPosition(-Screen.Width, 0);
+            SetPosition(_cameraX = -Screen.Width * 1, 0);
         }
         public static string[] GetFilesInDirectory(string directoryPath, string filter)
         {
@@ -85,17 +98,19 @@ namespace VolleyBallTournament
 
         public override Node Update(GameTime gameTime)
         {
+            _key = Keyboard.GetState();
             UpdateRect();
 
-            _phaseRegister.IsPaused = true;
-            _phasePool1.IsPaused = true;
-            _phasePool2.IsPaused = true;
+            _phaseRegister.IsLocked = true;
+            _phasePool1.IsLocked = true;
+            _phasePool2.IsLocked = true;
+            //_phasePool3.IsLocked = true;
 
-            if (_cameraX == -_phaseRegister._x) _phaseRegister.IsPaused = false;
-            if (_cameraX == -_phasePool1._x) _phasePool1.IsPaused = false;
-            if (_cameraX == -_phasePool2._x) _phasePool2.IsPaused = false;
+            if (_cameraX == -_phaseRegister._x) _phaseRegister.IsLocked = false;
+            if (_cameraX == -_phasePool1._x) _phasePool1.IsLocked = false;
+            if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
+            //if (_cameraX == -_phasePool3._x) _phasePool3.IsLocked = false;
 
-            _key = Keyboard.GetState();
 
             if (ButtonControl.OnePress("SlideLeft", _key.IsKeyDown(Keys.Left) && _key.IsKeyDown(Keys.LeftControl)))
             {
@@ -111,7 +126,7 @@ namespace VolleyBallTournament
             }
             if (ButtonControl.OnePress("SlideRight", _key.IsKeyDown(Keys.Right) && _key.IsKeyDown(Keys.LeftControl)))
             {
-                if (_cameraX > -Screen.Width * 2)
+                if (_cameraX > -Screen.Width * _nbScreen)
                 {
                     //Misc.Log("Slide Right");
 
@@ -131,11 +146,28 @@ namespace VolleyBallTournament
 
             UpdateChilds(gameTime);
 
+            //_phaseRegister.Update(gameTime);
+            //_phasePool1.Update(gameTime);
+            //_phasePool2.Update(gameTime);
+
+            _scrolling.X -= 2f;
+
+            if (_scrolling.X < -_sizeTextScrolling )
+                _scrolling.X = 0;
+
+
             return base.Update(gameTime);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
         {
             batch.GraphicsDevice.Clear(Color.Transparent);
+
+            if (indexLayer == (int)Layers.HUD)
+            {
+                batch.FilledCircle(Static.TexCircle, _scrolling + AbsXY, 40, Color.Yellow);
+                batch.LeftMiddleString(_fontScrolling, _textScrolling, _scrolling, Color.Yellow);
+                batch.LeftMiddleString(_fontScrolling, _textScrolling, _scrolling + Vector2.UnitX * _sizeTextScrolling, Color.Gold);
+            }
 
             if (indexLayer == (int)Layers.Debug)
             { 

@@ -47,7 +47,7 @@ namespace VolleyBallTournament
                 var team = _teams[i];
 
                 team.SetRank(i + 1);
-                team.MoveToPosition(new Vector2(0, (team._rect.Height + 16 )* i));
+                team.MoveToPosition(new Vector2(0, (team._rect.Height + 8) * i));
                 //team.SetPosition(0, team._rect.Height * i);
             }
 

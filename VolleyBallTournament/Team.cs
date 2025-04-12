@@ -170,7 +170,7 @@ namespace VolleyBallTournament
                 return;
 
             _newPosition = position;
-            _animate.SetMotion("move", Easing.QuadraticEaseOut, _y, _newPosition.Y, duration);
+            _animate.SetMotion("move", Easing.QuadraticEaseInOut, _y, _newPosition.Y, duration);
             _animate.Start("move");
 
         }
@@ -210,8 +210,8 @@ namespace VolleyBallTournament
                 
                 int bonus = _bonusPoint + _currentBonusPoint;
 
-                batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 16, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
-                batch.LeftMiddleString(Static.FontMain, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 16, Color.Yellow);
+                batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
+                batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
 
                 DrawVictory(batch);
 

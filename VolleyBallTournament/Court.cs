@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Mugen.Animation;
 using Mugen.Core;
 using Mugen.GFX;
+using Mugen.Input;
 using Mugen.Physics;
 using System;
 
@@ -12,30 +14,28 @@ namespace VolleyBallTournament
     {
         private Match _match;
 
-        private Vector2 _teamRefereePos;
-        //private bool _prevServiceSide = true;
-        //public bool ServiceSide => _serviceSide;
-        //private bool _serviceSide = true; // true A , false B
-
         private bool _changeSide = false;
         public string CourtName => _courtName;
         private string _courtName;
         private float _ticWave = 0;
-        private float _waveValue = 0;
-        private float _rotation = 0f;
+        private Vector2 _waveValue = new Vector2();
 
-        private Vector2 SetAPos;
-        private Vector2 SetBPos;
-        private Vector2 ScoreAPos;
-        private Vector2 ScoreBPos;
-        private Vector2 TeamAPos;
-        private Vector2 TeamBPos;
-        private Vector2 TeamRefereePos;
-        private Vector2 VBallAPos;
-        private Vector2 VBallBPos;
-        private Vector2 VBallCurrentPos;
-        private Vector2 InfosPos;
-        private Vector2 CourtNamePos;
+        private float _rotationBall = 0f;
+
+        private Vector2 _setAPos;
+        private Vector2 _setBPos;
+        public Vector2 ScoreAPos => _scoreAPos;
+        private Vector2 _scoreAPos;
+        public Vector2 ScoreBPos => _scoreBPos;
+        private Vector2 _scoreBPos;
+        private Vector2 _teamAPos;
+        private Vector2 _teamBPos;
+        private Vector2 _teamRefereePos;
+        private Vector2 _vBallAPos;
+        private Vector2 _vBallBPos;
+        private Vector2 _vBallCurrentPos;
+        private Vector2 _infosPos;
+        private Vector2 _courtNamePos;
 
         private Animate2D _animate2D;
 
@@ -46,7 +46,7 @@ namespace VolleyBallTournament
 
             SetSize(200, 280);
 
-            _rotation = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
+            _rotationBall = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
 
             _animate2D = new();
 
@@ -55,9 +55,9 @@ namespace VolleyBallTournament
         }
         public void SwapTeams()
         {
-            _animate2D.SetMotion("SwapA", Easing.QuadraticEaseOut, TeamAPos, TeamBPos, 80);
+            _animate2D.SetMotion("SwapA", Easing.QuadraticEaseInOut, _teamAPos, _teamBPos, 64);
             _animate2D.Start("SwapA");
-            _animate2D.SetMotion("SwapB", Easing.QuadraticEaseOut, TeamBPos, TeamAPos, 80);
+            _animate2D.SetMotion("SwapB", Easing.QuadraticEaseInOut, _teamBPos, _teamAPos, 64);
             _animate2D.Start("SwapB");
         }
         //public void SetServiceSideA()
@@ -82,67 +82,70 @@ namespace VolleyBallTournament
         //}
         public void UpdateTeamsPosition()
         {
+            if (_animate2D.OnFinish("SwapA") && _animate2D.OnFinish("SwapB"))
+            {
+                //Misc.Log("On Finish Animation2d ");
+                _changeSide = !_changeSide;
+            }
+
             if (!_animate2D.IsPlay("SwapA") && !_animate2D.IsPlay("SwapB"))
             {
                 if (_changeSide)
                 {
-                    TeamAPos = AbsRectF.TopCenter - Vector2.UnitY * 40 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/ 2;
-                    TeamBPos = AbsRectF.BottomCenter + Vector2.UnitY * 40 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/2;
+                    _teamAPos = AbsRectF.TopCenter - Vector2.UnitY * 40 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/ 2;
+                    _teamBPos = AbsRectF.BottomCenter + Vector2.UnitY * 40 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/2;
                 }
                 else
                 {
-                    TeamBPos = AbsRectF.TopCenter - Vector2.UnitY * 40 - Vector2.UnitY * Team.Height / 2 - Vector2.UnitX * Team.Width / 2;
-                    TeamAPos = AbsRectF.BottomCenter + Vector2.UnitY * 40 - Vector2.UnitY * Team.Height / 2 - Vector2.UnitX * Team.Width / 2;
+                    _teamBPos = AbsRectF.TopCenter - Vector2.UnitY * 40 - Vector2.UnitY * Team.Height / 2 - Vector2.UnitX * Team.Width / 2;
+                    _teamAPos = AbsRectF.BottomCenter + Vector2.UnitY * 40 - Vector2.UnitY * Team.Height / 2 - Vector2.UnitX * Team.Width / 2;
                 }
             }
             else
             {
-                TeamAPos = _animate2D.Value("SwapA");
-                TeamBPos = _animate2D.Value("SwapB");
+                _teamAPos = _animate2D.Value("SwapA");
+                _teamBPos = _animate2D.Value("SwapB");
 
             }
 
-            if (_animate2D.OnFinish("SwapA") && _animate2D.OnFinish("SwapB"))
-            {
-                Misc.Log("On Finish Animation2d ");
-                _changeSide = !_changeSide;
-            }
+            _scoreAPos = Team.Bound.TopRight + _teamAPos - Vector2.UnitX * 10;
+            _scoreBPos = Team.Bound.TopRight + _teamBPos - Vector2.UnitX * 10;
 
-
-
-            ScoreAPos = Team.Bound.TopRight + TeamAPos - Vector2.UnitX * 10;
-            ScoreBPos = Team.Bound.TopRight + TeamBPos - Vector2.UnitX * 10;
-
-            SetAPos = Team.Bound.RightMiddle + TeamAPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
-            SetBPos = Team.Bound.RightMiddle + TeamBPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
+            _setAPos = Team.Bound.RightMiddle + _teamAPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
+            _setBPos = Team.Bound.RightMiddle + _teamBPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
 
         }
         public override Node Update(GameTime gameTime)
         {
+            // Debug
+            if (ButtonControl.OnePress($"Swap{_courtName}", Static.Key.IsKeyDown(Keys.S)))
+            {
+                SwapTeams();
+            }
+
             _animate2D.Update();
 
             UpdateRect();
 
             UpdateTeamsPosition();
 
-            TeamRefereePos = AbsRectF.Center + Vector2.UnitY * 0 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/2 + Vector2.UnitX * 120;
+            _teamRefereePos = AbsRectF.Center + Vector2.UnitY * 0 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/2 + Vector2.UnitX * 120;
 
-            VBallAPos = Team.Bound.LeftMiddle + TeamAPos - Vector2.UnitX * 32;
-            VBallBPos = Team.Bound.LeftMiddle + TeamBPos - Vector2.UnitX * 32;
+            _vBallAPos = Team.Bound.LeftMiddle + _teamAPos - Vector2.UnitX * 32;
+            _vBallBPos = Team.Bound.LeftMiddle + _teamBPos - Vector2.UnitX * 32;
 
-            if (_match.TeamA.HasService) VBallCurrentPos = VBallAPos;
-            if (_match.TeamB.HasService) VBallCurrentPos = VBallBPos;
+            if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
+            if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
 
-            _teamRefereePos = AbsRectF.Center;
-            InfosPos = AbsRectF.Center - Vector2.UnitY * 90 + Vector2.UnitY * _waveValue;
-            CourtNamePos = AbsRectF.Center + Vector2.UnitY * 90;
+            _infosPos = AbsRectF.Center - Vector2.UnitY * 90 + _waveValue;
+            _courtNamePos = AbsRectF.Center + Vector2.UnitY * 90;
 
             _ticWave += 0.1f;
-            _waveValue = MathF.Sin(_ticWave) * 4f;
+            //_waveValue.X = MathF.Cos(_ticWave) * 8f;
+            _waveValue.Y = MathF.Sin(_ticWave) * 8f;
 
             if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2)
-                _rotation += .05f;
-
+                _rotationBall += .05f;
 
             return base.Update(gameTime);
         }
@@ -152,18 +155,18 @@ namespace VolleyBallTournament
             {
                 DrawCourt(batch);
                 
-                _match.TeamA.DrawBasicTeam(batch, Team.Bound + TeamAPos);
-                _match.TeamB.DrawBasicTeam(batch, Team.Bound + TeamBPos);
+                _match.TeamA.DrawBasicTeam(batch, Team.Bound + _teamAPos);
+                _match.TeamB.DrawBasicTeam(batch, Team.Bound + _teamBPos);
 
-                _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + TeamRefereePos);
+                _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos);
 
                 //if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Ready || _match.State.CurState == Match.States.CountDown)
-                    DrawVBall(batch, VBallCurrentPos);
+                    DrawVBall(batch, _vBallCurrentPos);
 
-                batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", CourtNamePos, Color.Yellow);
+                batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", _courtNamePos, Color.Yellow);
 
                 //batch.CenterStringXY(Static.FontMain, $"{_match.Infos[_match.State.CurState]}", InfosPos + Vector2.One * 6, Color.Black);
-                batch.CenterStringXY(Static.FontMain, $"{_match.Infos[_match.State.CurState]}", InfosPos, Color.White);
+                batch.CenterStringXY(Static.FontMain, $"{_match.Infos[_match.State.CurState]}", _infosPos, Color.White);
 
 
                 //batch.Draw(Static.TexReferee, Color.Black, 0, _teamRefereePos + Vector2.One * 6, Position.CENTER, Vector2.One / 4);
@@ -177,17 +180,17 @@ namespace VolleyBallTournament
                     DrawSet(batch);
                 }
 
-                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), ScoreAPos + Vector2.One * 6, Color.Black * .5f);
-                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), ScoreBPos + Vector2.One * 6, Color.Black * .5f);
+                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), _scoreAPos + Vector2.One * 6, Color.Black * .5f);
+                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), _scoreBPos + Vector2.One * 6, Color.Black * .5f);
 
-                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), ScoreAPos, Color.Gold);
-                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), ScoreBPos, Color.Gold);
+                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), _scoreAPos, Color.Gold);
+                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), _scoreBPos, Color.Gold);
 
             }
 
             if (indexLayer == (int)Layers.HUD)
             {
-                _match.TeamReferee.DrawReferee(batch, Team.Bound + TeamRefereePos);
+                _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
             }
 
 
@@ -207,12 +210,12 @@ namespace VolleyBallTournament
             {
                 var offset = new Vector2(i * 30, 0) + Vector2.UnitX * 10;
 
-                batch.FillRectangleCentered(SetAPos + offset + Vector2.One * 6, Vector2.One * 26, Color.Black, 0);
-                batch.FillRectangleCentered(SetBPos + offset + Vector2.One * 6, Vector2.One * 26, Color.Black, 0);
-                batch.FillRectangleCentered(SetAPos + offset, Vector2.One * 26, Color.Gray, 0);
-                batch.FillRectangleCentered(SetAPos + offset, Vector2.One * 20, i >= _match.TeamA.ScoreSet ? Color.Black * .75f: Color.Gold, 0);
-                batch.FillRectangleCentered(SetBPos + offset, Vector2.One * 26, Color.Gray, 0);
-                batch.FillRectangleCentered(SetBPos + offset, Vector2.One * 20, i >= _match.TeamB.ScoreSet ? Color.Black * .75f: Color.Gold, 0);
+                batch.FillRectangleCentered(_setAPos + offset + Vector2.One * 6, Vector2.One * 26, Color.Black, 0);
+                batch.FillRectangleCentered(_setBPos + offset + Vector2.One * 6, Vector2.One * 26, Color.Black, 0);
+                batch.FillRectangleCentered(_setAPos + offset, Vector2.One * 26, Color.Gray, 0);
+                batch.FillRectangleCentered(_setAPos + offset, Vector2.One * 20, i >= _match.TeamA.ScoreSet ? Color.Black * .75f: Color.Gold, 0);
+                batch.FillRectangleCentered(_setBPos + offset, Vector2.One * 26, Color.Gray, 0);
+                batch.FillRectangleCentered(_setBPos + offset, Vector2.One * 20, i >= _match.TeamB.ScoreSet ? Color.Black * .75f: Color.Gold, 0);
             }
         }
         private void DrawCourt(SpriteBatch batch)
@@ -232,8 +235,8 @@ namespace VolleyBallTournament
         }
         private void DrawVBall(SpriteBatch batch, Vector2 position)
         {
-            batch.Draw(Static.TexVBall, Color.Black * .5f, _rotation, position + Vector2.One * 16, Mugen.Physics.Position.CENTER, Vector2.One / 2);
-            batch.Draw(Static.TexVBall, Color.White, _rotation, position, Mugen.Physics.Position.CENTER, Vector2.One / 2);
+            batch.Draw(Static.TexVBall, Color.Black * .5f, _rotationBall, position + Vector2.One * 16, Mugen.Physics.Position.CENTER, Vector2.One / 2);
+            batch.Draw(Static.TexVBall, Color.White, _rotationBall, position, Mugen.Physics.Position.CENTER, Vector2.One / 2);
         }
     }
 }
