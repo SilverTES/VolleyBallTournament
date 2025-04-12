@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Mugen.Animation;
 using Mugen.Core;
+using Mugen.Event;
 using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Physics;
@@ -12,6 +13,46 @@ using System.IO.Pipes;
 
 namespace VolleyBallTournament
 {
+    public class Trail : Node
+    {
+        Color _color;
+        Vector2 _scale;
+        float _stepAlpha;
+        public Trail(RectangleF rectF, Vector2 scale, float stepAplha = 0.5f, Color color = default)
+        {
+            _x = rectF.X;
+            _y = rectF.Y;
+
+            _rect = rectF;
+            _scale = scale;
+            _color = color;
+            _stepAlpha = stepAplha;
+        }
+
+        public override Node Update(GameTime gameTime)
+        {
+            UpdateRect();
+
+            _alpha += -_stepAlpha;
+
+            if (_alpha <= 0f)
+                KillMe();
+            return base.Update(gameTime);
+        }
+
+        public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
+        {
+
+            if (indexLayer == (int)Layers.BackFX)
+            {
+                batch.FillRectangle(_rect, _color * _alpha);
+            }
+
+
+            return base.Draw(batch, gameTime, indexLayer);
+        }
+    }
+
     public enum Result
     {
         Null,
@@ -21,6 +62,15 @@ namespace VolleyBallTournament
 
     public class Team : Node  
     {
+        public enum Timers
+        {
+            None,
+            Trail,
+        }
+        Timer<Timers> _timer = new Timer<Timers>();
+
+        private bool _isMove = false;
+
         private Match _match = null;
 
         private int _rank = 0;
@@ -66,6 +116,9 @@ namespace VolleyBallTournament
             //Match = match;
             //ScorePanel = scorePanel;
             //Court = court;
+
+            _timer.Set(Timers.Trail, Timer.Time(0, 0, .01f), true);
+            _timer.Start(Timers.Trail);
 
             _animate = new Animate();
             _animate.Add("move");
@@ -169,13 +222,19 @@ namespace VolleyBallTournament
             if (position == XY) 
                 return;
 
+            //_isMove = true;
             _newPosition = position;
-            _animate.SetMotion("move", Easing.QuadraticEaseInOut, _y, _newPosition.Y, duration);
+            _animate.SetMotion("move", Easing.QuadraticEaseOut, _y, _newPosition.Y, duration);
             _animate.Start("move");
 
         }
+        public void SetIsMove(bool isMove)
+        {
+            _isMove = isMove;
+        }
         public override Node Update(GameTime gameTime)
         {
+            _timer.Update();
             UpdateRect();
 
             if (_animate.IsPlay != null)
@@ -185,6 +244,7 @@ namespace VolleyBallTournament
 
             if (_animate.Off("move"))
             {
+                _isMove = false;
                 //Misc.Log("End move");
             }
             _animate.NextFrame();
@@ -238,14 +298,18 @@ namespace VolleyBallTournament
 
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
         {
+            if (_timer.On(Timers.Trail) && _isMove)
+            {
+                //Misc.Log("Move");
+                new Trail(rectF.Extend(-8f), Vector2.One, .05f, Color.WhiteSmoke).AppendTo(_parent);
+            }
+
             batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 8, Color.Black * .5f);
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 2f);
 
             batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
-
-
         }
         public void DrawReferee(SpriteBatch batch, RectangleF rectF)
         {

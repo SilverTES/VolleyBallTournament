@@ -59,6 +59,11 @@ namespace VolleyBallTournament
             _animate2D.Start("SwapA");
             _animate2D.SetMotion("SwapB", Easing.QuadraticEaseInOut, _teamBPos, _teamAPos, 64);
             _animate2D.Start("SwapB");
+
+            _match.TeamA.SetIsMove(true);
+            _match.TeamB.SetIsMove(true);
+
+            Static.SoundSwap.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
         }
         //public void SetServiceSideA()
         //{
@@ -84,7 +89,9 @@ namespace VolleyBallTournament
         {
             if (_animate2D.OnFinish("SwapA") && _animate2D.OnFinish("SwapB"))
             {
-                //Misc.Log("On Finish Animation2d ");
+                _match.TeamA.SetIsMove(false);
+                _match.TeamB.SetIsMove(false);
+                Misc.Log("On Finish Animation2d ");
                 _changeSide = !_changeSide;
             }
 

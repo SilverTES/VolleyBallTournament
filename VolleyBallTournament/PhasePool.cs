@@ -29,8 +29,8 @@ namespace VolleyBallTournament
         private List<Group> _groups = new();
         private List<Team> _teams = new();
 
-        public Timer Timer => _timer;
-        private readonly Timer _timer;
+        public TimerCountDown Timer => _timer;
+        private readonly TimerCountDown _timer;
 
         private int _currentRotation = 0;
 
@@ -63,7 +63,7 @@ namespace VolleyBallTournament
                 CreateMatchs(nbMatch, nbTeamPerGroup);
             }
 
-            _timer = (Timer)new Timer().AppendTo(this);
+            _timer = (TimerCountDown)new TimerCountDown().AppendTo(this);
             _divTimer.Insert(_timer);
 
             _divMain.Insert(_divTimer);
@@ -90,28 +90,28 @@ namespace VolleyBallTournament
 
             State.On(States.Play1, () => 
             {
-                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.SetDuration(_rotationManager.GetDuration(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.Play1, () =>
             {
-                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
 
             State.On(States.Play2, () =>
             {
-                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.SetDuration(_rotationManager.GetDuration(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.Play2, () =>
             {
-                Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
@@ -546,7 +546,7 @@ namespace VolleyBallTournament
                 var pos2 = new Vector2(position.X + (i+1) * 64, position.Y);
 
                 if (i == 0)
-                    batch.CenterStringXY(Static.FontMini, "Debut des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, "Début des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
 
                 if (i == _rotationManager.NbRotation - 2)
                     batch.CenterStringXY(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 40, Color.Yellow);

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace VolleyBallTournament
 {
-    public class Timer : Node
+    public class TimerCountDown : Node
     {
         private double _elapsedTime;
         private double _durationTime;
@@ -20,7 +20,7 @@ namespace VolleyBallTournament
 
         private bool _onRemainingTime = false;
         public TimeSpan ElapsedTime => TimeSpan.FromSeconds(_durationTime) - TimeSpan.FromSeconds(_elapsedTime);
-        public Timer(double durationInSeconds = 120) 
+        public TimerCountDown(double durationInSeconds = 120) 
         {
             _elapsedTime = 0;
             _durationTime = durationInSeconds;

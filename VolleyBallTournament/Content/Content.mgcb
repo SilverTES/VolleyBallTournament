@@ -104,6 +104,12 @@
 /processorParam:Quality=Best
 /build:Sounds/countdown.wav
 
+#begin Sounds/electric_door_opening_1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/electric_door_opening_1.wav
+
 #begin Sounds/picked-coin-echo.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor

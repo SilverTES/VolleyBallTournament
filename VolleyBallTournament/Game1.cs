@@ -16,6 +16,7 @@ namespace VolleyBallTournament
     }
     public enum Layers
     {
+        BackFX,
         Main,
         HUD,
         FrontFX,
@@ -51,6 +52,7 @@ namespace VolleyBallTournament
         public static SoundEffect SoundPoint;
         public static SoundEffect SoundCountDown;
         public static SoundEffect SoundStart;
+        public static SoundEffect SoundSwap;
 
         public static void DrawRoundedRectangle(SpriteBatch batch, Texture2D texLine, Rectangle rect, Color color, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius, int thickness, int segments = 4)
         {
@@ -121,6 +123,7 @@ namespace VolleyBallTournament
             ScreenManager.Init(_screenPlay, Enums.GetList<Layers>());
 
             Static.RasterizerState = new RasterizerState { ScissorTestEnable = true };
+            ScreenManager.SetLayerParameter((int)Layers.BackFX, samplerState: SamplerState.LinearWrap, blendState: BlendState.Additive);
             ScreenManager.SetLayerParameter((int)Layers.Main, samplerState: SamplerState.LinearWrap);
             ScreenManager.SetLayerParameter((int)Layers.HUD, samplerState: SamplerState.LinearWrap, rasterizerState : Static.RasterizerState, sortMode: SpriteSortMode.Immediate);
             ScreenManager.SetLayerParameter((int)Layers.FrontFX, samplerState: SamplerState.LinearWrap, blendState: BlendState.Additive);
@@ -149,6 +152,7 @@ namespace VolleyBallTournament
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
             Static.SoundCountDown = Content.Load<SoundEffect>("Sounds/countdown");
             Static.SoundStart = Content.Load<SoundEffect>("Sounds/race-start");
+            Static.SoundSwap = Content.Load<SoundEffect>("Sounds/electric_door_opening_1");
 
             Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
             Static.TexLine = GFX.CreateLineTextureAA(GraphicsDevice, 100, 15, 7);
