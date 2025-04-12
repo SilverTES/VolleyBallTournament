@@ -515,7 +515,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 40)/2, 80));
+                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 64)/2, 80));
             }
 
             if (indexLayer == (int)Layers.Debug)
@@ -542,14 +542,14 @@ namespace VolleyBallTournament
         {
             for (int i = 0; i < _rotationManager.NbRotation; i++)
             {
-                var pos = new Vector2(position.X + (i+0) * 40, position.Y);
-                var pos2 = new Vector2(position.X + (i+1) * 40, position.Y);
+                var pos = new Vector2(position.X + (i+0) * 64, position.Y);
+                var pos2 = new Vector2(position.X + (i+1) * 64, position.Y);
 
                 if (i == 0)
-                    batch.RightMiddleString(Static.FontMini, "Debut des Matchs", pos - Vector2.UnitX * 30, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, "Debut des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
 
                 if (i == _rotationManager.NbRotation - 2)
-                    batch.LeftMiddleString(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitX * 30, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 40, Color.Yellow);
 
 
                 if (i < _rotationManager.NbRotation - 1)

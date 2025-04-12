@@ -38,11 +38,13 @@ namespace VolleyBallTournament
         Vector2 _scrolling = new Vector2(0, Screen.Height - 28);
 
         SpriteFont _fontScrolling;
-        string _textScrolling = "             -- Bienvenue au Tournoi de VolleyBall de Saint Maurice L'Exil --          Match : Victoire = 3p, Nul = 1p, Défaite = 0p  + Bonus : écart de point et nombre de points marqué total";
+        string _textScrolling = "               -- Bienvenue au Tournoi de VolleyBall de Saint Maurice L'Exil --                 Match : Victoire = 3p, Nul = 1p, Défaite = 0p  + Bonus : écart de point et nombre de points total marqués        ";
         float _sizeTextScrolling;
+        Color _colorTextScrolling;
 
         public ScreenPlay(Game game)
         {
+            _colorTextScrolling = Color.Gray;
             _fontScrolling = Static.FontMini;
             _sizeTextScrolling = _fontScrolling.MeasureString(_textScrolling).X;
 
@@ -165,8 +167,8 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.HUD)
             {
                 batch.FilledCircle(Static.TexCircle, _scrolling + AbsXY, 40, Color.Yellow);
-                batch.LeftMiddleString(_fontScrolling, _textScrolling, _scrolling, Color.Yellow);
-                batch.LeftMiddleString(_fontScrolling, _textScrolling, _scrolling + Vector2.UnitX * _sizeTextScrolling, Color.Gold);
+                batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling + Vector2.One * 4, Color.Black * .75f);
+                batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling, _colorTextScrolling);
             }
 
             if (indexLayer == (int)Layers.Debug)

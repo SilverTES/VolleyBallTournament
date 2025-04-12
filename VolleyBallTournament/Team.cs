@@ -194,7 +194,8 @@ namespace VolleyBallTournament
 
             if (_match != null)
             {
-                _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
+                if (!_isReferee) // Seul l'équipe qui joue on leur bonus qui changent !
+                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
             }
 
             return base.Update(gameTime);
@@ -237,7 +238,7 @@ namespace VolleyBallTournament
 
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
         {
-            batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 6, Color.Black * .75f);
+            batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 8, Color.Black * .5f);
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 2f);
@@ -254,8 +255,15 @@ namespace VolleyBallTournament
                 //batch.Draw(Static.TexReferee, Color.White, 0, rectF.Center + Vector2.UnitX * 10, Position.CENTER, Vector2.One / 4);
                 if (_match != null)
                 {
-                    batch.CenterStringXY(Static.FontMini, $"Arbitre Terrain {_match.Court.CourtName}", rectF.TopCenter + Vector2.One * 2, Color.Black *.5f);
-                    batch.CenterStringXY(Static.FontMini, $"Arbitre Terrain {_match.Court.CourtName}", rectF.TopCenter, Color.Orange);
+                    string text = $"Arbitre Terrain {_match.Court.CourtName}";
+
+                    Vector2 pos = rectF.TopCenter - Vector2.UnitY * 4;
+
+                    batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Black *.75f, 0f);
+                    batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
+
+                    batch.CenterStringXY(Static.FontMini, text, pos + Vector2.One * 2, Color.Black *.5f);
+                    batch.CenterStringXY(Static.FontMini, text, pos, Color.Orange);
                 }
             }
         }
