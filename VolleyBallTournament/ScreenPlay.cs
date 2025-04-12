@@ -44,7 +44,7 @@ namespace VolleyBallTournament
 
         public ScreenPlay(Game game)
         {
-            _colorTextScrolling = Color.Gray;
+            _colorTextScrolling = Color.WhiteSmoke;
             _fontScrolling = Static.FontMini;
             _sizeTextScrolling = _fontScrolling.MeasureString(_textScrolling).X;
 

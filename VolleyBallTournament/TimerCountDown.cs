@@ -99,7 +99,7 @@ namespace VolleyBallTournament
             {
                 batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .5f, 0);
                 //batch.CenterStringXY(Static.FontDigitMonoBG, GetFormattedTime(), AbsXY + OXY, Color.Black);
-                batch.CenterStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.Orange);
+                batch.CenterStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.OrangeRed);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

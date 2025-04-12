@@ -172,8 +172,8 @@ namespace VolleyBallTournament
 
                 batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", _courtNamePos, Color.Yellow);
 
-                //batch.CenterStringXY(Static.FontMain, $"{_match.Infos[_match.State.CurState]}", InfosPos + Vector2.One * 6, Color.Black);
-                batch.CenterStringXY(Static.FontMain, $"{_match.Infos[_match.State.CurState]}", _infosPos, Color.White);
+
+                DrawInfos(batch);
 
 
                 //batch.Draw(Static.TexReferee, Color.Black, 0, _teamRefereePos + Vector2.One * 6, Position.CENTER, Vector2.One / 4);
@@ -225,12 +225,22 @@ namespace VolleyBallTournament
                 batch.FillRectangleCentered(_setBPos + offset, Vector2.One * 20, i >= _match.TeamB.ScoreSet ? Color.Black * .75f: Color.Gold, 0);
             }
         }
+        private void DrawInfos(SpriteBatch batch)
+        {
+            string text = $"{_match.Infos[_match.State.CurState]}";
+            Vector2 pos = _infosPos;
+            Vector2 size = Static.FontMain.MeasureString(text) + new Vector2(24, -20);
+            batch.FillRectangleCentered(pos, size, Color.Black * .75f, 0f);
+            batch.RectangleCentered(pos, size, Color.Gray, 1f);
+            batch.CenterStringXY(Static.FontMain, text, _infosPos, Color.White);
+        }
         private void DrawCourt(SpriteBatch batch)
         {
             Color color = Color.White * .25f;
             float thickness = 3f;
 
-            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? .25f : .1f));
+            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? .5f : .25f));
+            batch.FillRectangle(AbsRectF.Extend(0f), Color.Goldenrod * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? 1f : .5f));
             batch.Rectangle(AbsRectF, color, thickness);
 
             batch.Line(AbsRectF.LeftMiddle, AbsRectF.RightMiddle, color, thickness);

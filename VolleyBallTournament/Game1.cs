@@ -16,6 +16,7 @@ namespace VolleyBallTournament
     }
     public enum Layers
     {
+        BackGround,
         BackFX,
         Main,
         HUD,
@@ -44,6 +45,7 @@ namespace VolleyBallTournament
         public static SpriteFont FontDigitMonoBG;
 
         public static Texture2D TexBG00;
+        public static Texture2D TexBG01;
         public static Texture2D TexVBall;
         public static Texture2D TexReferee;
         public static Texture2D TexCircle;
@@ -53,6 +55,7 @@ namespace VolleyBallTournament
         public static SoundEffect SoundCountDown;
         public static SoundEffect SoundStart;
         public static SoundEffect SoundSwap;
+        public static SoundEffect SoundRanking;
 
         public static void DrawRoundedRectangle(SpriteBatch batch, Texture2D texLine, Rectangle rect, Color color, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius, int thickness, int segments = 4)
         {
@@ -145,6 +148,7 @@ namespace VolleyBallTournament
             Static.FontDigitMono = Content.Load<SpriteFont>("Fonts/fontDigitMono");
             Static.FontDigitMonoBG = Content.Load<SpriteFont>("Fonts/fontDigitMonoBG");
 
+            Static.TexBG01 = Content.Load<Texture2D>("Images/bg01");
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
             Static.TexVBall = Content.Load<Texture2D>("Images/vballmini");
             Static.TexReferee = Content.Load<Texture2D>("Images/referee00");
@@ -153,6 +157,7 @@ namespace VolleyBallTournament
             Static.SoundCountDown = Content.Load<SoundEffect>("Sounds/countdown");
             Static.SoundStart = Content.Load<SoundEffect>("Sounds/race-start");
             Static.SoundSwap = Content.Load<SoundEffect>("Sounds/electric_door_opening_1");
+            Static.SoundRanking = Content.Load<SoundEffect>("Sounds/key2");
 
             Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
             Static.TexLine = GFX.CreateLineTextureAA(GraphicsDevice, 100, 15, 7);

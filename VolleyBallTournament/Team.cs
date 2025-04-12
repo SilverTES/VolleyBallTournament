@@ -301,13 +301,13 @@ namespace VolleyBallTournament
             if (_timer.On(Timers.Trail) && _isMove)
             {
                 //Misc.Log("Move");
-                new Trail(rectF.Extend(-8f), Vector2.One, .05f, Color.WhiteSmoke).AppendTo(_parent);
+                new Trail(rectF.Extend(-4f), Vector2.One, .05f, Color.WhiteSmoke).AppendTo(_parent);
             }
 
             batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 8, Color.Black * .5f);
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
-            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 2f);
+            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 1f);
 
             batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
         }
@@ -320,9 +320,7 @@ namespace VolleyBallTournament
                 if (_match != null)
                 {
                     string text = $"Arbitre Terrain {_match.Court.CourtName}";
-
                     Vector2 pos = rectF.TopCenter - Vector2.UnitY * 4;
-
                     batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Black *.75f, 0f);
                     batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
 

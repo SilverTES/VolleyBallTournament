@@ -459,7 +459,7 @@ public class TextBox : Node
             // Dessiner le fond du champ
             batch.Draw(GFX._whitePixel, AbsRect, _colorBg);
 
-            batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.Gray : Color.Transparent, 3f);
+            batch.Rectangle(AbsRectF.Extend(_isFocus ? _extend : 0), _isFocus ? Color.Gold : Color.Transparent, 3f);
 
             // Sauvegarder l'état actuel du ScissorRectangle
             Rectangle? originalScissor = batch.GraphicsDevice.ScissorRectangle;

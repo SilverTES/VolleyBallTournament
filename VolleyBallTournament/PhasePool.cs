@@ -146,6 +146,7 @@ namespace VolleyBallTournament
             });
             State.Off(States.ValidPoints, () =>
             {
+                Static.SoundRanking.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Count; i++)
@@ -497,12 +498,18 @@ namespace VolleyBallTournament
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
         {
+            //batch.GraphicsDevice.Clear(Color.Transparent);
+
+            if (indexLayer == (int)Layers.BackGround)
+            {
+                batch.Draw(Static.TexBG01, Vector2.Zero, Color.White);
+            }
 
             if (indexLayer == (int)Layers.Main)
             {
                 //batch.GraphicsDevice.Clear(Color.DarkSlateBlue);
-                
-                batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
+                batch.FillRectangle(AbsRectF, Color.Black * .25f);
+                //batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
 
                 //batch.FillRectangle(_divMatch.Rect.Translate(AbsXY), Color.White * .5f);
 

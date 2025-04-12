@@ -50,7 +50,6 @@ namespace VolleyBallTournament
                 team.MoveToPosition(new Vector2(0, (team._rect.Height + 8) * i));
                 //team.SetPosition(0, team._rect.Height * i);
             }
-
         }
         public override Node Update(GameTime gameTime)
         {
@@ -74,7 +73,7 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.HUD)
             {
                 //batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 30 + Vector2.One * 6, Color.Black * .5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 40, Color.LightSeaGreen);
+                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 40, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
