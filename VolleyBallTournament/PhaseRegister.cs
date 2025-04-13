@@ -278,14 +278,16 @@ namespace VolleyBallTournament
             {
                 _key = Static.Key;
 
-                if (ButtonControl.OnPress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
-                if (ButtonControl.OnPress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
-                if (ButtonControl.OnPress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
-                if (ButtonControl.OnPress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
+                if (!_key.IsKeyDown(Keys.LeftControl)) // Lock les touches si changement d'ecran
+                {
+                    if (ButtonControl.OnPress("Tab", _key.IsKeyDown(Keys.Tab))) FocusNextTextBox();
+                    if (ButtonControl.OnPress("Up", _key.IsKeyDown(Keys.Up))) FocusPrevTextBox();
+                    if (ButtonControl.OnPress("Down", _key.IsKeyDown(Keys.Down))) FocusNextTextBox();
+                    if (ButtonControl.OnPress("Enter", _key.IsKeyDown(Keys.Enter))) FocusNextTextBox();
 
-                if (ButtonControl.OnPress("Left", _key.IsKeyDown(Keys.Left))) FocusPrevGroupRegister(_currentTextBox);
-                if (ButtonControl.OnPress("Right", _key.IsKeyDown(Keys.Right))) FocusNextGroupRegister(_currentTextBox);
-
+                    if (ButtonControl.OnPress("Left", _key.IsKeyDown(Keys.Left))) FocusPrevGroupRegister(_currentTextBox);
+                    if (ButtonControl.OnPress("Right", _key.IsKeyDown(Keys.Right))) FocusNextGroupRegister(_currentTextBox);
+                }
             }
 
             UpdateChilds(gameTime);

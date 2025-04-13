@@ -120,25 +120,25 @@ namespace VolleyBallTournament
             _vBallAPos = Team.Bound.LeftMiddle + _teamAPos - Vector2.UnitX * 32;
             _vBallBPos = Team.Bound.LeftMiddle + _teamBPos - Vector2.UnitX * 32;
 
-            if (_match.TeamHasService == _match.LastTeamHasService)
-            {
-                //Misc.Log("======");
-                if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
-                if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
-            }
+            //if (_match.TeamHasService == _match.LastTeamHasService)
+            //{
+            //    //Misc.Log("======");
+            //    if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
+            //    if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
+            //}
 
-            if (_animate2D.IsPlay("VBallMoveToA")) _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
-            if (_animate2D.IsPlay("VBallMoveToB")) _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
+            //if (_animate2D.IsPlay("VBallMoveToA")) _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
+            //if (_animate2D.IsPlay("VBallMoveToB")) _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
 
-            //if (_animate2D.IsPlay("VBallMoveToA"))
-            //    _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
-            //else
-            //    if (_match.TeamA.HasService) {_vBallCurrentPos = _vBallAPos; }
+            if (_animate2D.IsPlay("VBallMoveToA"))
+                _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
+            else
+                if (_match.TeamA.HasService) { _vBallCurrentPos = _vBallAPos; }
 
-            //if (_animate2D.IsPlay("VBallMoveToB"))
-            //    _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
-            //else
-            //    if (_match.TeamB.HasService) { _vBallCurrentPos = _vBallBPos; }
+            if (_animate2D.IsPlay("VBallMoveToB"))
+                _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
+            else
+                if (_match.TeamB.HasService) { _vBallCurrentPos = _vBallBPos; }
 
         }
         public void OnChangeService(Team team)

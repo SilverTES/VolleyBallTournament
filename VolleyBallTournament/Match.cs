@@ -122,6 +122,7 @@ namespace VolleyBallTournament
             _teamHasService = team;
             _teamHasService.SetService(true);
             _lastTeamHasService = team;
+            GetTeamOppenent(_teamHasService).SetService(false);
         }
         public void CancelAction()
         {
@@ -311,9 +312,8 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Debug)
             {
-                //if (_lastTeamHasService != null)
-                batch.LeftTopString(Static.FontMini, $"{_teamHasService.TeamName}", AbsXY + new Vector2(10, 10), Color.Red);
-                batch.LeftTopString(Static.FontMini, $"{_lastTeamHasService.TeamName}", AbsXY + new Vector2(10, 40), Color.Red);
+                //batch.LeftTopString(Static.FontMini, $"{_teamHasService.TeamName}", AbsXY + new Vector2(10, 10), Color.Red);
+                //batch.LeftTopString(Static.FontMini, $"{_lastTeamHasService.TeamName}", AbsXY + new Vector2(10, 40), Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

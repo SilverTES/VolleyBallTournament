@@ -149,6 +149,7 @@ namespace VolleyBallTournament
 
             UpdateChilds(gameTime);
 
+
             _scrolling.X -= 2f;
 
             if (_scrolling.X <= -_sizeTextScrolling )

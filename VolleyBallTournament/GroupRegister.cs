@@ -42,6 +42,7 @@ namespace VolleyBallTournament
                 batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .75f);
 
                 batch.Rectangle(AbsRectF, Color.DarkSlateBlue * 1f);
+                batch.Rectangle(AbsRectF.Extend(-4f), Color.Gray * .75f);
 
                 batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20 + Vector2.One * 6, Color.Black * .5f);
                 batch.CenterStringXY(Static.FontMain, $"Groupe {_idGroupRegister + 1}", AbsRectF.TopCenter - Vector2.UnitY * 20, Color.White);
