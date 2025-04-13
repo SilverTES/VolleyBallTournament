@@ -16,6 +16,7 @@ namespace VolleyBallTournament
             Ready,
             CountDown1,
             Play1,
+            PreSwap,
             SwapSide,
             CountDown2,
             Play2,
@@ -31,10 +32,11 @@ namespace VolleyBallTournament
             {States.WarmUp, "Echauffement"},
             {States.Ready, "Prêt a jouer"},
             {States.CountDown1, "Début du Match"},
-            {States.Play1, "Match en cours"},
+            {States.Play1, "Manche 1 en cours"},
+            {States.PreSwap, "Fin de Manche 1"},
             {States.SwapSide, "Changement de côté"},
             {States.CountDown2, "Reprise du Match"},
-            {States.Play2, "Match en cours"},
+            {States.Play2, "Manche 2 en cours"},
             {States.Finish, "Fin du match"},
             {States.ValidPoints, "Validation des Points"},
             //{States.LastPoint, "Dernière balle"},
@@ -90,9 +92,21 @@ namespace VolleyBallTournament
             //_timerCountDown = new Timer();
             //_timerCountDown.Start();
         }
+        public void ValidSet()
+        {
+            var winner = GetWinner();
+            TeamA.AddScoreSet(new Set(winner == TeamA, TeamA.ScorePoint));
+            TeamB.AddScoreSet(new Set(winner == TeamB, TeamB.ScorePoint));
+        }
         public void SetNbSetToWin(int nbSetToWin)
         {
             _nbSetToWin = nbSetToWin;
+        }
+        public Team GetTeamHasService()
+        {
+            if (TeamA.HasService) return TeamA;
+            if (TeamB.HasService) return TeamB;
+            return null;
         }
         public Team GetWinner()
         {
@@ -131,10 +145,13 @@ namespace VolleyBallTournament
             if (_teamReferee.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamReferee.SetMatch(this);
         }
-        public void ResetScore()
+        public void ResetSets()
         {
-            TeamA.SetScoreSet(0);
-            TeamB.SetScoreSet(0);
+            TeamA.Sets.Clear();
+            TeamB.Sets.Clear();
+        }
+        public void ResetScorePoints()
+        {
             TeamA.SetScorePoint(0);
             TeamB.SetScorePoint(0);
         }

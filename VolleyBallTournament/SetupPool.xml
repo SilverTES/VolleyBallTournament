@@ -3,45 +3,45 @@
   
   <config nbGroupe = "4" nbEquipeParGroupe = "4" nbTerrain = "3"/>
   
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "A1:B1" arbitre = "A4"/>
-    <match terrain ="2" equipes = "A2:B2" arbitre = "B4"/>
-    <match terrain ="3" equipes = "A3:B3" arbitre = "C4"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "A1:B1" arbitre = "A4" nbSet ="1"/>
+    <match terrain ="2" equipes = "A2:B2" arbitre = "B4" nbSet ="1"/>
+    <match terrain ="3" equipes = "A3:B3" arbitre = "C4" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "A4:B4" arbitre = "A1"/>
-    <match terrain ="2" equipes = "C2:D2" arbitre = "B1"/>
-    <match terrain ="3" equipes = "C3:D3" arbitre = "C1"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "A4:B4" arbitre = "A1" nbSet ="1"/>
+    <match terrain ="2" equipes = "C2:D2" arbitre = "B1" nbSet ="1"/>
+    <match terrain ="3" equipes = "C3:D3" arbitre = "C1" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "C1:D1" arbitre = "A2"/>
-    <match terrain ="2" equipes = "C4:D4" arbitre = "B2"/>
-    <match terrain ="3" equipes = "A3:C3" arbitre = "C2"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "C1:D1" arbitre = "A2" nbSet ="1"/>
+    <match terrain ="2" equipes = "C4:D4" arbitre = "B2" nbSet ="1"/>
+    <match terrain ="3" equipes = "A3:C3" arbitre = "C2" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "A1:C1" arbitre = "A3"/>
-    <match terrain ="2" equipes = "A2:C2" arbitre = "B3"/>
-    <match terrain ="3" equipes = "A4:C4" arbitre = "C3"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "A1:C1" arbitre = "A3" nbSet ="1"/>
+    <match terrain ="2" equipes = "A2:C2" arbitre = "B3" nbSet ="1"/>
+    <match terrain ="3" equipes = "A4:C4" arbitre = "C3" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "B1:D1" arbitre = "A4"/>
-    <match terrain ="2" equipes = "B2:D2" arbitre = "B4"/>
-    <match terrain ="3" equipes = "B3:D3" arbitre = "C4"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "B1:D1" arbitre = "A4" nbSet ="1"/>
+    <match terrain ="2" equipes = "B2:D2" arbitre = "B4" nbSet ="1"/>
+    <match terrain ="3" equipes = "B3:D3" arbitre = "C4" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "B4:D4" arbitre = "A1"/>
-    <match terrain ="2" equipes = "A2:D2" arbitre = "B1"/>
-    <match terrain ="3" equipes = "A3:D3" arbitre = "C1"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "B4:D4" arbitre = "A1" nbSet ="1"/>
+    <match terrain ="2" equipes = "A2:D2" arbitre = "B1" nbSet ="1"/>
+    <match terrain ="3" equipes = "A3:D3" arbitre = "C1" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "A1:D1" arbitre = "A2"/>
-    <match terrain ="2" equipes = "A4:D4" arbitre = "B2"/>
-    <match terrain ="3" equipes = "B3:C3" arbitre = "C2"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "A1:D1" arbitre = "A2" nbSet ="1"/>
+    <match terrain ="2" equipes = "A4:D4" arbitre = "B2" nbSet ="1"/>
+    <match terrain ="3" equipes = "B3:C3" arbitre = "C2" nbSet ="1"/>
   </rotation>
-  <rotation temps = "120">
-    <match terrain ="1" equipes = "B1:C1" arbitre = "A3"/>
-    <match terrain ="2" equipes = "B2:C2" arbitre = "B3"/>
-    <match terrain ="3" equipes = "B4:C4" arbitre = "C3"/>
+  <rotation temps = "12" echauffement="6">
+    <match terrain ="1" equipes = "B1:C1" arbitre = "A3" nbSet ="1"/>
+    <match terrain ="2" equipes = "B2:C2" arbitre = "B3" nbSet ="1"/>
+    <match terrain ="3" equipes = "B4:C4" arbitre = "C3" nbSet ="1"/>
   </rotation>
 
 </phasePool>

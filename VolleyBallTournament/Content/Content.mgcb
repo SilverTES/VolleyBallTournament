@@ -146,11 +146,23 @@
 /processorParam:Quality=Best
 /build:Sounds/race-start.wav
 
+#begin Sounds/referee-whistle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/referee-whistle.wav
+
 #begin Sounds/robotic-countdown.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Sounds/robotic-countdown.wav
+
+#begin Sounds/sci-fi-warning-beep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/sci-fi-warning-beep.wav
 
 #begin Sounds/simple-clean-logo.wav
 /importer:WavImporter

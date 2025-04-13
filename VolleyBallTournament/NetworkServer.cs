@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using Mugen.Core;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using System.Text.RegularExpressions;
 using static Mugen.GUI.Gui;
 
@@ -57,6 +58,7 @@ namespace VolleyBallTournament
     {
         private readonly EventBasedNetListener _listener;
         private readonly NetManager _server;
+        public Dictionary<int, NetPeer> Clients => _connectedPeers;
         private readonly Dictionary<int, NetPeer> _connectedPeers;
 
         ScreenPlay _screenPlay;

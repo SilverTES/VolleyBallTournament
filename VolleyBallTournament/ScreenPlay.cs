@@ -35,7 +35,7 @@ namespace VolleyBallTournament
 
         private int _nbScreen = 3;
 
-        Vector2 _scrolling = new Vector2(0, Screen.Height - 28);
+        Vector2 _scrolling = new Vector2(0, Screen.Height - 20);
 
         SpriteFont _fontScrolling;
         string _textScrolling = "               -- Bienvenue au Tournoi de VolleyBall de Saint Maurice L'Exil --                 Match : Victoire = 3p, Nul = 1p, Défaite = 0p  + Bonus : écart de point et nombre de points total marqués        ";
@@ -60,7 +60,8 @@ namespace VolleyBallTournament
 
             SetSize(Screen.Width, Screen.Height);
 
-            _phaseRegister = new PhaseRegister(game, 4, 4, 3).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+            _phaseRegister = new PhaseRegister(game, configFile).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+            //_phaseRegister = new PhaseRegister(game, 4, 4, 3).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
 
             _rotationManager = new RotationManager();
             _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
@@ -154,7 +155,7 @@ namespace VolleyBallTournament
 
             _scrolling.X -= 2f;
 
-            if (_scrolling.X < -_sizeTextScrolling )
+            if (_scrolling.X <= -_sizeTextScrolling )
                 _scrolling.X = 0;
 
 
@@ -166,7 +167,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                batch.FilledCircle(Static.TexCircle, _scrolling + AbsXY, 40, Color.Yellow);
+                //batch.FilledCircle(Static.TexCircle, _scrolling + AbsXY, 40, Color.Yellow);
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling + Vector2.One * 4, Color.Black * .75f);
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling, _colorTextScrolling);
             }
@@ -174,6 +175,12 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Debug)
             { 
                 batch.RightMiddleString(Static.FontMicro, $"VolleyBall Tournament V{1}.{0} ©SilverTES 2025", _versionPos, Color.White);
+
+                var clients = Static.Server.Clients;
+                for (int i = 0; i < clients.Count; i++)
+                {
+                    batch.LeftMiddleString(Static.FontMini, $"{i} : {clients[i]}", new Vector2(40, 80 + 40 * i), Color.Orange);
+                }
             }
 
             //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 200, Color.White);

@@ -65,15 +65,16 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                //batch.FillRectangle(AbsRectF.Extend(32f), Color.Black * .5f);
-                //batch.Rectangle(AbsRectF, Color.White * .8f, 3f);
+                //batch.FillRectangle(AbsRectF.Extend(48f), Color.Black * .25f);
+                //batch.Rectangle(AbsRectF.Extend(48f), Color.Gray * .5f, 1f);
 
             }
 
             if (indexLayer == (int)Layers.HUD)
             {
                 //batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 30 + Vector2.One * 6, Color.Black * .5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 40, Color.Cyan);
+                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 50 + Vector2.One * 6, Color.Black *.5f);
+                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 50, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

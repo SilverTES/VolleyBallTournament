@@ -6,6 +6,7 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace VolleyBallTournament
 {
@@ -34,19 +35,21 @@ namespace VolleyBallTournament
         private RotationManager _rotationManager = new RotationManager();
 
         private TextBox _currentTextBox = null;
-        public PhaseRegister(Game game, int nbGroup, int nbTeamPerGroup, int nbMatch)
+        public PhaseRegister(Game game, string xmlFile)//, int nbGroup, int nbTeamPerGroup, int nbMatch)
         {
-            _nbGroup = nbGroup;
-            _nbTeamPerGroup = nbTeamPerGroup;
-            _nbMatch = nbMatch;
+            //_nbGroup = nbGroup;
+            //_nbTeamPerGroup = nbTeamPerGroup;
+            //_nbMatch = nbMatch;
+
+            LoadConfigFile(xmlFile);
 
             SetSize(Screen.Width, Screen.Height);
 
             _div = new Container(Style.Space.One * 20, Style.Space.One * 20);
 
-            for (int i = 0; i < nbGroup; i++)
+            for (int i = 0; i < _nbGroup; i++)
             {
-                var groupRegister = new GroupRegister(game, nbTeamPerGroup, i).AppendTo(this).This<GroupRegister>();
+                var groupRegister = new GroupRegister(game, _nbTeamPerGroup, i).AppendTo(this).This<GroupRegister>();
                 _div.Insert(groupRegister);
                 _groupRegisters.Add(groupRegister);
             }
@@ -73,10 +76,19 @@ namespace VolleyBallTournament
             }
 
         }
-        //public void LoadRotationFile(string rotationFile)
-        //{
-        //    _rotationManager.LoadFile(rotationFile, _teams, _matchs);
-        //}
+        private void LoadConfigFile(string xmlFile)
+        {
+            XDocument doc = XDocument.Load(xmlFile);
+            // Lire la config
+            var config = doc.Root.Element("config");
+            int nbGroupe = int.Parse(config.Attribute("nbGroupe").Value);
+            int nbEquipeParGroupe = int.Parse(config.Attribute("nbEquipeParGroupe").Value);
+            int nbTerrain = int.Parse(config.Attribute("nbTerrain").Value);
+
+            _nbGroup = nbGroupe;
+            _nbTeamPerGroup = nbEquipeParGroupe;
+            _nbMatch = nbTerrain;
+        }
         public List<Team> GetTeams() { return _teams; }
         public List<Group> GetGroups() { return _groups; }
         public List<Match> GetMatchs() { return _matchs; }

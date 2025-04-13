@@ -9,32 +9,10 @@ using System.Xml.Linq;
 
 namespace VolleyBallTournament
 {
-    public class MatchConfig
-    {
-        public int IdTerrain;
-        public Team TeamA;
-        public Team TeamB;
-        public Team TeamReferee;
-
-        public MatchConfig()
-        {
-            IdTerrain = Const.NoIndex;
-            TeamA = null;
-            TeamB = null;
-            TeamReferee = null;
-        }
-        public MatchConfig(int idTerrain, Team teamA, Team teamB, Team teamReferee)
-        {
-            IdTerrain = idTerrain;
-            TeamA = teamA;
-            TeamB = teamB;
-            TeamReferee = teamReferee;
-        }
-    }
-
     public class RotationManager
     {
-        private List<double>_durations = [];
+        private List<double>_matchTime = [];
+        private List<double>_warmUpTime = [];
         public int NbGroup => _nbGroup;
         private int _nbGroup;
         public int NbTeamPerGroup => _nbTeamPerGroup;
@@ -89,9 +67,13 @@ namespace VolleyBallTournament
 
             return list;
         }
-        public double GetDuration(int rotation)
+        public double GetMatchTime(int rotation)
         {
-            return _durations[rotation];
+            return _matchTime[rotation];
+        }
+        public double GetWarmUpTime(int rotation)
+        {
+            return _warmUpTime[rotation];
         }
         public void LoadFile(string xmlFile, List<Team> teams, List<Match> matchs)
         {
@@ -121,9 +103,11 @@ namespace VolleyBallTournament
             int indexRotation = 0;
             foreach (var rotation in rotations)
             {
-                int temps = int.Parse(rotation.Attribute("temps").Value);
-                Console.WriteLine($"Rotation {rotation} - Temps : {temps}s");
-                _durations.Add(temps);
+                int tempsMatch = int.Parse(rotation.Attribute("temps").Value);
+                int tempsEchauffement = int.Parse(rotation.Attribute("echauffement").Value);
+                Console.WriteLine($"Rotation {rotation} - Temps : {tempsMatch}s - Echauffement : {tempsEchauffement}");
+                _matchTime.Add(tempsMatch);
+                _warmUpTime.Add(tempsEchauffement);
 
                 int indexMatch = 0;
                 foreach (var match in rotation.Elements("match"))
@@ -131,11 +115,12 @@ namespace VolleyBallTournament
                     MatchConfig matchConfig = new();
 
                     int terrain = int.Parse(match.Attribute("terrain").Value); 
+                    int sets = int.Parse(match.Attribute("nbSet").Value); 
                     string equipes = match.Attribute("equipes").Value;
                     string arbitre = match.Attribute("arbitre").Value;
 
                     matchConfig.IdTerrain = terrain - 1;
-
+                    matchConfig.NbSetToWin = sets;
                     var opponents = equipes.Split(':');
                     //Misc.Log($"{opponents[0]} vs {opponents[1]}");
                     matchConfig.TeamA = teams[Indexs[opponents[0]]];

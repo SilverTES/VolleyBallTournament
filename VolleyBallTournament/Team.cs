@@ -60,6 +60,12 @@ namespace VolleyBallTournament
         Loose,
     }
 
+    public struct Set(bool isWin, int scorePoint)
+    {
+        public bool IsWin = isWin; // true win, false loose
+        public int Points = scorePoint; // points in Set
+    }
+
     public class Team : Node  
     {
         public enum Timers
@@ -69,6 +75,7 @@ namespace VolleyBallTournament
         }
         Timer<Timers> _timer = new Timer<Timers>();
 
+        public bool IsMove => _isMove;
         private bool _isMove = false;
 
         private Match _match = null;
@@ -77,8 +84,9 @@ namespace VolleyBallTournament
         private Vector2 _newPosition = Vector2.Zero;
         public int ScorePoint => _scorePoint;
         private int _scorePoint = 0;
-        public int ScoreSet => _scoreSet;
-        private int _scoreSet = 1;
+
+        public List<Set> Sets => _sets;
+        private List<Set> _sets = [];
 
         private bool _isPlaying = false;
         private bool _isReferee = false;
@@ -133,7 +141,7 @@ namespace VolleyBallTournament
         }
         public void SetService(bool hasService)
         { 
-            _hasService = hasService; 
+            _hasService = hasService;
         }
         public void TakeService(Team opponent)
         {
@@ -212,7 +220,7 @@ namespace VolleyBallTournament
         }
         public void AddPoint(int points) { _scorePoint += points; AddTotalPoint(points); }
         public void SetScorePoint(int points) { _scorePoint = points; }
-        public void SetScoreSet(int points) { _scoreSet = points; }
+        public void AddScoreSet(Set set) { _sets.Add(set); }
         public void SetRank(int rank)
         {
             _rank = rank;
@@ -250,7 +258,7 @@ namespace VolleyBallTournament
             _animate.NextFrame();
 
             _scorePoint = int.Clamp(_scorePoint, 0, 99);
-            _scoreSet = int.Clamp(_scoreSet, 0, 3);
+            //_scoreSet = int.Clamp(_scoreSet, 0, 3);
 
             if (_match != null)
             {
@@ -308,6 +316,7 @@ namespace VolleyBallTournament
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 1f);
+            batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
             batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
         }

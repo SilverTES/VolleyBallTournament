@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
@@ -75,49 +76,74 @@ namespace VolleyBallTournament
 
             State.Set(States.Pause);
 
+            State.On(States.WarmUp, () =>
+            {
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
+
+                Timer.SetDuration(_rotationManager.GetWarmUpTime(_currentRotation));
+                Timer.StartTimer();
+            });
+            State.Off(States.WarmUp, () =>
+            {
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
+
+                Timer.SetDuration(0);
+            });
+
             State.On(States.CountDown1, () =>
             {
-                Static.SoundCountDown.Play(0.25f * Static.VolumeMaster, .1f, 0f);
+                Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 Timer.SetDuration(3);
                 Timer.StartTimer();
             });
             State.On(States.CountDown2, () =>
             {
-                Static.SoundCountDown.Play(0.25f * Static.VolumeMaster, .1f, 0f);
+                Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 Timer.SetDuration(3);
                 Timer.StartTimer();
             });
 
             State.On(States.Play1, () => 
             {
-                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
-                Timer.SetDuration(_rotationManager.GetDuration(_currentRotation));
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
+                Timer.SetDuration(_rotationManager.GetMatchTime(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.Play1, () =>
             {
-                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
 
             State.On(States.Play2, () =>
             {
-                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
-                Timer.SetDuration(_rotationManager.GetDuration(_currentRotation));
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
+                Timer.SetDuration(_rotationManager.GetMatchTime(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.Play2, () =>
             {
-                //Static.SoundStart.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
 
+            State.On(States.PreSwap, () => 
+            {
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
+                Timer.SetDuration(2);
+                Timer.StartTimer();
+
+                //ValidSets();
+            });
+
             State.On(States.SwapSide, () =>
             {
+                Timer.SetDuration(0);
+
                 // On change de côté
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Count; i++)
@@ -131,7 +157,9 @@ namespace VolleyBallTournament
             State.On(States.Pause, () =>
             {
                 ResetTeamsStatus();
-                ResetScorePanels();
+                ResetAllMatchScorePoints();
+                ResetAllMatchSetPoints();
+
                 SetRotation(_currentRotation);
 
             });
@@ -140,13 +168,17 @@ namespace VolleyBallTournament
                 
 
             });
-            State.Off(States.Finish, () =>
+            State.On(States.Finish, () =>
             {
-
+                Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
+            });
+            State.On(States.ValidPoints, () =>
+            {
+                ValidSets();
             });
             State.Off(States.ValidPoints, () =>
             {
-                Static.SoundRanking.Play(0.25f * Static.VolumeMaster, 0.1f, 0f);
+                Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Count; i++)
@@ -185,6 +217,17 @@ namespace VolleyBallTournament
                 _currentRotation++;
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
+        }
+
+        public void ValidSets()
+        {
+            var matchs = GetMatchs();
+            for (int i = 0; i < matchs.Count; i++)
+            {
+                var match = matchs[i];
+                if (match != null)
+                    match.ValidSet();
+            }
         }
         private void CreateGroups(int nbGroup, int nbTeamPerGroup)
         {
@@ -262,6 +305,7 @@ namespace VolleyBallTournament
                     var match = _matchs[matchConfig.IdTerrain];
 
                     match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee, _rotationManager.NbTeamPerGroup);
+                    match.SetNbSetToWin(matchConfig.NbSetToWin);
                 }
             }
         }
@@ -275,14 +319,23 @@ namespace VolleyBallTournament
                 team.SetMatch(null);
             }
         }
-        public void ResetScorePanels()
+        public void ResetAllMatchScorePoints()
         {
             for (int i = 0; i < _matchs.Count; i++)
             {
                 var match = _matchs[i];
-                match.ResetScore();
+                match.ResetScorePoints();
             }
         }
+        public void ResetAllMatchSetPoints()
+        {
+            for (int i = 0; i < _matchs.Count; i++)
+            {
+                var match = _matchs[i];
+                match.ResetSets();
+            }
+        }
+
         //public void ShuffleTeamsTotalPoint()
         //{
         //    for (int i = 0; i < _teams.Length; i++)
@@ -346,11 +399,11 @@ namespace VolleyBallTournament
         {
             return _groups[index];
         }
-        private void Play()
+        private void PlayCountDown(SoundEffect sound, double secondRemaining = 3d, float volume = .25f, float pitch = .1f, float pan = 0f)
         {
-            if (Timer.OnRemaingTime(3))
+            if (Timer.OnRemaingTime(secondRemaining) && sound != null)
             {
-                Static.SoundCountDown.Play(.25f * Static.VolumeMaster, .1f, 0f);
+                sound.Play(volume * Static.VolumeMaster, pitch, pan);
             }
 
             if (Timer.IsFinish())
@@ -377,46 +430,41 @@ namespace VolleyBallTournament
                     break;
 
                 case States.WarmUp:
+
+                    PlayCountDown(null);
                     break;
 
                 case States.Play1:
 
-                    Play();
-
+                    PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
                 case States.Play2:
 
-                    Play();
-
+                    PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
                 case States.CountDown1:
 
-                    if (Timer.IsFinish())
-                    {
-                        Misc.Log("Finish CountDown");
-                        Timer.StopTimer();
-                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
-                    }
-
+                    PlayCountDown(Static.SoundCountDown, 3);
                     break;
                 case States.CountDown2:
 
-                    if (Timer.IsFinish())
-                    {
-                        Misc.Log("Finish CountDown");
-                        Timer.StopTimer();
-                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
-                    }
-
+                    PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
 
                 case States.ValidPoints:
                     break;
+
                 case States.SwapSide:
                     break;
+
+                case States.PreSwap:
+
+                    PlayCountDown(null);
+                    break;
+
                 default:
                     break;
             }
@@ -511,7 +559,7 @@ namespace VolleyBallTournament
                 batch.FillRectangle(AbsRectF, Color.Black * .25f);
                 //batch.FillRectangle(AbsRectF, Color.DarkSlateBlue * .5f);
 
-                //batch.FillRectangle(_divMatch.Rect.Translate(AbsXY), Color.White * .5f);
+                //batch.FillRectangle(_divGroup.Rect.Translate(AbsXY), Color.Black * .25f);
 
                 //batch.Grid(Vector2.Zero, Screen.Width, Screen.Height, 40, 40, Color.Black * .5f, 1f);
 

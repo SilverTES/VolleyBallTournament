@@ -54,6 +54,7 @@ namespace VolleyBallTournament
         public static SoundEffect SoundPoint;
         public static SoundEffect SoundCountDown;
         public static SoundEffect SoundStart;
+        public static SoundEffect SoundWhistle;
         public static SoundEffect SoundSwap;
         public static SoundEffect SoundRanking;
 
@@ -155,7 +156,8 @@ namespace VolleyBallTournament
 
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
             Static.SoundCountDown = Content.Load<SoundEffect>("Sounds/countdown");
-            Static.SoundStart = Content.Load<SoundEffect>("Sounds/race-start");
+            Static.SoundStart = Content.Load<SoundEffect>("Sounds/sci-fi-warning-beep");
+            Static.SoundWhistle = Content.Load<SoundEffect>("Sounds/referee-whistle");
             Static.SoundSwap = Content.Load<SoundEffect>("Sounds/electric_door_opening_1");
             Static.SoundRanking = Content.Load<SoundEffect>("Sounds/key2");
 
