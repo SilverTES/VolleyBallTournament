@@ -102,7 +102,7 @@ namespace VolleyBallTournament
         //public int NbMaxMatchPlayed = 3;
         public bool HasService => _hasService;
         private bool _hasService = false;
-        private Team _lastTeamHasService = null;
+        //private Team _lastTeamHasService = null;
         public int NbMatchPlayed => _results.Count;
         private List<Result> _results = new List<Result>();
         public string TeamName => _teamName;
@@ -143,29 +143,29 @@ namespace VolleyBallTournament
         { 
             _hasService = hasService;
         }
-        public void TakeService(Team opponent)
-        {
-            if (opponent == null) return;
+        //public void TakeService(Team opponent)
+        //{
+        //    if (opponent == null) return;
 
-            if (_hasService) _lastTeamHasService = this;
-            if (opponent.HasService) _lastTeamHasService = opponent;
+        //    if (_hasService) _lastTeamHasService = this;
+        //    if (opponent.HasService) _lastTeamHasService = opponent;
 
-            _hasService = true;
-            opponent.SetService(false);
-        }
-        public void CancelService(Team opponent)
-        {
-            if (opponent == null) return;
+        //    _hasService = true;
+        //    opponent.SetService(false);
+        //}
+        //public void CancelService(Team opponent)
+        //{
+        //    if (opponent == null) return;
 
-            if (_lastTeamHasService != null)
+        //    if (_lastTeamHasService != null)
             
-            if (_lastTeamHasService == this)
-                TakeService(opponent);
+        //    if (_lastTeamHasService == this)
+        //        TakeService(opponent);
 
-            if (_lastTeamHasService == opponent)
-                opponent.TakeService(this);
+        //    if (_lastTeamHasService == opponent)
+        //        opponent.TakeService(this);
             
-        }
+        //}
         public void SetIsPlaying(bool isPlaying)
         {
             _isPlaying = isPlaying;

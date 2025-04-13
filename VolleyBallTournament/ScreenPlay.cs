@@ -149,10 +149,6 @@ namespace VolleyBallTournament
 
             UpdateChilds(gameTime);
 
-            //_phaseRegister.Update(gameTime);
-            //_phasePool1.Update(gameTime);
-            //_phasePool2.Update(gameTime);
-
             _scrolling.X -= 2f;
 
             if (_scrolling.X <= -_sizeTextScrolling )

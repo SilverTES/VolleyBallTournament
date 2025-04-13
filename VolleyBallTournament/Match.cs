@@ -1,9 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Framework.Devices.Sensors;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VolleyBallTournament
 {
@@ -65,7 +68,13 @@ namespace VolleyBallTournament
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
 
-        //Timer _timerCountDown;
+        public Team TeamHasService => _teamHasService;
+        private Team _teamHasService;
+        public Team LastTeamHasService => _lastTeamHasService;
+        private Team _lastTeamHasService;
+        //private Stack<Team> _teamHasServiceHistory = [];
+
+        public Action<Team> OnChangeService;
         
         public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
         {
@@ -92,6 +101,33 @@ namespace VolleyBallTournament
             //_timerCountDown = new Timer();
             //_timerCountDown.Start();
         }
+        public void ChangeTeamHasService(Team team)
+        {
+            _lastTeamHasService = _teamHasService;
+
+            _teamHasService = team;
+
+            if (_teamHasService != _lastTeamHasService)
+            {
+                if (OnChangeService != null)
+                    OnChangeService(_teamHasService);
+            }
+
+            GetTeamOppenent(_teamHasService).SetService(false);
+            _teamHasService.SetService(true);
+
+        }
+        public void SetTeamHasService(Team team)
+        {
+            _teamHasService = team;
+            _teamHasService.SetService(true);
+            _lastTeamHasService = team;
+        }
+        public void CancelAction()
+        {
+            Misc.Log("Cancel Action");
+            ChangeTeamHasService(_lastTeamHasService);
+        }
         public void ValidSet()
         {
             var winner = GetWinner();
@@ -102,12 +138,12 @@ namespace VolleyBallTournament
         {
             _nbSetToWin = nbSetToWin;
         }
-        public Team GetTeamHasService()
-        {
-            if (TeamA.HasService) return TeamA;
-            if (TeamB.HasService) return TeamB;
-            return null;
-        }
+        //public Team GetTeamHasService()
+        //{
+        //    if (TeamA.HasService) return TeamA;
+        //    if (TeamB.HasService) return TeamB;
+        //    return null;
+        //}
         public Team GetWinner()
         {
             if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
@@ -134,7 +170,7 @@ namespace VolleyBallTournament
             _teamB.SetIsPlaying(true);
             _teamReferee.SetIsReferee(true);
 
-            _teamA.TakeService(_teamB);
+            SetTeamHasService(_teamA);
 
             if (_teamA.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamA.SetMatch(this);
@@ -155,19 +191,21 @@ namespace VolleyBallTournament
             TeamA.SetScorePoint(0);
             TeamB.SetScorePoint(0);
         }
-        public void AddPointA(int points = 1)
+        public void AddPointA(int points)
         {
+            Misc.Log($"{points}");
+
             if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 
                 if (points > 0)
                 {
-                    TeamA.TakeService(TeamB);
+                    ChangeTeamHasService(TeamA);
                 }
 
                 if (points < 0)
-                    TeamA.CancelService(TeamB);
+                    CancelAction();
 
                 _teamA.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
@@ -177,22 +215,24 @@ namespace VolleyBallTournament
             }
             else if (State.CurState == States.Ready)
             {
-                TeamA.TakeService(TeamB);
+                ChangeTeamHasService(TeamA);
             }
         }
-        public void AddPointB(int points = 1)
+        public void AddPointB(int points)
         {
+            Misc.Log($"{points}");
+
             if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {
                 if (points == 0) return;
 
                 if (points > 0)
                 {
-                    TeamB.TakeService(TeamA);
+                    ChangeTeamHasService(TeamB);
                 }
 
                 if (points < 0)
-                    TeamB.CancelService(TeamA);
+                    CancelAction();
 
                 _teamB.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
@@ -202,7 +242,7 @@ namespace VolleyBallTournament
             }
             else if (State.CurState == States.Ready)
             {
-                TeamB.TakeService(TeamA);
+                ChangeTeamHasService(TeamB);
             }
         }
         private void RunState()
@@ -267,6 +307,13 @@ namespace VolleyBallTournament
                 //batch.Line(AbsRectF.LeftMiddle + threeMeter, AbsRectF.RightMiddle + threeMeter, Color.White, 1f);
 
                 //batch.CenterBorderedStringXY(Static.FontMain, _courtName, AbsRectF.TopCenter - Vector2.UnitY * 20, Color.Yellow, Color.Black);
+            }
+
+            if (indexLayer == (int)Layers.Debug)
+            {
+                //if (_lastTeamHasService != null)
+                batch.LeftTopString(Static.FontMini, $"{_teamHasService.TeamName}", AbsXY + new Vector2(10, 10), Color.Red);
+                batch.LeftTopString(Static.FontMini, $"{_lastTeamHasService.TeamName}", AbsXY + new Vector2(10, 40), Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

@@ -37,8 +37,8 @@ namespace VolleyBallTournament
         private Vector2 _vBallAPos;
         private Vector2 _vBallBPos;
         private Vector2 _vBallCurrentPos;
-        private Team _prevTeamHasService = null;
-        private Team _teamHasService = null;
+        //private Team _prevTeamHasService = null;
+        //private Team _teamHasService = null;
 
         private Vector2 _infosPos;
         private Vector2 _courtNamePos;
@@ -63,6 +63,9 @@ namespace VolleyBallTournament
 
             _animate2D.Add("VBallMoveToA");
             _animate2D.Add("VBallMoveToB");
+
+            _match.OnChangeService += OnChangeService;
+
         }
         public void SwapTeams()
         {
@@ -103,7 +106,6 @@ namespace VolleyBallTournament
             {
                 _teamAPos = _animate2D.Value("SwapA");
                 _teamBPos = _animate2D.Value("SwapB");
-
             }
 
             _scoreAPos = Team.Bound.TopRight + _teamAPos - Vector2.UnitX * 10;
@@ -112,6 +114,39 @@ namespace VolleyBallTournament
             //_setAPos = Team.Bound.RightMiddle + _teamAPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
             //_setBPos = Team.Bound.RightMiddle + _teamBPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
 
+        }
+        public void UpdateVBallPosition()
+        {
+            _vBallAPos = Team.Bound.LeftMiddle + _teamAPos - Vector2.UnitX * 32;
+            _vBallBPos = Team.Bound.LeftMiddle + _teamBPos - Vector2.UnitX * 32;
+
+            if (_match.TeamHasService == _match.LastTeamHasService)
+            {
+                //Misc.Log("======");
+                if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
+                if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
+            }
+
+            if (_animate2D.IsPlay("VBallMoveToA")) _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
+            if (_animate2D.IsPlay("VBallMoveToB")) _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
+
+            //if (_animate2D.IsPlay("VBallMoveToA"))
+            //    _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
+            //else
+            //    if (_match.TeamA.HasService) {_vBallCurrentPos = _vBallAPos; }
+
+            //if (_animate2D.IsPlay("VBallMoveToB"))
+            //    _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
+            //else
+            //    if (_match.TeamB.HasService) { _vBallCurrentPos = _vBallBPos; }
+
+        }
+        public void OnChangeService(Team team)
+        {
+            // Si changement de service on lance l'animation du déplacement de la balle !
+            Misc.Log("Move VBALL !");
+            if (team == _match.TeamA) VBallMoveToA();
+            if (team == _match.TeamB) VBallMoveToB();
         }
         public override Node Update(GameTime gameTime)
         {
@@ -127,34 +162,10 @@ namespace VolleyBallTournament
 
             UpdateTeamsPosition();
 
+            UpdateVBallPosition();
+
             _teamRefereePos = AbsRectF.Center + Vector2.UnitY * 0 - Vector2.UnitY * Team.Height/2 - Vector2.UnitX * Team.Width/2 + Vector2.UnitX * 120;
 
-            _vBallAPos = Team.Bound.LeftMiddle + _teamAPos - Vector2.UnitX * 32;
-            _vBallBPos = Team.Bound.LeftMiddle + _teamBPos - Vector2.UnitX * 32;
-
-
-
-            // Si changement de service on lance l'animation du déplacement de la balle !
-            _teamHasService = _match.GetTeamHasService();
-
-            if (_teamHasService != _prevTeamHasService)
-            {
-                Misc.Log("Move VBALL !");
-                if (_teamHasService == _match.TeamA) VBallMoveToA();
-                if (_teamHasService == _match.TeamB) VBallMoveToB();
-            }
-            else
-            {
-                if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
-                if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
-            }
-
-            _prevTeamHasService = _teamHasService;
-
-            if (_animate2D.IsPlay("VBallMoveToA")) _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
-            if (_animate2D.IsPlay("VBallMoveToB")) _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
-
-            
             _infosPos = AbsRectF.Center - Vector2.UnitY * 90 + _waveValue;
             _courtNamePos = AbsRectF.Center + Vector2.UnitY * 90;
 
@@ -175,14 +186,14 @@ namespace VolleyBallTournament
             _animate2D.SetMotion("VBallMoveToA", Easing.QuadraticEaseInOut, _vBallBPos, _vBallAPos, 32);
             _animate2D.Start("VBallMoveToA");
 
-            Static.SoundRanking.Play(.5f * Static.VolumeMaster, 0.1f, 0f);
+            //Static.SoundRanking.Play(.5f * Static.VolumeMaster, 0.1f, 0f);
         }
         public void VBallMoveToB()
         {
             _animate2D.SetMotion("VBallMoveToB", Easing.QuadraticEaseInOut, _vBallAPos, _vBallBPos, 32);
             _animate2D.Start("VBallMoveToB");
 
-            Static.SoundRanking.Play(.5f * Static.VolumeMaster, 0.1f, 0f);
+            //Static.SoundRanking.Play(.5f * Static.VolumeMaster, 0.1f, 0f);
         }
         public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
         {
