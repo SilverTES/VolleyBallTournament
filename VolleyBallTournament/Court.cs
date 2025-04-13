@@ -120,16 +120,6 @@ namespace VolleyBallTournament
             _vBallAPos = Team.Bound.LeftMiddle + _teamAPos - Vector2.UnitX * 32;
             _vBallBPos = Team.Bound.LeftMiddle + _teamBPos - Vector2.UnitX * 32;
 
-            //if (_match.TeamHasService == _match.LastTeamHasService)
-            //{
-            //    //Misc.Log("======");
-            //    if (_match.TeamA.HasService) _vBallCurrentPos = _vBallAPos;
-            //    if (_match.TeamB.HasService) _vBallCurrentPos = _vBallBPos;
-            //}
-
-            //if (_animate2D.IsPlay("VBallMoveToA")) _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
-            //if (_animate2D.IsPlay("VBallMoveToB")) _vBallCurrentPos = _animate2D.Value("VBallMoveToB");
-
             if (_animate2D.IsPlay("VBallMoveToA"))
                 _vBallCurrentPos = _animate2D.Value("VBallMoveToA");
             else
@@ -144,7 +134,7 @@ namespace VolleyBallTournament
         public void OnChangeService(Team team)
         {
             // Si changement de service on lance l'animation du déplacement de la balle !
-            Misc.Log("Move VBALL !");
+            //Misc.Log("Move VBALL !");
             if (team == _match.TeamA) VBallMoveToA();
             if (team == _match.TeamB) VBallMoveToB();
         }
@@ -206,25 +196,14 @@ namespace VolleyBallTournament
 
                 _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos);
 
-                //if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Ready || _match.State.CurState == Match.States.CountDown)
-                    DrawVBall(batch, _vBallCurrentPos);
+                DrawVBall(batch, _vBallCurrentPos);
 
                 batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", _courtNamePos, Color.Yellow);
 
 
                 DrawInfos(batch);
 
-
-                //batch.Draw(Static.TexReferee, Color.Black, 0, _teamRefereePos + Vector2.One * 6, Position.CENTER, Vector2.One / 4);
-                //batch.Draw(Static.TexReferee, Color.White, 0, _teamRefereePos - Vector2.UnitY * 50, Position.CENTER, Vector2.One / 4);
-
-                //batch.CenterStringXY(Static.FontMain, $"Arbitre {_match.TeamReferee.TeamName}", _teamRefereePos + Vector2.One * 6, Color.Black);
-                //batch.CenterStringXY(Static.FontMain, $"Arbitre {_match.TeamReferee.TeamName}", _teamRefereePos, Color.Orange);
-
-                //if (_match.NbSetToWin > 0)
-                {
-                    DrawSets(batch);
-                }
+                DrawSets(batch);
 
                 batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), _scoreAPos + Vector2.One * 6, Color.Black * .5f);
                 batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), _scoreBPos + Vector2.One * 6, Color.Black * .5f);

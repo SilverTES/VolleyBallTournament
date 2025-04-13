@@ -18,8 +18,7 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
-        
-        //private PhasePool _phasePool3;
+        private PhaseFinal _phaseFinal;
 
         private RotationManager _rotationManager;
 
@@ -31,7 +30,7 @@ namespace VolleyBallTournament
 
         Vector2 _versionPos;
 
-        int _rotation = 0;
+        //int _rotation = 0;
 
         private int _nbScreen = 3;
 
@@ -61,7 +60,6 @@ namespace VolleyBallTournament
             SetSize(Screen.Width, Screen.Height);
 
             _phaseRegister = new PhaseRegister(game, configFile).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
-            //_phaseRegister = new PhaseRegister(game, 4, 4, 3).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
 
             _rotationManager = new RotationManager();
             _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
@@ -69,9 +67,9 @@ namespace VolleyBallTournament
             _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            //_phasePool3 = new PhasePool(2, "Phase de poule Qualification 2", _rotationManager).SetX(Screen.Width * 3f).AppendTo(this).This<PhasePool>();
+            _phaseFinal = new PhaseFinal("Phase Finale").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseFinal>();
 
-            _phasePool1.SetRotation(_rotation = 0);
+            _phasePool1.SetRotation(0);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
@@ -80,7 +78,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 1, 0);
+            SetPosition(_cameraX = -Screen.Width * 3, 0);
         }
         public static string[] GetFilesInDirectory(string directoryPath, string filter)
         {
@@ -107,12 +105,12 @@ namespace VolleyBallTournament
             _phaseRegister.IsLocked = true;
             _phasePool1.IsLocked = true;
             _phasePool2.IsLocked = true;
-            //_phasePool3.IsLocked = true;
+            _phaseFinal.IsLocked = true;
 
             if (_cameraX == -_phaseRegister._x) _phaseRegister.IsLocked = false;
             if (_cameraX == -_phasePool1._x) _phasePool1.IsLocked = false;
             if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
-            //if (_cameraX == -_phasePool3._x) _phasePool3.IsLocked = false;
+            if (_cameraX == -_phaseFinal._x) _phaseFinal.IsLocked = false;
 
 
             if (ButtonControl.OnePress("SlideLeft", _key.IsKeyDown(Keys.Left) && _key.IsKeyDown(Keys.LeftControl)))

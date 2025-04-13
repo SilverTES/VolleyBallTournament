@@ -72,7 +72,6 @@ namespace VolleyBallTournament
         private Team _teamHasService;
         public Team LastTeamHasService => _lastTeamHasService;
         private Team _lastTeamHasService;
-        //private Stack<Team> _teamHasServiceHistory = [];
 
         public Action<Team> OnChangeService;
         
@@ -98,8 +97,6 @@ namespace VolleyBallTournament
 
             State.Set(States.Pause);
 
-            //_timerCountDown = new Timer();
-            //_timerCountDown.Start();
         }
         public void ChangeTeamHasService(Team team)
         {
@@ -139,12 +136,6 @@ namespace VolleyBallTournament
         {
             _nbSetToWin = nbSetToWin;
         }
-        //public Team GetTeamHasService()
-        //{
-        //    if (TeamA.HasService) return TeamA;
-        //    if (TeamB.HasService) return TeamB;
-        //    return null;
-        //}
         public Team GetWinner()
         {
             if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
@@ -194,7 +185,7 @@ namespace VolleyBallTournament
         }
         public void AddPointA(int points)
         {
-            Misc.Log($"{points}");
+            //Misc.Log($"{points}");
 
             if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {
@@ -221,7 +212,7 @@ namespace VolleyBallTournament
         }
         public void AddPointB(int points)
         {
-            Misc.Log($"{points}");
+            //Misc.Log($"{points}");
 
             if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish)
             {

@@ -116,6 +116,7 @@ namespace VolleyBallTournament
 
         public Team(string teamName)//, Match match = null, ScorePanel scorePanel = null, Court court = null)
         {
+            _type = UID.Get<Team>();
             SetSize(Width, Height);
 
             Bound = new RectangleF(0, 0, Width, Height);
@@ -225,7 +226,7 @@ namespace VolleyBallTournament
         {
             _rank = rank;
         }
-        public void MoveToPosition(Vector2 position, int duration = 32)
+        public void MoveToPosition(Vector2 position, int duration = 64)
         {
             if (position == XY) 
                 return;
