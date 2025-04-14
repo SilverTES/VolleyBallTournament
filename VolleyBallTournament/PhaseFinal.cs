@@ -27,7 +27,8 @@ namespace VolleyBallTournament
         Container _divSemiC;
         Container _divSemiD;
 
-        Vector2 _pos = new Vector2(0, 100f);
+        Container _divSemi;
+
         public PhaseFinal(string title) 
         { 
             _title = title;
@@ -36,8 +37,13 @@ namespace VolleyBallTournament
 
             _divSemiA = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
             _divSemiB = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-
             _divSemiAB = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+
+            _divSemiC = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+            _divSemiD = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+            _divSemiCD = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+
+            _divSemi = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
 
             CreateTeams();
 
@@ -45,15 +51,22 @@ namespace VolleyBallTournament
             _divSemiA.Insert(_teams[1]);
             _divSemiB.Insert(_teams[2]);
             _divSemiB.Insert(_teams[3]);
-            
             _divSemiAB.Insert(_divSemiA);
             _divSemiAB.Insert(_divSemiB);
 
-            //_divSemiAB.SetPosition((Screen.Width - _divSemiAB.Rect.Width) / 2, (Screen.Height - _divSemiAB.Rect.Height) / 2);
-            _divSemiAB.Refresh();
+            _divSemiC.Insert(_teams[4]);
+            _divSemiC.Insert(_teams[5]);
+            _divSemiD.Insert(_teams[6]);
+            _divSemiD.Insert(_teams[7]);
+            _divSemiCD.Insert(_divSemiC);
+            _divSemiCD.Insert(_divSemiD);
 
+            _divSemi.Insert(_divSemiAB);
+            _divSemi.Insert(_divSemiCD);
 
-            Misc.Log($"-------------- {GroupOf<Team>().Count}");
+            _divSemi.SetPosition((Screen.Width - _divSemiAB.Rect.Width) / 2, (Screen.Height - _divSemiAB.Rect.Height) / 2);
+            _divSemi.Refresh();
+
 
         }
         private void CreateTeams(int nbTeams = 16)
@@ -67,8 +80,6 @@ namespace VolleyBallTournament
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();
-
-            _pos.X += 1f;
 
             if (IsLocked)
             {
@@ -87,11 +98,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer ==(int)Layers.Debug)
             {
-                batch.FilledCircle(Static.TexCircle, _pos, 40, Color.Yellow);
 
-                batch.Rectangle(_divSemiA.Rect, Color.Red, 3f);
-                batch.Rectangle(_divSemiB.Rect, Color.Red, 3f);
-                batch.Rectangle(_divSemiAB.Rect, Color.Red, 3f);
             }
             if (indexLayer ==(int)Layers.Main)
             {

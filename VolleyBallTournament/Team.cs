@@ -246,7 +246,7 @@ namespace VolleyBallTournament
             _timer.Update();
             UpdateRect();
 
-            if (_animate.IsPlay != null)
+            if (_animate.IsPlay())
             {
                 _y = _animate.Value();
             }
