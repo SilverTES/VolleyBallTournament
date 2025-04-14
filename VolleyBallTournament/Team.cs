@@ -90,6 +90,8 @@ namespace VolleyBallTournament
 
         private bool _isPlaying = false;
         private bool _isReferee = false;
+
+        private bool _isShowStats = true;
         public int RankingPoint => _rankingPoint;
         private int _rankingPoint = 0; EasingValue _easeRankingPoint = new(0);
         private int _currentBonusPoint = 0;
@@ -186,6 +188,10 @@ namespace VolleyBallTournament
         {
             _results.Clear();
         }
+        public void SetIsShowStats(bool isShowStats)
+        {
+            _isShowStats = isShowStats;
+        }
         public void AddResult(Result result)
         {
             _results.Add(result);
@@ -275,13 +281,8 @@ namespace VolleyBallTournament
             {
                 DrawBasicTeam(batch, AbsRectF);
 
-                //batch.CenterStringXY(Static.FontMain, $"{Rank}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.Orange);
-                batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
-                
-                int bonus = _bonusPoint + _currentBonusPoint;
-
-                batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
-                batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
+                if (_isShowStats)
+                    DrawStats(batch);
 
                 DrawVictory(batch);
 
@@ -304,7 +305,13 @@ namespace VolleyBallTournament
 
             return base.Draw(batch, gameTime, indexLayer);
         }
-
+        public void DrawStats(SpriteBatch batch)
+        {
+            batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
+            int bonus = _bonusPoint + _currentBonusPoint;
+            batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
+            batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
+        }
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
         {
             if (_timer.On(Timers.Trail) && _isMove)

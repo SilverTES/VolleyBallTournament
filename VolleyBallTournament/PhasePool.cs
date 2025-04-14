@@ -61,7 +61,7 @@ namespace VolleyBallTournament
             else
             {
                 CreateGroups(nbGroup, nbTeamPerGroup);
-                CreateMatchs(nbMatch, nbTeamPerGroup);
+                CreateMatchs(nbMatch);
             }
 
             _timer = (TimerCountDown)new TimerCountDown().AppendTo(this);
@@ -249,7 +249,7 @@ namespace VolleyBallTournament
                 }
             }
         }
-        private void CreateMatchs(int nbMatch, int nbTeamPerGroup)
+        private void CreateMatchs(int nbMatch)
         {
             Misc.Log($"Create Matchs --------------------------");
             for (int i = 0;i < nbMatch ; i++)
@@ -258,7 +258,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee, nbTeamPerGroup).AppendTo(this).This<Match>();
+                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this).This<Match>();
                 _matchs.Add(match);
 
                 Misc.Log($"Create Match {i + 1}");
@@ -304,7 +304,7 @@ namespace VolleyBallTournament
 
                     var match = _matchs[matchConfig.IdTerrain];
 
-                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee, _rotationManager.NbTeamPerGroup);
+                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
                     match.SetNbSetToWin(matchConfig.NbSetToWin);
                 }
             }
@@ -492,6 +492,13 @@ namespace VolleyBallTournament
             if (!IsLocked)
             {
                 RunState();
+
+                // Debug
+                if (ButtonControl.OnePress($"SwapTeams", Static.Key.IsKeyDown(Keys.S)))
+                {
+                    for (int i = 0;i <_matchs.Count;i++)
+                        _matchs[i].Court.SwapTeams();
+                }
 
                 if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {

@@ -78,6 +78,8 @@ namespace VolleyBallTournament
             _match.TeamB.SetIsMove(true);
 
             Static.SoundSwap.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
+
+            //Misc.Log($"Court SwapTeams {_match.IdTerrain}");
         }
         public void UpdateTeamsPosition()
         {
@@ -140,12 +142,6 @@ namespace VolleyBallTournament
         }
         public override Node Update(GameTime gameTime)
         {
-            // Debug
-            if (ButtonControl.OnePress($"Swap{_courtName}", Static.Key.IsKeyDown(Keys.S)))
-            {
-                SwapTeams();
-            }
-
             _animate2D.Update();
 
             UpdateRect();

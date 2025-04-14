@@ -75,7 +75,7 @@ namespace VolleyBallTournament
 
         public Action<Team> OnChangeService;
         
-        public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
+        public Match(int idTerrain, string courtName, Team teamA, Team teamB, Team teamReferee)//, int nbTeamPerGroup)
         {
             _idTerrain = idTerrain;
 
@@ -87,7 +87,7 @@ namespace VolleyBallTournament
             //_scorePanel.AppendTo(this);
             _court.AppendTo(this);
 
-            SetTeam(teamA, teamB, teamReferee, nbTeamPerGroup);
+            SetTeam(teamA, teamB, teamReferee);//, nbTeamPerGroup);
 
             //_div.Insert(_scorePanel);
             _div.Insert(_court);
@@ -152,7 +152,7 @@ namespace VolleyBallTournament
         {
             return team == _teamA ? _teamB : _teamA;
         }
-        public void SetTeam(Team teamA, Team teamB, Team teamReferee, int nbTeamPerGroup)
+        public void SetTeam(Team teamA, Team teamB, Team teamReferee)//, int nbTeamPerGroup)
         {
             _teamA = teamA;
             _teamB = teamB;
@@ -164,13 +164,13 @@ namespace VolleyBallTournament
 
             SetTeamHasService(_teamA);
 
-            if (_teamA.NbMatchPlayed < nbTeamPerGroup - 1)
+            //if (_teamA.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamA.SetMatch(this);
             
-            if (_teamB.NbMatchPlayed < nbTeamPerGroup - 1)
+            //if (_teamB.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamB.SetMatch(this);
 
-            if (_teamReferee.NbMatchPlayed < nbTeamPerGroup - 1)
+            //if (_teamReferee.NbMatchPlayed < nbTeamPerGroup - 1)
                 _teamReferee.SetMatch(this);
         }
         public void ResetSets()

@@ -119,7 +119,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee, _nbTeamPerGroup);
+                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee);
 
                 _matchs.Add(match);
             }

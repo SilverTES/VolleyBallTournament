@@ -8,64 +8,58 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace VolleyBallTournament
 {
+    public class SemiFinal
+    {
+        public Container Div => _div;
+        private Container _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+
+        public SemiFinal(Team teamA, Team teamB)
+        {
+            _div.Insert(teamA);
+            _div.Insert(teamB);
+        }
+
+    }
     public class PhaseFinal : Node
     {
         string _title;
         public bool IsLocked = false;
 
         List<Team> _teams = [];
+        List<Match> _matchs = [];
 
-        Container _divSemiAB;
-        Container _divSemiA;
-        Container _divSemiB;
+        List<SemiFinal> _divSemi = [];
 
-        Container _divSemiCD;
-        Container _divSemiC;
-        Container _divSemiD;
+        Container _divMain;
+        Container _divMatch;
 
-        Container _divSemi;
 
         public PhaseFinal(string title) 
         { 
             _title = title;
-            SetSize(Screen.Width, Screen.Height);   
-
-
-            _divSemiA = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _divSemiB = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _divSemiAB = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-
-            _divSemiC = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _divSemiD = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-            _divSemiCD = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-
-            _divSemi = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.HORIZONTAL);
-
+            SetSize(Screen.Width, Screen.Height);
+            
             CreateTeams();
 
-            _divSemiA.Insert(_teams[0]);
-            _divSemiA.Insert(_teams[1]);
-            _divSemiB.Insert(_teams[2]);
-            _divSemiB.Insert(_teams[3]);
-            _divSemiAB.Insert(_divSemiA);
-            _divSemiAB.Insert(_divSemiB);
+            _divSemi.Add(new SemiFinal(_teams[0], _teams[1]));
+            _divSemi.Add(new SemiFinal(_teams[2], _teams[3]));
 
-            _divSemiC.Insert(_teams[4]);
-            _divSemiC.Insert(_teams[5]);
-            _divSemiD.Insert(_teams[6]);
-            _divSemiD.Insert(_teams[7]);
-            _divSemiCD.Insert(_divSemiC);
-            _divSemiCD.Insert(_divSemiD);
+            _divMain = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+            
+            _divMatch = new Container(Style.Space.One * 10, new Style.Space(20, 0, 40, 40), Mugen.Physics.Position.HORIZONTAL);
+            CreateMatchs(3);
+            _divMain.Insert(_divMatch);
 
-            _divSemi.Insert(_divSemiAB);
-            _divSemi.Insert(_divSemiCD);
+            _divMain.Insert(_divSemi[0].Div);
+            _divMain.Insert(_divSemi[1].Div);
 
-            _divSemi.SetPosition((Screen.Width - _divSemiAB.Rect.Width) / 2, (Screen.Height - _divSemiAB.Rect.Height) / 2);
-            _divSemi.Refresh();
+            _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
+            _divMain.Refresh();
 
 
         }
@@ -74,7 +68,25 @@ namespace VolleyBallTournament
             for (int i = 0; i < nbTeams; i++)
             {
                 var team = new Team($"Team{i}").AppendTo(this).This<Team>();
+                team.SetIsShowStats(false);
                 _teams.Add(team);
+            }
+        }
+        private void CreateMatchs(int nbMatch)
+        {
+            Misc.Log($"Create Matchs --------------------------");
+            for (int i = 0; i < nbMatch; i++)
+            {
+                var teamA = new Team("TeamA");
+                var teamB = new Team("TeamB");
+                var teamReferee = new Team("TeamR");
+
+                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this).This<Match>();
+                _matchs.Add(match);
+
+                Misc.Log($"Create Match {i + 1}");
+
+                _divMatch.Insert(match);
             }
         }
         public override Node Update(GameTime gameTime)
