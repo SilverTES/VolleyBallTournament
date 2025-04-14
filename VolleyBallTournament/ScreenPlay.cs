@@ -112,6 +112,11 @@ namespace VolleyBallTournament
             if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
             if (_cameraX == -_phaseFinal._x) _phaseFinal.IsLocked = false;
 
+            //
+            if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
+            {
+                _phasePool2.GetTeam(0).SetStats(_phasePool1.GetTeam(0).Stats);
+            }
 
             if (ButtonControl.OnePress("SlideLeft", _key.IsKeyDown(Keys.Left) && _key.IsKeyDown(Keys.LeftControl)))
             {

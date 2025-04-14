@@ -134,7 +134,7 @@ namespace VolleyBallTournament
             State.On(States.PreSwap, () => 
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
-                Timer.SetDuration(1);
+                Timer.SetDuration(2);
                 Timer.StartTimer();
 
                 //ValidSets();
