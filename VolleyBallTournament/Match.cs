@@ -33,7 +33,7 @@ namespace VolleyBallTournament
         {
             {States.Pause, "Prochain match"},
             {States.WarmUp, "Echauffement"},
-            {States.Ready, "Prêt a jouer"},
+            {States.Ready, "Joueurs en place"},
             {States.CountDown1, "Début du Match"},
             {States.Play1, "Manche 1 en cours"},
             {States.PreSwap, "Fin de Manche 1"},
@@ -46,6 +46,8 @@ namespace VolleyBallTournament
 
         };
 
+        public bool IsFreeCourt => _isFreeCourt;
+        private bool _isFreeCourt = false; // terrain libre
         public int NbSetToWin => _nbSetToWin;
         private int _nbSetToWin = 2;
 
@@ -98,6 +100,7 @@ namespace VolleyBallTournament
             State.Set(States.Pause);
 
         }
+        public void SetIsFreeCourt(bool isFreeCourt) { _isFreeCourt = isFreeCourt; }
         public void ChangeTeamHasService(Team team)
         {
             _lastTeamHasService = _teamHasService;
@@ -129,8 +132,8 @@ namespace VolleyBallTournament
         public void ValidSet()
         {
             var winner = GetWinner();
-            TeamA.AddScoreSet(new Set(winner == TeamA, TeamA.ScorePoint));
-            TeamB.AddScoreSet(new Set(winner == TeamB, TeamB.ScorePoint));
+            TeamA.Stats.AddScoreSet(new Set(winner == TeamA, TeamA.Stats.ScorePoint));
+            TeamB.Stats.AddScoreSet(new Set(winner == TeamB, TeamB.Stats.ScorePoint));
         }
         public void SetNbSetToWin(int nbSetToWin)
         {
@@ -138,15 +141,15 @@ namespace VolleyBallTournament
         }
         public Team GetWinner()
         {
-            if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
+            if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
             
-            return _teamA.ScorePoint > _teamB.ScorePoint ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint > _teamB.Stats.ScorePoint ? _teamA : _teamB;
         }
         public Team GetLooser()
         {
-            if (_teamA.ScorePoint == _teamB.ScorePoint) return null;
+            if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
 
-            return _teamA.ScorePoint < _teamB.ScorePoint ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint < _teamB.Stats.ScorePoint ? _teamA : _teamB;
         }
         public Team GetTeamOppenent(Team team)
         {
@@ -175,13 +178,13 @@ namespace VolleyBallTournament
         }
         public void ResetSets()
         {
-            TeamA.Sets.Clear();
-            TeamB.Sets.Clear();
+            TeamA.Stats.Sets.Clear();
+            TeamB.Stats.Sets.Clear();
         }
         public void ResetScorePoints()
         {
-            TeamA.SetScorePoint(0);
-            TeamB.SetScorePoint(0);
+            TeamA.Stats.SetScorePoint(0);
+            TeamB.Stats.SetScorePoint(0);
         }
         public void AddPointA(int points)
         {
@@ -199,7 +202,7 @@ namespace VolleyBallTournament
                 if (points < 0)
                     CancelAction();
 
-                _teamA.AddPoint(points);
+                _teamA.Stats.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreAPos - Vector2.UnitY * 64).AppendTo(_parent);
                 new FxExplose(_court.ScoreAPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 
@@ -226,7 +229,7 @@ namespace VolleyBallTournament
                 if (points < 0)
                     CancelAction();
 
-                _teamB.AddPoint(points);
+                _teamB.Stats.AddPoint(points);
                 new PopInfo(points > 0 ? $"+{points}" : $"{points}", points > 0 ? Color.GreenYellow : Color.Red, Color.Black, 0, 16, 32).SetPosition(_court.ScoreBPos - Vector2.UnitY * 64).AppendTo(_parent);
                 new FxExplose(_court.ScoreBPos, points > 0 ? Color.GreenYellow : Color.Red, 20, 20, 80).AppendTo(_parent);
 

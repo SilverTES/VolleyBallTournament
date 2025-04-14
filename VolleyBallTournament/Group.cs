@@ -37,16 +37,16 @@ namespace VolleyBallTournament
             //_teams = _teams.OrderByDescending(p => p.TotalPoint).ToList();
 
             _teams = _teams
-                .OrderByDescending(e => e.RankingPoint)
-                .ThenByDescending(e => e.BonusPoint)
-                .ThenByDescending(e => e.TotalPoint)
+                .OrderByDescending(e => e.Stats.RankingPoint)
+                .ThenByDescending(e => e.Stats.BonusPoint)
+                .ThenByDescending(e => e.Stats.TotalPoint)
                 .ToList();
 
             for (int i = 0; i < _teams.Count; i++)
             {
                 var team = _teams[i];
 
-                team.SetRank(i + 1);
+                team.Stats.SetRank(i + 1);
                 team.MoveToPosition(new Vector2(0, (team._rect.Height + 8) * i));
                 //team.SetPosition(0, team._rect.Height * i);
             }

@@ -67,7 +67,7 @@ namespace VolleyBallTournament
                 var textBox = textBoxs[i];
                 textBox.OnChange += (t) =>
                 {
-                    _teams[t.Id].SetTeamName(textBox.Text);
+                    _teams[t.Id].Stats.SetTeamName(textBox.Text);
                 };
                 textBox.OnFocus += (t) => 
                 { 
@@ -310,10 +310,13 @@ namespace VolleyBallTournament
                 //    batch.CenterStringXY(Static.FontMain, $"Groupe {i+1}", AbsXY + new Vector2(i * 480 + 40 + 200, 280), Color.White);
                 //}
 
+            }
+
+            if (indexLayer == (int)Layers.HUD)
+            {
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
             }
-
             if (indexLayer == (int)Layers.Debug)
             {
                 //if (_currentTextBox != null)

@@ -203,10 +203,10 @@ namespace VolleyBallTournament
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)MessageType.Update); // Identifiant de type
-            writer.Put(match.TeamA.ScorePoint);
-            writer.Put(match.TeamB.ScorePoint);
-            writer.Put(match.TeamA.TeamName);
-            writer.Put(match.TeamB.TeamName);
+            writer.Put(match.TeamA.Stats.ScorePoint);
+            writer.Put(match.TeamB.Stats.ScorePoint);
+            writer.Put(match.TeamA.Stats.TeamName);
+            writer.Put(match.TeamB.Stats.TeamName);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
         private void ProcessUpdate(NetPeer peer, NetPacketReader reader)
@@ -217,10 +217,10 @@ namespace VolleyBallTournament
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)MessageType.Update); // Identifiant de type
-            writer.Put(match.TeamA.ScorePoint);
-            writer.Put(match.TeamB.ScorePoint);
-            writer.Put(match.TeamA.TeamName);
-            writer.Put(match.TeamB.TeamName);
+            writer.Put(match.TeamA.Stats.ScorePoint);
+            writer.Put(match.TeamB.Stats.ScorePoint);
+            writer.Put(match.TeamA.Stats.TeamName);
+            writer.Put(match.TeamB.Stats.TeamName);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
 

@@ -67,7 +67,7 @@ namespace VolleyBallTournament
             _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            _phaseFinal = new PhaseFinal("Phase Finale").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseFinal>();
+            _phaseFinal = new PhaseFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseFinal>();
 
             _phasePool1.SetRotation(0);
 

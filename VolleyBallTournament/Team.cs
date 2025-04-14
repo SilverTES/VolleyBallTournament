@@ -9,50 +9,11 @@ using Mugen.Physics;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Text.RegularExpressions;
 
 
 namespace VolleyBallTournament
 {
-    public class Trail : Node
-    {
-        Color _color;
-        Vector2 _scale;
-        float _stepAlpha;
-        public Trail(RectangleF rectF, Vector2 scale, float stepAplha = 0.5f, Color color = default)
-        {
-            _x = rectF.X;
-            _y = rectF.Y;
-
-            _rect = rectF;
-            _scale = scale;
-            _color = color;
-            _stepAlpha = stepAplha;
-        }
-
-        public override Node Update(GameTime gameTime)
-        {
-            UpdateRect();
-
-            _alpha += -_stepAlpha;
-
-            if (_alpha <= 0f)
-                KillMe();
-            return base.Update(gameTime);
-        }
-
-        public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
-        {
-
-            if (indexLayer == (int)Layers.BackFX)
-            {
-                batch.FillRectangle(_rect, _color * _alpha);
-            }
-
-
-            return base.Draw(batch, gameTime, indexLayer);
-        }
-    }
-
     public enum Result
     {
         Null,
@@ -66,49 +27,111 @@ namespace VolleyBallTournament
         public int Points = scorePoint; // points in Set
     }
 
+    public class Stats(Match match, Team team)
+    {
+        private Match _match = match;
+        private Team _team = team;
+        public string TeamName => _teamName;
+        private string _teamName;
+        public int ScorePoint => _scorePoint;
+        private int _scorePoint = 0;
+        public List<Set> Sets => _sets;
+        private List<Set> _sets = [];
+        private int _rank = 0;
+        public int RankingPoint => _rankingPoint;
+        private int _rankingPoint = 0; 
+        public EasingValue EaseRankingPoint => _easeRankingPoint;
+        EasingValue _easeRankingPoint = new(0);
+        public int CurrentBonusPoint => _currentBonusPoint;
+        private int _currentBonusPoint = 0;
+        public int BonusPoint => _bonusPoint;
+        private int _bonusPoint = 0;
+        public int TotalPoint => _totalPoint;
+        private int _totalPoint = 0; 
+        public EasingValue EaseTotalPoint => _easeTotalPoint;
+        EasingValue _easeTotalPoint = new(0);
+
+        public int NbMatchPlayed => _results.Count;
+        public List<Result> Results => _results;
+        private List<Result> _results = new List<Result>();
+
+        public void Update()
+        {
+            _scorePoint = int.Clamp(_scorePoint, 0, 99);
+
+            if (_match != null)
+            {
+                if (!_team.IsReferee) // Seul l'équipe qui joue on leur bonus qui changent !
+                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(_team).Stats._scorePoint;
+            }
+        }
+        public void ResetResult() { _results.Clear(); }
+        public void AddResult(Result result) { _results.Add(result); }
+        public void ResetAllPoints()
+        {
+            _rank = 0;
+            _scorePoint = 0;
+            _rankingPoint = 0;
+            _bonusPoint = 0;
+            _totalPoint = 0;
+        }
+        public void SetMatch(Match match) { _match = match; }
+        public void SetTeamName(string teamName) { _teamName = teamName; }
+        public void AddRankingPoint(int points)
+        {
+            _rankingPoint += points;
+            _easeRankingPoint.SetValue(_rankingPoint);
+        }
+        public void SetRankingPoint(int points)
+        {
+            _rankingPoint = points;
+            _easeRankingPoint.SetValue(_rankingPoint);
+        }
+        public void AddTotalPoint(int points)
+        {
+            _totalPoint += points;
+            _easeTotalPoint.SetValue(_totalPoint);
+        }
+        public void SetTotalPoint(int points)
+        {
+            _totalPoint = points;
+            _easeTotalPoint.SetValue(_totalPoint);
+        }
+        public void ValidBonusPoint()
+        {
+            _bonusPoint += _currentBonusPoint;
+            _currentBonusPoint = 0;
+        }
+        public void AddPoint(int points) { _scorePoint += points; AddTotalPoint(points); }
+        public void SetScorePoint(int points) { _scorePoint = points; }
+        public void AddScoreSet(Set set) { _sets.Add(set); }
+        public void SetRank(int rank) { _rank = rank; }
+
+    }
+
     public class Team : Node  
     {
-        public enum Timers
-        {
-            None,
-            Trail,
-        }
-        Timer<Timers> _timer = new Timer<Timers>();
+        public Stats Stats => _stats;
+        private Stats _stats;
 
         public bool IsMove => _isMove;
         private bool _isMove = false;
 
         private Match _match = null;
 
-        private int _rank = 0;
         private Vector2 _newPosition = Vector2.Zero;
-        public int ScorePoint => _scorePoint;
-        private int _scorePoint = 0;
 
-        public List<Set> Sets => _sets;
-        private List<Set> _sets = [];
-
+        public bool IsPlaying => _isPlaying;
         private bool _isPlaying = false;
+        public bool IsReferee => _isReferee;
         private bool _isReferee = false;
 
         private bool _isShowStats = true;
-        public int RankingPoint => _rankingPoint;
-        private int _rankingPoint = 0; EasingValue _easeRankingPoint = new(0);
-        private int _currentBonusPoint = 0;
-        public int BonusPoint => _bonusPoint;
-        private int _bonusPoint = 0;
-
-        public int TotalPoint => _totalPoint;
-        private int _totalPoint = 0; EasingValue _easeTotalPoint = new(0);
 
         //public int NbMaxMatchPlayed = 3;
         public bool HasService => _hasService;
         private bool _hasService = false;
         //private Team _lastTeamHasService = null;
-        public int NbMatchPlayed => _results.Count;
-        private List<Result> _results = new List<Result>();
-        public string TeamName => _teamName;
-        private string _teamName;
 
         Animate _animate;
 
@@ -121,135 +144,39 @@ namespace VolleyBallTournament
             _type = UID.Get<Team>();
             SetSize(Width, Height);
 
+            _stats = new Stats(_match, this);
+
             Bound = new RectangleF(0, 0, Width, Height);
 
-            _teamName = teamName;
+            _stats.SetTeamName(teamName);
             //Match = match;
             //ScorePanel = scorePanel;
             //Court = court;
 
-            _timer.Set(Timers.Trail, Timer.Time(0, 0, .01f), true);
-            _timer.Start(Timers.Trail);
-
             _animate = new Animate();
             _animate.Add("move");
         }
-        public void ResetAllPoints()
-        {
-            _rank = 0;
-            _scorePoint = 0;
-            _rankingPoint = 0;
-            _bonusPoint = 0;
-            _totalPoint = 0;
-        }
-        public void SetService(bool hasService)
-        { 
-            _hasService = hasService;
-        }
-        //public void TakeService(Team opponent)
-        //{
-        //    if (opponent == null) return;
+        public void SetStats(Stats stats) { _stats = stats; }
 
-        //    if (_hasService) _lastTeamHasService = this;
-        //    if (opponent.HasService) _lastTeamHasService = opponent;
-
-        //    _hasService = true;
-        //    opponent.SetService(false);
-        //}
-        //public void CancelService(Team opponent)
-        //{
-        //    if (opponent == null) return;
-
-        //    if (_lastTeamHasService != null)
-            
-        //    if (_lastTeamHasService == this)
-        //        TakeService(opponent);
-
-        //    if (_lastTeamHasService == opponent)
-        //        opponent.TakeService(this);
-            
-        //}
-        public void SetIsPlaying(bool isPlaying)
-        {
-            _isPlaying = isPlaying;
-        }
-        public void SetIsReferee(bool isReferee)
-        {
-            _isReferee = isReferee;
-        }
-        public void SetMatch(Match match)
-        {
-            _match = match;
-
-            if (match == null) return;
-        }
-        public void SetTeamName(string teamName) { _teamName = teamName; }
-        public void ResetResult()
-        {
-            _results.Clear();
-        }
-        public void SetIsShowStats(bool isShowStats)
-        {
-            _isShowStats = isShowStats;
-        }
-        public void AddResult(Result result)
-        {
-            _results.Add(result);
-        }
-        public Team AddRankingPoint(int points)
-        { 
-            _rankingPoint += points; 
-            _easeRankingPoint.SetValue(_rankingPoint);
-            return this;
-        }
-        public Team SetRankingPoint(int points)
-        {
-            _rankingPoint = points;
-            _easeRankingPoint.SetValue(_rankingPoint);
-            return this;
-        }
-        public Team AddTotalPoint(int points)
-        {
-            _totalPoint += points;
-            _easeTotalPoint.SetValue(_totalPoint);
-            return this;
-        }
-        public Team SetTotalPoint(int points)
-        {
-            _totalPoint = points;
-            _easeTotalPoint.SetValue(_totalPoint);
-            return this;
-        }
-        public void ValidBonusPoint()
-        {
-            _bonusPoint += _currentBonusPoint;
-            _currentBonusPoint = 0;
-        }
-        public void AddPoint(int points) { _scorePoint += points; AddTotalPoint(points); }
-        public void SetScorePoint(int points) { _scorePoint = points; }
-        public void AddScoreSet(Set set) { _sets.Add(set); }
-        public void SetRank(int rank)
-        {
-            _rank = rank;
-        }
+        public void SetService(bool hasService) { _hasService = hasService; }
+        public void SetIsPlaying(bool isPlaying) { _isPlaying = isPlaying; }
+        public void SetIsReferee(bool isReferee) { _isReferee = isReferee; }
+        public void SetMatch(Match match) { _match = match; _stats.SetMatch(match) ; if (match == null) return; }
+        public void SetIsShowStats(bool isShowStats) { _isShowStats = isShowStats; }
         public void MoveToPosition(Vector2 position, int duration = 64)
         {
             if (position == XY) 
                 return;
 
-            //_isMove = true;
+            SetIsMove(true);
             _newPosition = position;
             _animate.SetMotion("move", Easing.QuadraticEaseOut, _y, _newPosition.Y, duration);
             _animate.Start("move");
 
         }
-        public void SetIsMove(bool isMove)
-        {
-            _isMove = isMove;
-        }
+        public void SetIsMove(bool isMove) { _isMove = isMove; }
         public override Node Update(GameTime gameTime)
         {
-            _timer.Update();
             UpdateRect();
 
             if (_animate.IsPlay())
@@ -259,19 +186,12 @@ namespace VolleyBallTournament
 
             if (_animate.Off("move"))
             {
-                _isMove = false;
+                SetIsMove(false);
                 //Misc.Log("End move");
             }
             _animate.NextFrame();
 
-            _scorePoint = int.Clamp(_scorePoint, 0, 99);
-            //_scoreSet = int.Clamp(_scoreSet, 0, 3);
-
-            if (_match != null)
-            {
-                if (!_isReferee) // Seul l'équipe qui joue on leur bonus qui changent !
-                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(this)._scorePoint;
-            }
+            _stats.Update();
 
             return base.Update(gameTime);
         }
@@ -279,18 +199,12 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                DrawBasicTeam(batch, AbsRectF);
+                DrawBasicTeam(batch, AbsRectF, _parent);
 
                 if (_isShowStats)
                     DrawStats(batch);
 
                 DrawVictory(batch);
-
-                if (_isPlaying)
-                {
-                    //batch.Rectangle(AbsRectF.Extend(-4f), Color.White, 3f);
-                }
-
             }
 
             if (indexLayer == (int)Layers.HUD)
@@ -307,17 +221,16 @@ namespace VolleyBallTournament
         }
         public void DrawStats(SpriteBatch batch)
         {
-            batch.RightMiddleString(Static.FontMain, $"{_easeRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
-            int bonus = _bonusPoint + _currentBonusPoint;
+            batch.RightMiddleString(Static.FontMain, $"{Stats.EaseRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
+            int bonus = Stats.BonusPoint + Stats.CurrentBonusPoint;
             batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
-            batch.LeftMiddleString(Static.FontMini, $"{_easeTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
+            batch.LeftMiddleString(Static.FontMini, $"{Stats.EaseTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
         }
-        public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF)
+        public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF, Node parent)
         {
-            if (_timer.On(Timers.Trail) && _isMove)
+            if (_isMove)
             {
-                //Misc.Log("Move");
-                new Trail(rectF.Extend(-4f), Vector2.One, .05f, Color.WhiteSmoke).AppendTo(_parent);
+                new Trail(rectF.Extend(-4f), Vector2.One, .05f, Color.WhiteSmoke).AppendTo(parent);
             }
 
             batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 8, Color.Black * .5f);
@@ -326,7 +239,7 @@ namespace VolleyBallTournament
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 1f);
             batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
-            batch.LeftMiddleString(Static.FontMain, $"{_teamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
+            batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
         }
         public void DrawReferee(SpriteBatch batch, RectangleF rectF)
         {
@@ -349,25 +262,25 @@ namespace VolleyBallTournament
 
         private void DrawVictory(SpriteBatch batch)
         {
-            for (int i = 0; i < NbMatchPlayed; i++)
+            for (int i = 0; i < Stats.NbMatchPlayed; i++)
             {
-                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 30 - (28 * NbMatchPlayed), AbsRectF.Center.Y);
+                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 30 - (28 * Stats.NbMatchPlayed), AbsRectF.Center.Y);
 
                 batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
 
-                if (_results[i] == Result.Null)
+                if (Stats.Results[i] == Result.Null)
                 {
                     batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
                     batch.CenterStringXY(Static.FontMini, "N", pos, Color.White);
                 }
 
-                if (_results[i] == Result.Win)
+                if (Stats.Results[i] == Result.Win)
                 {
                     batch.FilledCircle(Static.TexCircle, pos, 30, Color.Green);
                     batch.CenterStringXY(Static.FontMini, "G", pos, Color.White);
                 }
 
-                if (_results[i] == Result.Loose)
+                if (Stats.Results[i] == Result.Loose)
                 {
                     batch.FilledCircle(Static.TexCircle, pos, 30, Color.Red);
                     batch.CenterStringXY(Static.FontMini, "P", pos, Color.White);

@@ -187,31 +187,25 @@ namespace VolleyBallTournament
             {
                 DrawCourt(batch);
                 
-                _match.TeamA.DrawBasicTeam(batch, Team.Bound + _teamAPos);
-                _match.TeamB.DrawBasicTeam(batch, Team.Bound + _teamBPos);
+                if (!_match.IsFreeCourt)
+                {
+                    _match.TeamA.DrawBasicTeam(batch, Team.Bound + _teamAPos, _parent);
+                    _match.TeamB.DrawBasicTeam(batch, Team.Bound + _teamBPos, _parent);
+                    _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos, _parent);
 
-                _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos);
+                    DrawVBall(batch, _vBallCurrentPos);
 
-                DrawVBall(batch, _vBallCurrentPos);
+                    DrawSets(batch);
+                    DrawScores(batch);
 
-                batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", _courtNamePos, Color.Yellow);
-
-
-                DrawInfos(batch);
-
-                DrawSets(batch);
-
-                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), _scoreAPos + Vector2.One * 6, Color.Black * .5f);
-                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), _scoreBPos + Vector2.One * 6, Color.Black * .5f);
-
-                batch.RightMiddleString(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), _scoreAPos, Color.Gold);
-                batch.RightMiddleString(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), _scoreBPos, Color.Gold);
-
+                    DrawInfos(batch);
+                }
             }
 
             if (indexLayer == (int)Layers.HUD)
             {
-                _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
+                if (!_match.IsFreeCourt)
+                    _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
             }
 
 
@@ -222,6 +216,14 @@ namespace VolleyBallTournament
 
             return base.Draw(batch, gameTime, indexLayer);
         }
+        private void DrawScores(SpriteBatch batch)
+        {
+            batch.RightMiddleString(Static.FontMain3, _match.TeamA.Stats.ScorePoint.ToString(), _scoreAPos + Vector2.One * 6, Color.Black * .5f);
+            batch.RightMiddleString(Static.FontMain3, _match.TeamB.Stats.ScorePoint.ToString(), _scoreBPos + Vector2.One * 6, Color.Black * .5f);
+
+            batch.RightMiddleString(Static.FontMain3, _match.TeamA.Stats.ScorePoint.ToString(), _scoreAPos, Color.Gold);
+            batch.RightMiddleString(Static.FontMain3, _match.TeamB.Stats.ScorePoint.ToString(), _scoreBPos, Color.Gold);
+        }
         private void DrawSets(SpriteBatch batch)
         {
             DrawSet(batch, _match.TeamA, _scoreAPos);
@@ -229,9 +231,9 @@ namespace VolleyBallTournament
         }
         private void DrawSet(SpriteBatch batch, Team team, Vector2 position)
         {
-            for (int i = 0; i < team.Sets.Count; i++)
+            for (int i = 0; i < team.Stats.Sets.Count; i++)
             {
-                var set = team.Sets[i];
+                var set = team.Stats.Sets[i];
 
                 var offset = new Vector2(i * 48, 0) + Vector2.UnitX * 20;
                 batch.FillRectangleCentered(position + offset + Vector2.One * 6, Vector2.One * 42, Color.Black *.5f, 0);
@@ -264,6 +266,8 @@ namespace VolleyBallTournament
 
             batch.Line(AbsRectF.LeftMiddle - threeMeter, AbsRectF.RightMiddle - threeMeter, color, thickness);
             batch.Line(AbsRectF.LeftMiddle + threeMeter, AbsRectF.RightMiddle + threeMeter, color, thickness);
+
+            batch.CenterStringXY(Static.FontMain, $"Terrain {_courtName}", _courtNamePos, Color.Yellow);
         }
         private void DrawVBall(SpriteBatch batch, Vector2 position)
         {

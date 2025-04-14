@@ -75,11 +75,11 @@ namespace VolleyBallTournament
                 batch.Rectangle(AbsRectF, Color.Gray, 1f);
                 batch.Line(AbsRectF.TopCenter, AbsRectF.BottomCenter, Color.Black, 3f);
 
-                batch.LeftMiddleString(Static.FontMain, _match.TeamA.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
-                batch.LeftMiddleString(Static.FontMain, _match.TeamA.TeamName, TeamAPos, Color.GreenYellow);
+                batch.LeftMiddleString(Static.FontMain, _match.TeamA.Stats.TeamName, TeamAPos + Vector2.One * 6, Color.Black);
+                batch.LeftMiddleString(Static.FontMain, _match.TeamA.Stats.TeamName, TeamAPos, Color.GreenYellow);
 
-                batch.RightMiddleString(Static.FontMain, _match.TeamB.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
-                batch.RightMiddleString(Static.FontMain, _match.TeamB.TeamName, TeamBPos , Color.GreenYellow);
+                batch.RightMiddleString(Static.FontMain, _match.TeamB.Stats.TeamName, TeamBPos + Vector2.One * 6, Color.Black);
+                batch.RightMiddleString(Static.FontMain, _match.TeamB.Stats.TeamName, TeamBPos , Color.GreenYellow);
 
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
@@ -90,8 +90,8 @@ namespace VolleyBallTournament
                     //batch.CenterBorderedStringXY(Static.FontMain, _match.TeamB.ScoreSet.ToString(), SetBPos, Color.Cyan, Color.Black);
                 }
 
-                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamA.ScorePoint.ToString(), ScoreAPos, Color.Gold, Color.Black);
-                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamB.ScorePoint.ToString(), ScoreBPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamA.Stats.ScorePoint.ToString(), ScoreAPos, Color.Gold, Color.Black);
+                batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamB.Stats.ScorePoint.ToString(), ScoreBPos, Color.Gold, Color.Black);
 
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter + Vector2.One * 6, Color.Black, Color.Black);
                 batch.CenterBorderedStringXY(Static.FontMain, "VS", AbsRectF.TopCenter, Color.Gold, Color.Black);
@@ -102,7 +102,7 @@ namespace VolleyBallTournament
                 string result = "Match Nul";
                 var winner = _match.GetWinner();
                 if (winner != null)
-                    result = $"Vainqueur {winner.TeamName}";
+                    result = $"Vainqueur {winner.Stats.TeamName}";
 
                 //batch.CenterStringXY(Static.FontMini, result, AbsRectF.TopCenter - Vector2.UnitY * 40, Color.ForestGreen);
             }
