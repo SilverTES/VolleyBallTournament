@@ -7,11 +7,7 @@ using Mugen.GUI;
 using Mugen.Input;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
 {
@@ -71,8 +67,8 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangle(rectDiv, Color.DarkSlateBlue * .5f);
-                batch.Rectangle(rectDiv, Color.Gray * .5f);
+                //batch.FillRectangle(rectDiv, Color.DarkSlateBlue * .5f);
+                //batch.Rectangle(rectDiv, Color.Gray * .5f);
                 //batch.Rectangle(rectDiv.Extend(-4f), Color.Gray * .5f);
 
                 var pos = rectDiv.TopCenter - Vector2.UnitY * 40;
@@ -80,14 +76,21 @@ namespace VolleyBallTournament
                 batch.CenterStringXY(Static.FontMain, _name, pos, Color.Cyan);
 
                 batch.FillRectangle(rectDiv1, Color.Black * .5f);
+                batch.Rectangle(rectDiv1, Color.Gold * .75f);
+
                 batch.FillRectangle(rectDiv2, Color.Black * .5f);
+                batch.Rectangle(rectDiv2, Color.Gold * .75f);
 
             }
             if (indexLayer == (int)Layers.HUD)
             {
+                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle,54, Color.Gold * 1f, 0);
+                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 48, Color.Blue * 1f, 0);
+                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.LeftMiddle, Color.Gold);
 
-                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.Center - Vector2.UnitY, Color.Gold);
-                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.Center - Vector2.UnitY, Color.Gold);
+                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle,54, Color.Gold * 1f, 0);
+                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 48, Color.Blue * 1f, 0);
+                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.LeftMiddle, Color.Gold);
             }
 
             return base.Draw(batch, gameTime, indexLayer);
@@ -95,6 +98,8 @@ namespace VolleyBallTournament
     }
     public class PhaseDemiFinal : Node
     {
+        //public State<States> State { get; private set; } = new State<States>(States.Ready);
+
         string _title;
         public bool IsLocked = false;
 
@@ -108,17 +113,23 @@ namespace VolleyBallTournament
         Container _divMatch;
         Container _divSemi;
 
+        public List<MatchConfig> MatchConfigs => _matchConfigs;
+        private List<MatchConfig> _matchConfigs = [];
+        public const int NbRotation = 4;
 
-        public PhaseDemiFinal(string title) 
+        public Action<PhaseDemiFinal> OnFinishPhase;
+
+        public PhaseDemiFinal(string title)
         { 
             _title = title;
+
             SetSize(Screen.Width, Screen.Height);
 
-            SemiFinal principale1 = new SemiFinal("Demi Principale 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
-            SemiFinal principale2 = new SemiFinal("Demi Principale 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+            SemiFinal principale1 = new SemiFinal("Demi Principale Winner", "A", "B").AppendTo(this).This<SemiFinal>();
+            SemiFinal principale2 = new SemiFinal("Demi Principale Looser", "A", "B").AppendTo(this).This<SemiFinal>();
 
-            SemiFinal consolante1 = new SemiFinal("Demi Consolante 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
-            SemiFinal consolante2 = new SemiFinal("Demi Consolante 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+            SemiFinal consolante1 = new SemiFinal("Demi Consolante Winner", "A", "B").AppendTo(this).This<SemiFinal>();
+            SemiFinal consolante2 = new SemiFinal("Demi Consolante Looser", "A", "B").AppendTo(this).This<SemiFinal>();
 
             CreateTeams();
 
@@ -142,11 +153,11 @@ namespace VolleyBallTournament
             
             CreateMatchs(3);
 
-            _divSemi.Insert(_divSemiPrincipal[0].Div);
-            _divSemi.Insert(_divSemiPrincipal[1].Div);
-
-            _divSemi.Insert(_divSemiConsolante[0].Div);
             _divSemi.Insert(_divSemiConsolante[1].Div);
+            _divSemi.Insert(_divSemiConsolante[0].Div);
+            _divSemi.Insert(_divSemiPrincipal[1].Div);
+            _divSemi.Insert(_divSemiPrincipal[0].Div);
+
 
             _divMain.Insert(_divMatch);
             _divMain.Insert(_divSemi);
@@ -156,7 +167,42 @@ namespace VolleyBallTournament
 
 
             _matchs[1].SetIsFreeCourt(true);
+
+            CreateMatchConfigs();
+
+            _matchs[0].State.Set(States.BeginDemiFinal);
+            _matchs[2].State.Set(States.BeginDemiFinal);
+
+            _matchs[0].SetTicState((int)States.BeginDemiFinal);
+            _matchs[2].SetTicState((int)States.BeginDemiFinal);
+
         }
+        private MatchConfig CreateMatchConfigDemi(int nbSetToWin, int nbPointToWinSet, int idTeamA, int idTeamB, int idTeamReferee)
+        {
+            return new MatchConfig(0, nbSetToWin, nbPointToWinSet, _teams[idTeamA], _teams[idTeamB], _teams[idTeamReferee]);
+        }
+        private void CreateMatchConfigs()
+        {
+            // Demi consolante Looser
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 12, 13, 8));
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 14, 15, 10));
+
+            // demi consolante Looser
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 8, 9, 12));
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 10, 11, 14));
+
+            // demi principale Looser
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 4, 5, 0));
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 6, 7, 2));
+
+            // demi principale Winner
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 0, 1, 4));
+            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 2, 3, 6));
+        }
+        public List<Team> GetTeams() { return _teams; }
+        public Team GetTeam(int index) { return _teams[index]; }
+        public List<Match> GetMatchs() { return _matchs; }
+        public Match GetMatch(int index) { return _matchs[index]; }
         private void CreateTeams(int nbTeams = 16)
         {
             for (int i = 0; i < nbTeams; i++)
@@ -193,12 +239,7 @@ namespace VolleyBallTournament
             }
             else
             {
-                // Debug
-                if (ButtonControl.OnePress($"SwapTeams", Static.Key.IsKeyDown(Keys.S)))
-                {
-                    for (int i = 0; i < _matchs.Count; i++)
-                        _matchs[i].Court.SwapTeams();
-                }
+
             }
 
             UpdateChilds(gameTime);

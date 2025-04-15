@@ -17,8 +17,7 @@ namespace VolleyBallTournament
     {
         public State<States> State { get; private set; } = new State<States>(States.Ready);
 
-        private List<int> _process = Enums.GetList<States>();
-        private int _ticRotation = 0;
+        private int _ticState = 0;
 
         public bool IsLocked = false;
         public string Title => _title;
@@ -36,7 +35,6 @@ namespace VolleyBallTournament
         private readonly TimerCountDown _timer;
 
         private int _currentRotation = 0;
-
         private RotationManager _rotationManager;
 
         private int Id;
@@ -78,7 +76,7 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            State.Set(States.Pause);
+            State.Set(States.NextMatch);
 
             DefineStates();
         }
@@ -161,19 +159,18 @@ namespace VolleyBallTournament
                 }
             });
 
-            State.On(States.Pause, () =>
+            State.On(States.NextMatch, () =>
             {
-                ResetTeamsStatus();
-                ResetAllMatchScorePoints();
-                ResetAllMatchSetPoints();
+                ResetTeamsStatus(_teams);
+                ResetAllMatchScorePoints(_matchs);
+                ResetAllMatchSetPoints(_matchs);
 
                 SetRotation(_currentRotation, _rotationManager);
 
             });
-            State.Off(States.Ready, () =>
+            State.On(States.Ready, () =>
             {
-
-
+                _timer.StopTimer();
             });
             State.On(States.Finish, () =>
             {
@@ -358,7 +355,9 @@ namespace VolleyBallTournament
                 _groups[3].CopyTeamStats(i, teamsPrincipale[groupBTeamIndex[i] - 1]);
             }
 
-            ResetTeamsStatus();
+            ResetTeamsStatus(_teams);
+            ResetAllMatchScorePoints(_matchs);
+            ResetAllMatchSetPoints(_matchs);
             // On remet à zéro le ranking point des équipes avant de commencer la phase
             for (int i = 0; i < _teams.Count; i++)
             {
@@ -368,6 +367,13 @@ namespace VolleyBallTournament
             // Prépare la première rotation 
             _rotationManager.LoadFile(configFile, GetTeams(), GetMatchs());
             SetRotation(0, _rotationManager);
+
+            // Reclasse les équipes en fonctione des points accumulés
+            for (int i = 0; i < _groups.Count; i++)
+            {
+                var group = _groups[i];
+                group.Refresh();
+            }
 
         }
 
@@ -384,9 +390,6 @@ namespace VolleyBallTournament
                 var matchConfig = matchConfigs[i];
                 if (matchConfig !=  null)
                 {
-                    
-                    //Misc.Log($"SET ROTATION : {matchConfig.IdTerrain}");
-
                     var match = _matchs[matchConfig.IdTerrain];
 
                     match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
@@ -394,33 +397,6 @@ namespace VolleyBallTournament
                 }
             }
         }
-        public void ResetTeamsStatus()
-        {
-            for (int i = 0; i < _teams.Count; i++)
-            {
-                var team = _teams[i];
-                team.SetIsPlaying(false);
-                team.SetIsReferee(false);
-                team.SetMatch(null);
-            }
-        }
-        public void ResetAllMatchScorePoints()
-        {
-            for (int i = 0; i < _matchs.Count; i++)
-            {
-                var match = _matchs[i];
-                match.ResetScorePoints();
-            }
-        }
-        public void ResetAllMatchSetPoints()
-        {
-            for (int i = 0; i < _matchs.Count; i++)
-            {
-                var match = _matchs[i];
-                match.ResetSets();
-            }
-        }
-
         public void ShuffleTeamsTotalPoint()
         {
             for (int i = 0; i < _teams.Count; i++)
@@ -476,7 +452,7 @@ namespace VolleyBallTournament
             {
                 Misc.Log("Finish CountDown");
                 Timer.StopTimer();
-                SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
+                SetTicRotation((_ticState + 1) % Enums.Count<States>());
             }
         }
         private void RunState()
@@ -487,7 +463,7 @@ namespace VolleyBallTournament
 
                     break;
 
-                case States.Pause:
+                case States.NextMatch:
 
                     break;
 
@@ -537,9 +513,9 @@ namespace VolleyBallTournament
         }
         private void SetTicRotation(int ticProcess)
         {
-            _ticRotation = ticProcess;
+            _ticState = ticProcess;
 
-            States nextState = (States)_process[_ticRotation];
+            States nextState = (States)Process[_ticState];
 
             State.Set(nextState);
 
@@ -571,8 +547,15 @@ namespace VolleyBallTournament
 
                     if (_currentRotation < _rotationManager.NbRotation)
                     {
-                        Misc.Log($"Etape {_ticRotation}");
-                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
+                        Misc.Log($"Etape {_ticState}");
+
+                        _ticState++;
+
+                        if (_ticState > (int)States.ValidPoints)
+                            _ticState = (int)States.NextMatch;
+
+                        SetTicRotation(_ticState); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
+                        //SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
                     }
                 }
 
@@ -592,7 +575,7 @@ namespace VolleyBallTournament
                 if (ButtonControl.OnePress($"Reset{Id}", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
                     SetTicRotation(0);
-                    ResetTeamsStatus();
+                    ResetTeamsStatus(_teams);
                     ResetTeamsTotalPoint();
                     SetRotation(0, _rotationManager);
                 }

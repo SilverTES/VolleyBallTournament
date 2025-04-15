@@ -62,7 +62,8 @@ namespace VolleyBallTournament
             if (match != null)
             {
                 if (!team.IsReferee) // Seul l'équipe qui joue on leur bonus qui changent !
-                    _currentBonusPoint = _scorePoint - match.GetTeamOppenent(team).Stats._scorePoint;
+                    if (match.GetTeamOppenent(team) != null)
+                        _currentBonusPoint = _scorePoint - match.GetTeamOppenent(team).Stats._scorePoint;
             }
         }
         public void ResetResult() { _results.Clear(); }
@@ -102,7 +103,12 @@ namespace VolleyBallTournament
             _bonusPoint += _currentBonusPoint;
             _currentBonusPoint = 0;
         }
-        public void AddPoint(int points) { _scorePoint += points; AddTotalPoint(points); }
+        public void AddPoint(int points) 
+        { 
+            _scorePoint += points;
+            _scorePoint = int.Clamp(_scorePoint, 0, 99);
+            AddTotalPoint(points); 
+        }
         public void SetScorePoint(int points) { _scorePoint = points; }
         public void AddScoreSet(Set set) { _sets.Add(set); }
         public void SetRank(int rank) { _rank = rank; }
@@ -165,6 +171,32 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
+        public void ResetSets()
+        {
+            Stats.Sets.Clear();
+        }
+        public void ResetScorePoints()
+        {
+            Stats.SetScorePoint(0);
+        }
+        public void ResetTeamStatus()
+        {
+            SetIsPlaying(false);
+            SetIsReferee(false);
+            SetMatch(null);
+        }
+        //public void ResetMatchScorePoints()
+        //{
+        //    _match.ResetScorePoints();
+        //}
+        //public void ResetAllMatchSetPoints(List<Match> matchs)
+        //{
+        //    for (int i = 0; i < matchs.Count; i++)
+        //    {
+        //        var match = matchs[i];
+        //        match.ResetSets();
+        //    }
+        //}
         public void SetStats(Stats stats) { _stats = stats; }
 
         public void SetService(bool hasService) { _hasService = hasService; }
@@ -204,7 +236,7 @@ namespace VolleyBallTournament
 
             if (_isPlaying)
             {
-                _ticWave += .025f;
+                _ticWave += .05f;
                 _waveValue = Math.Abs(MathF.Sin(_ticWave)) * 1f;
             }
             else
@@ -259,7 +291,7 @@ namespace VolleyBallTournament
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : HSV.ToRGB(150, 1, _waveValue) * 1f, 1f);
             batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
-            batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);
+            batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray * 1f);
         }
         public void DrawReferee(SpriteBatch batch, RectangleF rectF)
         {

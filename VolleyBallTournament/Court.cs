@@ -259,8 +259,10 @@ namespace VolleyBallTournament
             Color color = Color.White * .25f;
             float thickness = 3f;
 
-            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? .5f : .25f));
-            batch.FillRectangle(AbsRectF.Extend(0f), Color.Goldenrod * (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 ? 1f : .5f));
+            bool isPlay = _match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 || _match.State.CurState == Match.States.SetPlay;
+
+            batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (isPlay ? .5f : .25f));
+            batch.FillRectangle(AbsRectF.Extend(0f), Color.Goldenrod * (isPlay ? 1f : .5f));
             batch.Rectangle(AbsRectF, color, thickness);
 
             batch.Line(AbsRectF.LeftMiddle, AbsRectF.RightMiddle, color, thickness);

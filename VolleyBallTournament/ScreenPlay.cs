@@ -18,9 +18,9 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
-        private PhaseDemiFinal _phaseFinal;
+        private PhaseDemiFinal _phaseDemiFinal;
 
-        private RotationManager _rotationManager;
+        private RotationManager _rotationManagerPhasePool;
 
         KeyboardState _key;
 
@@ -47,29 +47,32 @@ namespace VolleyBallTournament
             _fontScrolling = Static.FontMini;
             _sizeTextScrolling = _fontScrolling.MeasureString(_textScrolling).X;
 
-            var files = GetFilesInDirectory(Directory.GetCurrentDirectory(), "*.xml");
-
-
-            for (int i = 0; i < files.Length; i++)
-            {
-                var file = files[i];
-                Misc.Log($"-> {file} ");
-            }
-            var configFile = files[0];
+            //var files = GetFilesInDirectory(Directory.GetCurrentDirectory(), "*.xml");
+            //for (int i = 0; i < files.Length; i++)
+            //{
+            //    var file = files[i];
+            //    Misc.Log($"-> {file} ");
+            //}
+            //var configFile = files[0];
+            var configPhasePool = "SetupPool.xml";
 
             SetSize(Screen.Width, Screen.Height);
 
-            _phaseRegister = new PhaseRegister(game, configFile).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
+            _phaseRegister = new PhaseRegister(game, configPhasePool).SetX(Screen.Width * 0f).AppendTo(this).This<PhaseRegister>();
 
-            _rotationManager = new RotationManager();
-            _rotationManager.LoadFile(configFile, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
+            _rotationManagerPhasePool = new RotationManager();
+            _rotationManagerPhasePool.LoadFile(configPhasePool, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
 
-            _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManagerPhasePool, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManagerPhasePool).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            _phaseFinal = new PhaseDemiFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
+            _phasePool1.SetRotation(0, _rotationManagerPhasePool);
 
-            _phasePool1.SetRotation(0, _rotationManager);
+
+            _phaseDemiFinal = new PhaseDemiFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
+
+            _phaseDemiFinal.GetMatch(0).SetPhaseDemiFinal(_phaseDemiFinal);
+            _phaseDemiFinal.GetMatch(2).SetPhaseDemiFinal(_phaseDemiFinal);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
@@ -78,12 +81,12 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 1, 0);
+            SetPosition(_cameraX = -Screen.Width * 3, 0);
 
 
             _phasePool1.OnFinishPhase += (phasePool) =>
             {
-                _phasePool2.Import16TeamsBrassageToQualification(configFile, phasePool);
+                _phasePool2.Import16TeamsBrassageToQualification(configPhasePool, phasePool);
                 Misc.Log("Finish Phase Pool Brassage");
             };
         }
@@ -112,12 +115,12 @@ namespace VolleyBallTournament
             _phaseRegister.IsLocked = true;
             _phasePool1.IsLocked = true;
             _phasePool2.IsLocked = true;
-            _phaseFinal.IsLocked = true;
+            _phaseDemiFinal.IsLocked = true;
 
             if (_cameraX == -_phaseRegister._x) _phaseRegister.IsLocked = false;
             if (_cameraX == -_phasePool1._x) _phasePool1.IsLocked = false;
             if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
-            if (_cameraX == -_phaseFinal._x) _phaseFinal.IsLocked = false;
+            if (_cameraX == -_phaseDemiFinal._x) _phaseDemiFinal.IsLocked = false;
 
             //
             if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
