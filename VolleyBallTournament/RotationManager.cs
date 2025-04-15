@@ -57,7 +57,7 @@ namespace VolleyBallTournament
         public List<MatchConfig> GetMatchConfigs(int rotation)
         {
             //Misc.Log("GET MATCH CONFIG ************");
-            var list = new List<MatchConfig>();
+            List<MatchConfig> list = [];
 
             for (int i = 0; i < _grid.Width; i++)
             {

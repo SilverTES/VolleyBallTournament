@@ -198,7 +198,11 @@ namespace VolleyBallTournament
                     DrawSets(batch);
                     DrawScores(batch);
 
-                    DrawInfos(batch);
+                    DrawInfos(batch, $"{_match.Infos[_match.State.CurState]}");
+                }
+                else
+                {
+                    DrawInfos(batch, "Terrain Libre");
                 }
             }
 
@@ -242,9 +246,8 @@ namespace VolleyBallTournament
                 batch.CenterStringXY(Static.FontMain, $"{set.Points}", position + offset, set.IsWin ? Color.GreenYellow : Color.Red);
             }
         }
-        private void DrawInfos(SpriteBatch batch)
+        private void DrawInfos(SpriteBatch batch, string text)
         {
-            string text = $"{_match.Infos[_match.State.CurState]}";
             Vector2 pos = _infosPos;
             Vector2 size = Static.FontMain.MeasureString(text) + new Vector2(24, -20);
             batch.FillRectangleCentered(pos, size, Color.Black * .75f, 0f);

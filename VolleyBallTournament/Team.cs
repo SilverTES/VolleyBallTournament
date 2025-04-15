@@ -27,10 +27,10 @@ namespace VolleyBallTournament
         public int Points = scorePoint; // points in Set
     }
 
-    public class Stats(Match match, Team team)
+    public class Stats()
     {
-        private Match _match = match;
-        private Team _team = team;
+        //private Match _match = match;
+        //private Team _team = team;
         public string TeamName => _teamName;
         private string _teamName;
         public int ScorePoint => _scorePoint;
@@ -40,29 +40,29 @@ namespace VolleyBallTournament
         private int _rank = 0;
         public int RankingPoint => _rankingPoint;
         private int _rankingPoint = 0; 
-        public EasingValue EaseRankingPoint => _easeRankingPoint;
-        EasingValue _easeRankingPoint = new(0);
+        //public EasingValue EaseRankingPoint => _easeRankingPoint;
+        //EasingValue _easeRankingPoint = new(0);
         public int CurrentBonusPoint => _currentBonusPoint;
         private int _currentBonusPoint = 0;
         public int BonusPoint => _bonusPoint;
         private int _bonusPoint = 0;
         public int TotalPoint => _totalPoint;
         private int _totalPoint = 0; 
-        public EasingValue EaseTotalPoint => _easeTotalPoint;
-        EasingValue _easeTotalPoint = new(0);
+        //public EasingValue EaseTotalPoint => _easeTotalPoint;
+        //EasingValue _easeTotalPoint = new(0);
 
         public int NbMatchPlayed => _results.Count;
         public List<Result> Results => _results;
         private List<Result> _results = new List<Result>();
 
-        public void Update()
+        public void Update(Match match, Team team)
         {
             _scorePoint = int.Clamp(_scorePoint, 0, 99);
 
-            if (_match != null)
+            if (match != null)
             {
-                if (!_team.IsReferee) // Seul l'équipe qui joue on leur bonus qui changent !
-                    _currentBonusPoint = _scorePoint - _match.GetTeamOppenent(_team).Stats._scorePoint;
+                if (!team.IsReferee) // Seul l'équipe qui joue on leur bonus qui changent !
+                    _currentBonusPoint = _scorePoint - match.GetTeamOppenent(team).Stats._scorePoint;
             }
         }
         public void ResetResult() { _results.Clear(); }
@@ -75,27 +75,27 @@ namespace VolleyBallTournament
             _bonusPoint = 0;
             _totalPoint = 0;
         }
-        public void SetMatch(Match match) { _match = match; }
+        //public void SetMatch(Match match) { _match = match; }
         public void SetTeamName(string teamName) { _teamName = teamName; }
         public void AddRankingPoint(int points)
         {
             _rankingPoint += points;
-            _easeRankingPoint.SetValue(_rankingPoint);
+            //_easeRankingPoint.SetValue(_rankingPoint);
         }
         public void SetRankingPoint(int points)
         {
             _rankingPoint = points;
-            _easeRankingPoint.SetValue(_rankingPoint);
+            //_easeRankingPoint.SetValue(_rankingPoint);
         }
         public void AddTotalPoint(int points)
         {
             _totalPoint += points;
-            _easeTotalPoint.SetValue(_totalPoint);
+            //_easeTotalPoint.SetValue(_totalPoint);
         }
         public void SetTotalPoint(int points)
         {
             _totalPoint = points;
-            _easeTotalPoint.SetValue(_totalPoint);
+            //_easeTotalPoint.SetValue(_totalPoint);
         }
         public void ValidBonusPoint()
         {
@@ -107,6 +107,12 @@ namespace VolleyBallTournament
         public void AddScoreSet(Set set) { _sets.Add(set); }
         public void SetRank(int rank) { _rank = rank; }
 
+        public Stats Clone()
+        {
+            Stats clone = (Stats)MemberwiseClone();
+
+            return clone;
+        }
     }
 
     public class Team : Node  
@@ -147,7 +153,7 @@ namespace VolleyBallTournament
             _type = UID.Get<Team>();
             SetSize(Width, Height);
 
-            _stats = new Stats(_match, this);
+            _stats = new Stats();
 
             Bound = new RectangleF(0, 0, Width, Height);
 
@@ -164,7 +170,7 @@ namespace VolleyBallTournament
         public void SetService(bool hasService) { _hasService = hasService; }
         public void SetIsPlaying(bool isPlaying) { _isPlaying = isPlaying; }
         public void SetIsReferee(bool isReferee) { _isReferee = isReferee; }
-        public void SetMatch(Match match) { _match = match; _stats.SetMatch(match) ; if (match == null) return; }
+        public void SetMatch(Match match) { _match = match; if (match == null) return; }
         public void SetIsShowStats(bool isShowStats) { _isShowStats = isShowStats; }
         public void MoveToPosition(Vector2 position, int duration = 64)
         {
@@ -194,7 +200,7 @@ namespace VolleyBallTournament
             }
             _animate.NextFrame();
 
-            _stats.Update();
+            _stats.Update(_match, this);
 
             if (_isPlaying)
             {
@@ -234,10 +240,11 @@ namespace VolleyBallTournament
         }
         public void DrawStats(SpriteBatch batch)
         {
-            batch.RightMiddleString(Static.FontMain, $"{Stats.EaseRankingPoint.GetValue()}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
+            batch.RightMiddleString(Static.FontMain, $"{Stats.RankingPoint}", AbsRectF.LeftMiddle - Vector2.UnitX * 10, Color.White);
+
             int bonus = Stats.BonusPoint + Stats.CurrentBonusPoint;
             batch.LeftMiddleString(Static.FontMain, bonus > 0 ? $"+{bonus}": $"{bonus}", AbsRectF.RightMiddle + Vector2.UnitX * 10 - Vector2.UnitY * 14, bonus > 0 ? Color.GreenYellow : Color.OrangeRed);
-            batch.LeftMiddleString(Static.FontMini, $"{Stats.EaseTotalPoint.GetValue()}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
+            batch.LeftMiddleString(Static.FontMini, $"{Stats.TotalPoint}", AbsRectF.RightMiddle + Vector2.UnitX * 10 + Vector2.UnitY * 18, Color.Yellow);
         }
         public void DrawBasicTeam(SpriteBatch batch, RectangleF rectF, Node parent)
         {
@@ -277,33 +284,32 @@ namespace VolleyBallTournament
         {
             for (int i = 0; i < Stats.NbMatchPlayed; i++)
             {
-                var pos = new Vector2(AbsRectF.RightMiddle.X + i * 30 - (28 * Stats.NbMatchPlayed), AbsRectF.Center.Y);
-
-                batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
+            var pos = new Vector2(AbsRectF.RightMiddle.X + (i%3) * 20 - (Stats.NbMatchPlayed < 3 ? Stats.NbMatchPlayed * 20 : 3 * 20), AbsRectF.Center.Y + (i < 3 ? -10 : 10));
+                batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
 
                 if (Stats.Results[i] == Result.Null)
                 {
-                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Gray);
-                    batch.CenterStringXY(Static.FontMini, "N", pos, Color.White);
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gray);
+                    batch.CenterStringXY(Static.FontMicro, "N", pos, Color.White);
                 }
 
                 if (Stats.Results[i] == Result.Win)
                 {
-                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Green);
-                    batch.CenterStringXY(Static.FontMini, "G", pos, Color.White);
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Green);
+                    batch.CenterStringXY(Static.FontMicro, "G", pos, Color.White);
                 }
 
                 if (Stats.Results[i] == Result.Loose)
                 {
-                    batch.FilledCircle(Static.TexCircle, pos, 30, Color.Red);
-                    batch.CenterStringXY(Static.FontMini, "P", pos, Color.White);
+                    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Red);
+                    batch.CenterStringXY(Static.FontMicro, "P", pos, Color.White);
                 }
-
 
                 //if (i < NbMatchWin)
                 //    batch.FilledCircle(Static.TexCircle, pos, 20, Color.Gold);
                 //batch.Point(pos, 10, Color.Gold);
             }
+
         }
     }
 }

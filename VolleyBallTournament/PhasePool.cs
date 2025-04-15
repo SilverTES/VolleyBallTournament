@@ -6,6 +6,7 @@ using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Input;
+using System;
 using System.Collections.Generic;
 
 using static VolleyBallTournament.Match;
@@ -20,6 +21,7 @@ namespace VolleyBallTournament
         private int _ticRotation = 0;
 
         public bool IsLocked = false;
+        public string Title => _title;
         private readonly string _title;
         private readonly Container _divMain;
         private readonly Container _divTimer;
@@ -38,6 +40,8 @@ namespace VolleyBallTournament
         private RotationManager _rotationManager;
 
         private int Id;
+
+        public Action<PhasePool> OnFinishPhase;
 
         public PhasePool(int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
@@ -60,7 +64,7 @@ namespace VolleyBallTournament
             }
             else
             {
-                CreateGroups(nbGroup, nbTeamPerGroup, ["Principale A", "Principale B", "Consolante A", "Consolante B"]);
+                CreateGroups(nbGroup, nbTeamPerGroup, ["Consolante A", "Consolante B", "Principale A", "Principale B"]);
                 CreateMatchs(nbMatch);
             }
 
@@ -163,7 +167,7 @@ namespace VolleyBallTournament
                 ResetAllMatchScorePoints();
                 ResetAllMatchSetPoints();
 
-                SetRotation(_currentRotation);
+                SetRotation(_currentRotation, _rotationManager);
 
             });
             State.Off(States.Ready, () =>
@@ -221,6 +225,16 @@ namespace VolleyBallTournament
 
                 _currentRotation++;
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
+                if (_currentRotation >= _rotationManager.NbRotation)
+                {
+                    Misc.Log("Fin des matchs");
+                    for (int i = 0; i < _matchs.Count; i++)
+                        _matchs[i].SetIsFreeCourt(true);
+
+                    if (OnFinishPhase != null)
+                        OnFinishPhase(this);
+                }
+
             });
 
         }
@@ -248,7 +262,7 @@ namespace VolleyBallTournament
                 _divGroup.Insert(group);
                 for (int t = 0; t < nbTeamPerGroup; t++)
                 {
-                    var team = new Team($"Team{i * nbTeamPerGroup + t}").AppendTo(this).This<Team>();
+                    var team = new Team($"Team{i * nbTeamPerGroup + t + 1}").AppendTo(this).This<Team>();
                     _teams.Add(team);
 
                     group.AddTeam(team);
@@ -292,13 +306,78 @@ namespace VolleyBallTournament
                 _divMatch.Insert(match);
             }
         }
-        public void SetRotation(int rotation)
+        public void Import16TeamsBrassageToQualification(string configFile, PhasePool phasePool)
         {
-            if (_rotationManager == null) return;
-            if (rotation >= _rotationManager.NbRotation) return;
+
+            Misc.Log($"Import Teams from {phasePool.Title} to {Title}");
+
+            List<Team> teamsConsolante = new List<Team>();
+            List<Team> teamsPrincipale = new List<Team>();
+
+            var groups = phasePool.GetGroups();
+
+            foreach (var group in groups)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    teamsPrincipale.Add(group.GetTeam(i));
+                    teamsConsolante.Add(group.GetTeam(i+2));
+                }
+            }
+            
+            int index = 0;
+            foreach (var team in teamsConsolante)
+            {
+                Misc.Log($"Consolante {team.Stats.TeamName}");
+
+                _teams[index].SetStats(team.Stats.Clone());
+                index++;
+            }
+            foreach (var team in teamsPrincipale)
+            {
+                Misc.Log($"Principale {team.Stats.TeamName}");
+
+                _teams[index].SetStats(team.Stats.Clone());
+                index++;
+            }
+
+            int[] groupATeamIndex = [1, 7, 2, 4];
+            int[] groupBTeamIndex = [5, 3, 6, 8];
+
+            // les deux groupe consolante A & B
+            for (int i = 0; i < 4; i++)
+            {
+                _groups[0].CopyTeamStats(i, teamsConsolante[groupATeamIndex[i] - 1]);
+                _groups[1].CopyTeamStats(i, teamsConsolante[groupBTeamIndex[i] - 1]);
+            }
+
+            // les deux groupe principale A & B
+            for(int i = 0; i < 4; i++)
+            {
+                _groups[2].CopyTeamStats(i, teamsPrincipale[groupATeamIndex[i] - 1]);
+                _groups[3].CopyTeamStats(i, teamsPrincipale[groupBTeamIndex[i] - 1]);
+            }
+
+            ResetTeamsStatus();
+            // On remet à zéro le ranking point des équipes avant de commencer la phase
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                _teams[i].Stats.SetRankingPoint(0);
+            }
+
+            // Prépare la première rotation 
+            _rotationManager.LoadFile(configFile, GetTeams(), GetMatchs());
+            SetRotation(0, _rotationManager);
+
+        }
+
+        public void SetRotation(int rotation, RotationManager rotationManager)
+        {
+            if (rotationManager == null) return;
+            if (rotation >= rotationManager.NbRotation) return;
 
             _currentRotation = rotation;
-            var matchConfigs = _rotationManager.GetMatchConfigs(rotation);
+            var matchConfigs = rotationManager.GetMatchConfigs(rotation);
 
             for (int i = 0; i < matchConfigs.Count; i++)
             {
@@ -363,11 +442,6 @@ namespace VolleyBallTournament
                 var team = _teams[i];
                 team.Stats.SetScorePoint(Misc.Rng.Next(8, 20));
             }
-            //for (int i = 0; i < _groups.Count; i++)
-            //{
-            //    var group = _groups[i];
-            //    group.Refresh();
-            //}
         }
         public void ResetTeamsTotalPoint()
         {
@@ -385,26 +459,12 @@ namespace VolleyBallTournament
                 group.Refresh();
             }
         }
-        public List<Team> GetTeams()
-        {
-            return _teams;
-        }
-        public Team GetTeam(int index)
-        {
-            return _teams[index];
-        }
-        public List<Match> GetMatchs() 
-        { 
-            return _matchs; 
-        }
-        public Match GetMatch(int index)
-        {
-            return _matchs[index];
-        }
-        public Group GetGroup(int index)
-        {
-            return _groups[index];
-        }
+        public List<Team> GetTeams() { return _teams; }
+        public Team GetTeam(int index) { return _teams[index]; }
+        public List<Match> GetMatchs() { return _matchs; }
+        public Match GetMatch(int index) { return _matchs[index]; }
+        public List<Group> GetGroups() { return _groups; }
+        public Group GetGroup(int index) { return _groups[index]; }
         private void PlayCountDown(SoundEffect sound, double secondRemaining = 3d, float volume = .25f, float pitch = .1f, float pan = 0f)
         {
             if (Timer.OnRemaingTime(secondRemaining) && sound != null)
@@ -511,12 +571,8 @@ namespace VolleyBallTournament
 
                     if (_currentRotation < _rotationManager.NbRotation)
                     {
-                        Misc.Log($"Rotation {_currentRotation}");
-                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
-                    }
-                    else
-                    {
-                        Misc.Log("Fin des matchs");
+                        Misc.Log($"Etape {_ticRotation}");
+                        SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
                     }
                 }
 
@@ -538,7 +594,7 @@ namespace VolleyBallTournament
                     SetTicRotation(0);
                     ResetTeamsStatus();
                     ResetTeamsTotalPoint();
-                    SetRotation(0);
+                    SetRotation(0, _rotationManager);
                 }
 
                 for (int i = 0; i < _matchs.Count; i++)

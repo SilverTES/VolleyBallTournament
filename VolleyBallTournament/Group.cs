@@ -19,6 +19,10 @@ namespace VolleyBallTournament
         { 
             GroupName = groupName;
         }
+        public void Clear()
+        { 
+            _teams.Clear(); 
+        }
         public void AddTeam(Team team)
         {
             team.AppendTo(this);
@@ -27,6 +31,14 @@ namespace VolleyBallTournament
             Refresh();
 
             SetSize(team._rect.Width, team._rect.Height * _teams.Count);
+        }
+        public void CopyTeamStats(int index, Team team)
+        {
+            if (index < 0 || index > _teams.Count) return;
+            
+            _teams[index].SetStats(team.Stats.Clone());
+
+            Misc.Log($"SetTeam {team.Stats.TeamName}");
         }
         public Team GetTeam(int index)
         {

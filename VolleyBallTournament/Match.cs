@@ -153,7 +153,12 @@ namespace VolleyBallTournament
         }
         public Team GetTeamOppenent(Team team)
         {
-            return team == _teamA ? _teamB : _teamA;
+            if (team == _teamA)
+                return _teamB;
+            if (team == _teamB)
+                return _teamA;
+
+            return null;
         }
         public void SetTeam(Team teamA, Team teamB, Team teamReferee)//, int nbTeamPerGroup)
         {

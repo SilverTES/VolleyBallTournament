@@ -114,11 +114,11 @@ namespace VolleyBallTournament
             _title = title;
             SetSize(Screen.Width, Screen.Height);
 
-            SemiFinal principale1 = new SemiFinal("Principale 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
-            SemiFinal principale2 = new SemiFinal("Principale 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+            SemiFinal principale1 = new SemiFinal("Demi Principale 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
+            SemiFinal principale2 = new SemiFinal("Demi Principale 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
 
-            SemiFinal consolante1 = new SemiFinal("Consolante 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
-            SemiFinal consolante2 = new SemiFinal("Consolante 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+            SemiFinal consolante1 = new SemiFinal("Demi Consolante 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
+            SemiFinal consolante2 = new SemiFinal("Demi Consolante 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
 
             CreateTeams();
 

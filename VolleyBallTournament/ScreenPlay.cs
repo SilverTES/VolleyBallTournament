@@ -69,7 +69,7 @@ namespace VolleyBallTournament
 
             _phaseFinal = new PhaseDemiFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
-            _phasePool1.SetRotation(0);
+            _phasePool1.SetRotation(0, _rotationManager);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
@@ -79,6 +79,13 @@ namespace VolleyBallTournament
 
             //Debug
             SetPosition(_cameraX = -Screen.Width * 1, 0);
+
+
+            _phasePool1.OnFinishPhase += (phasePool) =>
+            {
+                _phasePool2.Import16TeamsBrassageToQualification(configFile, phasePool);
+                Misc.Log("Finish Phase Pool Brassage");
+            };
         }
         public static string[] GetFilesInDirectory(string directoryPath, string filter)
         {
