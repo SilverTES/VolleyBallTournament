@@ -46,11 +46,14 @@ namespace VolleyBallTournament
 
         public static Texture2D TexBG00;
         public static Texture2D TexBG01;
+        public static Texture2D TexBG02;
+
         public static Texture2D TexVBall;
         public static Texture2D TexReferee;
         public static Texture2D TexCircle;
         public static Texture2D TexLine;
 
+        public static SoundEffect SoundBeep;
         public static SoundEffect SoundPoint;
         public static SoundEffect SoundCountDown;
         public static SoundEffect SoundStart;
@@ -102,6 +105,13 @@ namespace VolleyBallTournament
                 //batch.LineIn(start, end, color, thickness);
             }
         }
+
+        public static void DrawTextFrame(SpriteBatch batch, SpriteFont font,  Vector2 position, string text, Color line, Color bg, Vector2 offset, float thickness = 1f)
+        {
+            var size = font.MeasureString(text) + new Vector2(40, -20);
+            batch.FillRectangleCentered(position + offset, size, Color.Black * .5f, 0);
+            batch.RectangleCentered(position + offset, size, Color.Cyan * .5f, thickness);
+        }
     }
 
     public class Game1 : Game
@@ -149,11 +159,13 @@ namespace VolleyBallTournament
             Static.FontDigitMono = Content.Load<SpriteFont>("Fonts/fontDigitMono");
             Static.FontDigitMonoBG = Content.Load<SpriteFont>("Fonts/fontDigitMonoBG");
 
+            Static.TexBG02 = Content.Load<Texture2D>("Images/bg02");
             Static.TexBG01 = Content.Load<Texture2D>("Images/bg01");
             Static.TexBG00 = Content.Load<Texture2D>("Images/bg00");
             Static.TexVBall = Content.Load<Texture2D>("Images/vballmini");
             Static.TexReferee = Content.Load<Texture2D>("Images/referee00");
 
+            Static.SoundBeep = Content.Load<SoundEffect>("Sounds/beep-2");
             Static.SoundPoint = Content.Load<SoundEffect>("Sounds/slide-ping");
             Static.SoundCountDown = Content.Load<SoundEffect>("Sounds/countdown");
             Static.SoundStart = Content.Load<SoundEffect>("Sounds/sci-fi-warning-beep");

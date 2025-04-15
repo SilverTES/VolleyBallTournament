@@ -72,9 +72,11 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                //batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 30 + Vector2.One * 6, Color.Black * .5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 50 + Vector2.One * 6, Color.Black *.5f);
-                batch.CenterStringXY(Static.FontMain, $"Groupe {GroupName}", AbsRectF.TopCenter - Vector2.UnitY * 50, Color.Cyan);
+                var pos = AbsRectF.TopCenter - Vector2.UnitY * 50;
+
+                Static.DrawTextFrame(batch, Static.FontMain, pos, GroupName, Color.Cyan * .5f, Color.Black * .5f, Vector2.UnitY * 3);
+
+                batch.CenterStringXY(Static.FontMain, GroupName, pos, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

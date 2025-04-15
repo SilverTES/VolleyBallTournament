@@ -18,7 +18,7 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
-        private PhaseFinal _phaseFinal;
+        private PhaseDemiFinal _phaseFinal;
 
         private RotationManager _rotationManager;
 
@@ -67,7 +67,7 @@ namespace VolleyBallTournament
             _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManager, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
             _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManager).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
-            _phaseFinal = new PhaseFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseFinal>();
+            _phaseFinal = new PhaseDemiFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
             _phasePool1.SetRotation(0);
 
@@ -78,7 +78,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 3, 0);
+            SetPosition(_cameraX = -Screen.Width * 1, 0);
         }
         public static string[] GetFilesInDirectory(string directoryPath, string filter)
         {
@@ -127,6 +127,8 @@ namespace VolleyBallTournament
                     _animate.SetMotion("SlideLeft", Easing.QuadraticEaseOut, _cameraX, _cameraX = _cameraX + Screen.Width, 24);
 
                     _animate.Start("SlideLeft");
+
+                    Static.SoundRanking.Play(.5f * Static.VolumeMaster, .5f, 0f);
                 }
 
             }
@@ -139,6 +141,8 @@ namespace VolleyBallTournament
                     _animate.SetMotion("SlideRight", Easing.QuadraticEaseOut, _cameraX, _cameraX = _cameraX - Screen.Width, 24);
 
                     _animate.Start("SlideRight");
+
+                    Static.SoundRanking.Play(.5f * Static.VolumeMaster, .5f, 0f);
                 }
             }
 
@@ -179,7 +183,7 @@ namespace VolleyBallTournament
                 var clients = Static.Server.Clients;
                 for (int i = 0; i < clients.Count; i++)
                 {
-                    batch.LeftMiddleString(Static.FontMini, $"{i} : {clients[i]}", new Vector2(40, 80 + 40 * i), Color.Orange);
+                    batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i]}", new Vector2(40, 80 + 40 * i), Color.Orange);
                 }
             }
 

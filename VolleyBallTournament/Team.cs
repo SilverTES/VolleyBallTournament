@@ -139,6 +139,9 @@ namespace VolleyBallTournament
         public static int Height = 64;
         public static RectangleF Bound;
 
+        private float _ticWave;
+        private float _waveValue;
+
         public Team(string teamName)//, Match match = null, ScorePanel scorePanel = null, Court court = null)
         {
             _type = UID.Get<Team>();
@@ -168,9 +171,9 @@ namespace VolleyBallTournament
             if (position == XY) 
                 return;
 
-            SetIsMove(true);
+            //SetIsMove(true);
             _newPosition = position;
-            _animate.SetMotion("move", Easing.QuadraticEaseOut, _y, _newPosition.Y, duration);
+            _animate.SetMotion("move", Easing.QuarticEaseOut, _y, _newPosition.Y, duration);
             _animate.Start("move");
 
         }
@@ -186,12 +189,22 @@ namespace VolleyBallTournament
 
             if (_animate.Off("move"))
             {
-                SetIsMove(false);
+                //SetIsMove(false);
                 //Misc.Log("End move");
             }
             _animate.NextFrame();
 
             _stats.Update();
+
+            if (_isPlaying)
+            {
+                _ticWave += .025f;
+                _waveValue = Math.Abs(MathF.Sin(_ticWave)) * 1f;
+            }
+            else
+            {
+                _waveValue = 0f;
+            }
 
             return base.Update(gameTime);
         }
@@ -236,7 +249,7 @@ namespace VolleyBallTournament
             batch.FillRectangle(rectF.Extend(-4f) + Vector2.One * 8, Color.Black * .5f);
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
-            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : Color.Gray * 1f, 1f);
+            batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : HSV.ToRGB(150, 1, _waveValue) * 1f, 1f);
             batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
             batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray);

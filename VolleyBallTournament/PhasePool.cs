@@ -60,7 +60,7 @@ namespace VolleyBallTournament
             }
             else
             {
-                CreateGroups(nbGroup, nbTeamPerGroup);
+                CreateGroups(nbGroup, nbTeamPerGroup, ["Principale A", "Principale B", "Consolante A", "Consolante B"]);
                 CreateMatchs(nbMatch);
             }
 
@@ -76,6 +76,10 @@ namespace VolleyBallTournament
 
             State.Set(States.Pause);
 
+            DefineStates();
+        }
+        private void DefineStates()
+        {
             State.On(States.WarmUp, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
@@ -103,7 +107,7 @@ namespace VolleyBallTournament
                 Timer.StartTimer();
             });
 
-            State.On(States.Play1, () => 
+            State.On(States.Play1, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Timer.SetDuration(_rotationManager.GetMatchTime(_currentRotation));
@@ -131,7 +135,7 @@ namespace VolleyBallTournament
                 //Misc.Log("Off Play");
             });
 
-            State.On(States.PreSwap, () => 
+            State.On(States.PreSwap, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Timer.SetDuration(2);
@@ -153,7 +157,6 @@ namespace VolleyBallTournament
                 }
             });
 
-
             State.On(States.Pause, () =>
             {
                 ResetTeamsStatus();
@@ -165,7 +168,7 @@ namespace VolleyBallTournament
             });
             State.Off(States.Ready, () =>
             {
-                
+
 
             });
             State.On(States.Finish, () =>
@@ -174,11 +177,13 @@ namespace VolleyBallTournament
             });
             State.On(States.ValidPoints, () =>
             {
+                Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
                 ValidSets();
             });
             State.Off(States.ValidPoints, () =>
             {
-                Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
+                //Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
+                Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Count; i++)
@@ -217,6 +222,7 @@ namespace VolleyBallTournament
                 _currentRotation++;
                 //_step = int.Clamp(_step, 0, _nbStep - 1);
             });
+
         }
 
         public void ValidSets()
@@ -229,12 +235,12 @@ namespace VolleyBallTournament
                     match.ValidSet();
             }
         }
-        private void CreateGroups(int nbGroup, int nbTeamPerGroup)
+        private void CreateGroups(int nbGroup, int nbTeamPerGroup, string[] groupNames)
         {
             Misc.Log($"Create Groups --------------------------");
             for (int i = 0;i < nbGroup;i++)
             {
-                var group = new Group($"{i+1}").AppendTo(this).This<Group>();
+                var group = new Group($"{groupNames[i]}").AppendTo(this).This<Group>();
                 _groups.Add(group);
 
                 Misc.Log($"Create Group {i + 1}");
@@ -336,20 +342,20 @@ namespace VolleyBallTournament
             }
         }
 
-        //public void ShuffleTeamsTotalPoint()
-        //{
-        //    for (int i = 0; i < _teams.Length; i++)
-        //    {
-        //        var team = _teams[i];
-        //        team.SetPointTotal(0);
-        //        team.AddPointTotal(Misc.Rng.Next(0, 9));
-        //    }
-        //    for (int i = 0; i < _groups.Length; i++)
-        //    {
-        //        var group = _groups[i];
-        //        group.Refresh();
-        //    }
-        //}
+        public void ShuffleTeamsTotalPoint()
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                team.Stats.SetTotalPoint(0);
+                team.Stats.SetTotalPoint(Misc.Rng.Next(0, 9));
+            }
+            for (int i = 0; i < _groups.Count; i++)
+            {
+                var group = _groups[i];
+                group.Refresh();
+            }
+        }
         public void ShuffleTeamsPoint()
         {
             for (int i = 0; i < _teams.Count; i++)
@@ -502,17 +508,30 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
-                    Misc.Log("Rotation");
 
                     if (_currentRotation < _rotationManager.NbRotation)
+                    {
+                        Misc.Log($"Rotation {_currentRotation}");
                         SetTicRotation((_ticRotation + 1) % Enums.Count<States>());
+                    }
+                    else
+                    {
+                        Misc.Log("Fin des matchs");
+                    }
                 }
 
-                if (ButtonControl.OnePress($"Shuffle{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
+                // Debug
+                if (ButtonControl.OnePress($"ShufflePoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
                 {
                     if (State.CurState == States.Play1)
                         ShuffleTeamsPoint();
                 }
+                if (ButtonControl.OnePress($"ShuffleTotalPoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad1)))
+                {
+                    //if (State.CurState == States.Play1)
+                        ShuffleTeamsTotalPoint();
+                }
+
 
                 if (ButtonControl.OnePress($"Reset{Id}", Keyboard.GetState().IsKeyDown(Keys.Back)))
                 {
@@ -557,7 +576,7 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.BackGround)
             {
-                batch.Draw(Static.TexBG01, Vector2.Zero, Color.White);
+                batch.Draw(Static.TexBG01, AbsXY, Color.White);
             }
 
             if (indexLayer == (int)Layers.Main)

@@ -97,7 +97,7 @@ namespace VolleyBallTournament
             int teamNumber = 0;
             for (int i = 0; i < _nbGroup; i++)
             {
-                var group = new Group($"{i + 1}");
+                var group = new Group($"Groupe {(char)(64 + i + 1)}");
                 _groups.Add(group);
 
                 for (int t = 0; t < _nbTeamPerGroup; t++)

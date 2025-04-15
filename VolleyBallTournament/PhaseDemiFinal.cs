@@ -15,14 +15,22 @@ using System.Threading.Tasks;
 
 namespace VolleyBallTournament
 {
-    public class SemiFinal
+    public class SemiFinal : Node
     {
+        string _name1;
+        string _name2;
         public Container Div => _div;
         private Container _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-        private Container _div1 = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-        private Container _div2 = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
+        private Container _div1 = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.VERTICAL);
+        private Container _div2 = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.VERTICAL);
 
-        public SemiFinal(Team teamA1, Team teamB1, Team teamA2, Team teamB2)
+        public SemiFinal(string name, string name1, string name2) 
+        { 
+            _name = name;
+            _name1 = name1;
+            _name2 = name2;
+        }
+        public void Set(Team teamA1, Team teamB1, Team teamA2, Team teamB2)
         {
             _div1.Insert(teamA1);
             _div1.Insert(teamB1);
@@ -32,9 +40,60 @@ namespace VolleyBallTournament
             _div.Insert(_div1);
             _div.Insert(_div2);
         }
+        public SemiFinal(string name, string name1, string name2, Team teamA1, Team teamB1, Team teamA2, Team teamB2)
+        {
+            _name = name;
+            _name1 = name1;
+            _name2 = name2;
 
+            _div1.Insert(teamA1);
+            _div1.Insert(teamB1);
+            _div2.Insert(teamA2);
+            _div2.Insert(teamB2);
+
+            _div.Insert(_div1);
+            _div.Insert(_div2);
+        }
+
+        public override Node Update(GameTime gameTime)
+        {
+            UpdateRect();
+
+            return base.Update(gameTime);
+        }
+
+        public override Node Draw(SpriteBatch batch, GameTime gameTime, int indexLayer)
+        {
+            var rectDiv = _div.Rect.Translate(_parent.AbsXY);
+
+            var rectDiv1 = _div1.Rect.Translate(_parent.AbsXY);
+            var rectDiv2 = _div2.Rect.Translate(_parent.AbsXY);
+
+            if (indexLayer == (int)Layers.Main)
+            {
+                batch.FillRectangle(rectDiv, Color.DarkSlateBlue * .5f);
+                batch.Rectangle(rectDiv, Color.Gray * .5f);
+                //batch.Rectangle(rectDiv.Extend(-4f), Color.Gray * .5f);
+
+                var pos = rectDiv.TopCenter - Vector2.UnitY * 40;
+                Static.DrawTextFrame(batch, Static.FontMain, pos, _name, Color.Cyan * .5f, Color.Black * .5f, Vector2.UnitY * 3);
+                batch.CenterStringXY(Static.FontMain, _name, pos, Color.Cyan);
+
+                batch.FillRectangle(rectDiv1, Color.Black * .5f);
+                batch.FillRectangle(rectDiv2, Color.Black * .5f);
+
+            }
+            if (indexLayer == (int)Layers.HUD)
+            {
+
+                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.Center - Vector2.UnitY, Color.Gold);
+                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.Center - Vector2.UnitY, Color.Gold);
+            }
+
+            return base.Draw(batch, gameTime, indexLayer);
+        } 
     }
-    public class PhaseFinal : Node
+    public class PhaseDemiFinal : Node
     {
         string _title;
         public bool IsLocked = false;
@@ -50,18 +109,30 @@ namespace VolleyBallTournament
         Container _divSemi;
 
 
-        public PhaseFinal(string title) 
+        public PhaseDemiFinal(string title) 
         { 
             _title = title;
             SetSize(Screen.Width, Screen.Height);
-            
+
+            SemiFinal principale1 = new SemiFinal("Principale 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
+            SemiFinal principale2 = new SemiFinal("Principale 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+
+            SemiFinal consolante1 = new SemiFinal("Consolante 1", "Winner", "Winner").AppendTo(this).This<SemiFinal>();
+            SemiFinal consolante2 = new SemiFinal("Consolante 2", "Looser", "Looser").AppendTo(this).This<SemiFinal>();
+
             CreateTeams();
 
-            _divSemiPrincipal.Add(new SemiFinal(_teams[0], _teams[1], _teams[2], _teams[3]));
-            _divSemiPrincipal.Add(new SemiFinal(_teams[4], _teams[5], _teams[6], _teams[7]));
+            principale1.Set(_teams[0], _teams[1], _teams[2], _teams[3]);
+            principale2.Set(_teams[4], _teams[5], _teams[6], _teams[7]);
 
-            _divSemiConsolante.Add(new SemiFinal(_teams[8], _teams[9], _teams[10], _teams[11]));
-            _divSemiConsolante.Add(new SemiFinal(_teams[12], _teams[13], _teams[14], _teams[15]));
+            consolante1.Set(_teams[8], _teams[9], _teams[10], _teams[11]);
+            consolante2.Set(_teams[12], _teams[13], _teams[14], _teams[15]);
+
+            _divSemiPrincipal.Add(principale1);
+            _divSemiPrincipal.Add(principale2);
+
+            _divSemiConsolante.Add(consolante1);
+            _divSemiConsolante.Add(consolante2);
 
 
             _divMain = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
@@ -140,11 +211,16 @@ namespace VolleyBallTournament
             {
 
             }
+            if (indexLayer == (int)Layers.BackGround)
+            {
+                batch.Draw(Static.TexBG02, AbsXY, Color.White);
+            }
+
             if (indexLayer ==(int)Layers.Main)
             {
                 batch.FillRectangle(AbsRectF, Color.Black * .25f);
 
-                batch.Grid(AbsXY, Screen.Width, Screen.Height, 40, 40, Color.Black * .1f);
+                //batch.Grid(AbsXY, Screen.Width, Screen.Height, 40, 40, Color.Black * .1f);
 
             }
 

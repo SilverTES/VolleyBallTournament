@@ -52,7 +52,7 @@ namespace VolleyBallTournament
             _courtName = courtName;
             _match = match;
 
-            SetSize(200, 280);
+            SetSize(180, 260);
 
             _rotationBall = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
 
