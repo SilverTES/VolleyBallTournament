@@ -84,13 +84,13 @@ namespace VolleyBallTournament
             }
             if (indexLayer == (int)Layers.HUD)
             {
-                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle,54, Color.Gold * 1f, 0);
-                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 48, Color.Blue * 1f, 0);
-                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.LeftMiddle, Color.Gold);
+                //batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle,54, Color.Gold * 1f, 0);
+                //batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 48, Color.Blue * 1f, 0);
+                //batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.LeftMiddle, Color.Gold);
 
-                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle,54, Color.Gold * 1f, 0);
-                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 48, Color.Blue * 1f, 0);
-                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.LeftMiddle, Color.Gold);
+                //batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle,54, Color.Gold * 1f, 0);
+                //batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 48, Color.Blue * 1f, 0);
+                //batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.LeftMiddle, Color.Gold);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

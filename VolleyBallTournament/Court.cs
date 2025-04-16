@@ -233,7 +233,7 @@ namespace VolleyBallTournament
             DrawSet(batch, _match.TeamA, _scoreAPos);
             DrawSet(batch, _match.TeamB, _scoreBPos);
         }
-        private void DrawSet(SpriteBatch batch, Team team, Vector2 position)
+        public static void DrawSet(SpriteBatch batch, Team team, Vector2 position)
         {
             for (int i = 0; i < team.Stats.Sets.Count; i++)
             {

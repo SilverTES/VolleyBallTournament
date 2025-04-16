@@ -147,6 +147,7 @@ namespace VolleyBallTournament
         private bool _isReferee = false;
 
         private bool _isShowStats = true;
+        private bool _isShowSets = true;
 
         //public int NbMaxMatchPlayed = 3;
         public bool HasService => _hasService;
@@ -274,6 +275,9 @@ namespace VolleyBallTournament
             {
                 DrawReferee(batch, AbsRectF);
                 DrawWinner(batch, AbsRectF);
+
+                if (_isShowSets)
+                    Court.DrawSet(batch, this, AbsRectF.TopRight - Vector2.UnitX * 48 * Stats.Sets.Count);
             }
             
             if (indexLayer == (int)Layers.Debug)
@@ -329,7 +333,7 @@ namespace VolleyBallTournament
                 if (_match != null)
                 {
                     string text = $"Vainqueur";
-                    Vector2 pos = rectF.TopCenter - Vector2.UnitY * 4;
+                    Vector2 pos = rectF.TopLeft - Vector2.UnitY * 4 + Vector2.UnitX * 120 + Vector2.UnitY * _waveValue * 4f;
                     batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Blue * .75f, 0f);
                     batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
 

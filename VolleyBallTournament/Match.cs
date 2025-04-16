@@ -300,15 +300,17 @@ namespace VolleyBallTournament
         {
             if (_teamA == null || _teamB == null) return null;
             if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
+            if (pointGap > Math.Abs(_teamA.Stats.ScorePoint - _teamB.Stats.ScorePoint)) return null;
             
-            return _teamA.Stats.ScorePoint >= _teamB.Stats.ScorePoint + pointGap ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint > _teamB.Stats.ScorePoint ? _teamA : _teamB;
         }
         public Team GetLooser(int pointGap = 1)
         {
             if (_teamA == null || _teamB == null) return null;
             if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
+            if (pointGap > Math.Abs(_teamA.Stats.ScorePoint - _teamB.Stats.ScorePoint)) return null;
 
-            return _teamA.Stats.ScorePoint + pointGap <= _teamB.Stats.ScorePoint ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint < _teamB.Stats.ScorePoint ? _teamA : _teamB;
         }
         public Team GetTeamOppenent(Team team)
         {

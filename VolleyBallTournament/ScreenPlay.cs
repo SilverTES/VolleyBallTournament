@@ -72,7 +72,7 @@ namespace VolleyBallTournament
 
             _phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
-            var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 5);
+            var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 3);
 
             _phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
             //_phaseDemiFinal.GetMatch(2).SetMatchConfigs(matchConfigs);
