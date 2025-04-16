@@ -16,9 +16,9 @@ namespace VolleyBallTournament
         string _name1;
         string _name2;
         public Container Div => _div;
-        private Container _div = new Container(Style.Space.One * 10, Style.Space.One * 10, Mugen.Physics.Position.VERTICAL);
-        private Container _div1 = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.VERTICAL);
-        private Container _div2 = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.VERTICAL);
+        private Container _div = new Container(Style.Space.One * 10, new Style.Space(10, 10, 10, 10), Mugen.Physics.Position.VERTICAL);
+        private Container _div1 = new Container(Style.Space.One * 10, new Style.Space(15, 15, 10, 10), Mugen.Physics.Position.VERTICAL);
+        private Container _div2 = new Container(Style.Space.One * 10, new Style.Space(15, 15, 10, 10), Mugen.Physics.Position.VERTICAL);
 
         public SemiFinal(string name, string name1, string name2) 
         { 
@@ -75,10 +75,10 @@ namespace VolleyBallTournament
                 Static.DrawTextFrame(batch, Static.FontMain, pos, _name, Color.Cyan * .5f, Color.Black * .5f, Vector2.UnitY * 3);
                 batch.CenterStringXY(Static.FontMain, _name, pos, Color.Cyan);
 
-                batch.FillRectangle(rectDiv1, Color.Black * .5f);
+                //batch.FillRectangle(rectDiv1, Color.Black * .5f);
                 batch.Rectangle(rectDiv1, Color.Gold * .75f);
 
-                batch.FillRectangle(rectDiv2, Color.Black * .5f);
+                //batch.FillRectangle(rectDiv2, Color.Black * .5f);
                 batch.Rectangle(rectDiv2, Color.Gold * .75f);
 
             }
@@ -172,10 +172,10 @@ namespace VolleyBallTournament
 
             //CreateMatchConfigsDemiFinal(_teams);
 
-            _matchs[0].State.Set(States.BeginDemiFinal);
+            _matchs[0].State.Set(States.DemiFinalBegin);
             //_matchs[2].State.Set(States.BeginDemiFinal);
 
-            _matchs[0].SetTicState((int)States.BeginDemiFinal);
+            _matchs[0].SetTicState((int)States.DemiFinalBegin);
             //_matchs[2].SetTicState((int)States.BeginDemiFinal);
 
         }

@@ -15,7 +15,7 @@ namespace VolleyBallTournament
 {
     public class PhasePool : Node
     {
-        public State<States> State { get; private set; } = new State<States>(States.Ready);
+        public State<States> State { get; private set; } = new State<States>(States.PoolReady);
 
         private int _ticState = 0;
 
@@ -77,68 +77,68 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            State.Set(States.NextMatch);
+            State.Set(States.PoolNextMatch);
 
             DefineStates();
         }
         private void DefineStates()
         {
-            State.On(States.WarmUp, () =>
+            State.On(States.PoolWarmUp, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
 
                 Timer.SetDuration(_rotationManager.GetWarmUpTime(_currentRotation));
                 Timer.StartTimer();
             });
-            State.Off(States.WarmUp, () =>
+            State.Off(States.PoolWarmUp, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
 
                 Timer.SetDuration(0);
             });
 
-            State.On(States.CountDown1, () =>
+            State.On(States.PoolCountDown1, () =>
             {
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 Timer.SetDuration(3);
                 Timer.StartTimer();
             });
-            State.On(States.CountDown2, () =>
+            State.On(States.PoolCountDown2, () =>
             {
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 Timer.SetDuration(3);
                 Timer.StartTimer();
             });
 
-            State.On(States.Play1, () =>
+            State.On(States.PoolPlay1, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Timer.SetDuration(_rotationManager.GetMatchTime(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
-            State.Off(States.Play1, () =>
+            State.Off(States.PoolPlay1, () =>
             {
                 //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
 
-            State.On(States.Play2, () =>
+            State.On(States.PoolPlay2, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Timer.SetDuration(_rotationManager.GetMatchTime(_currentRotation));
                 Timer.StartTimer();
                 //Misc.Log("On Play");
             });
-            State.Off(States.Play2, () =>
+            State.Off(States.PoolPlay2, () =>
             {
                 //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
                 Timer.StopTimer();
                 //Misc.Log("Off Play");
             });
 
-            State.On(States.PreSwap, () =>
+            State.On(States.PoolPreSwap, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Timer.SetDuration(2);
@@ -147,7 +147,7 @@ namespace VolleyBallTournament
                 //ValidSets();
             });
 
-            State.On(States.SwapSide, () =>
+            State.On(States.PoolSwapSide, () =>
             {
                 Timer.SetDuration(0);
 
@@ -160,7 +160,7 @@ namespace VolleyBallTournament
                 }
             });
 
-            State.On(States.NextMatch, () =>
+            State.On(States.PoolNextMatch, () =>
             {
                 ResetTeamsStatus(_teams);
                 ResetAllMatchScorePoints(_matchs);
@@ -169,20 +169,20 @@ namespace VolleyBallTournament
                 SetRotation(_currentRotation, _rotationManager);
 
             });
-            State.On(States.Ready, () =>
+            State.On(States.PoolReady, () =>
             {
                 _timer.StopTimer();
             });
-            State.On(States.Finish, () =>
+            State.On(States.PoolFinishMatch, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
             });
-            State.On(States.ValidPoints, () =>
+            State.On(States.PoolValidPoints, () =>
             {
                 Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
-                ValidSets();
+                ValidSets(1);
             });
-            State.Off(States.ValidPoints, () =>
+            State.Off(States.PoolValidPoints, () =>
             {
                 //Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
                 Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
@@ -237,14 +237,14 @@ namespace VolleyBallTournament
 
         }
 
-        public void ValidSets()
+        public void ValidSets(int pointGap)
         {
             var matchs = GetMatchs();
             for (int i = 0; i < matchs.Count; i++)
             {
                 var match = matchs[i];
                 if (match != null)
-                    match.ValidSet();
+                    match.ValidSet(pointGap);
             }
         }
         private void CreateGroups(int nbGroup, int nbTeamPerGroup, string[] groupNames)
@@ -460,50 +460,50 @@ namespace VolleyBallTournament
         {
             switch (State.CurState)
             {
-                case States.Ready:
+                case States.PoolReady:
 
                     break;
 
-                case States.NextMatch:
+                case States.PoolNextMatch:
 
                     break;
 
-                case States.Finish:
+                case States.PoolFinishMatch:
 
                     break;
 
-                case States.WarmUp:
+                case States.PoolWarmUp:
 
                     PlayCountDown(null);
                     break;
 
-                case States.Play1:
+                case States.PoolPlay1:
 
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
-                case States.Play2:
+                case States.PoolPlay2:
 
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
-                case States.CountDown1:
+                case States.PoolCountDown1:
 
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
-                case States.CountDown2:
+                case States.PoolCountDown2:
 
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
 
-                case States.ValidPoints:
+                case States.PoolValidPoints:
                     break;
 
-                case States.SwapSide:
+                case States.PoolSwapSide:
                     break;
 
-                case States.PreSwap:
+                case States.PoolPreSwap:
 
                     PlayCountDown(null);
                     break;
@@ -552,8 +552,8 @@ namespace VolleyBallTournament
 
                         _ticState++;
 
-                        if (_ticState > (int)States.ValidPoints)
-                            _ticState = (int)States.NextMatch;
+                        if (_ticState > (int)States.PoolValidPoints)
+                            _ticState = (int)States.PoolNextMatch;
 
                         SetTicRotation(_ticState); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
                         //SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
@@ -563,7 +563,7 @@ namespace VolleyBallTournament
                 // Debug
                 if (ButtonControl.OnePress($"ShufflePoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
                 {
-                    if (State.CurState == States.Play1)
+                    if (State.CurState == States.PoolPlay1)
                         ShuffleTeamsPoint();
                 }
                 if (ButtonControl.OnePress($"ShuffleTotalPoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad1)))

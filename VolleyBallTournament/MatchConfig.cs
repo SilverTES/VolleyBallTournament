@@ -8,6 +8,7 @@ namespace VolleyBallTournament
         public int IdTerrain;
         public int NbSetToWin;
         public int NbPointToWinSet;
+        //public int PointGap; // différence de points pour la victoire du set ou match 1 ou 2  
         public Team TeamA;
         public Team TeamB;
         public Team TeamReferee;
@@ -17,6 +18,7 @@ namespace VolleyBallTournament
             IdTerrain = Const.NoIndex;
             NbSetToWin = 1;
             NbPointToWinSet = 25;
+            //PointGap = 1;
             TeamA = null;
             TeamB = null;
             TeamReferee = null;
@@ -26,6 +28,7 @@ namespace VolleyBallTournament
             IdTerrain = idTerrain;
             NbSetToWin = nbSetToWin;
             NbPointToWinSet = nbPointToWinSet;
+            //PointGap = pointGap;
 
             TeamA = teamA;
             TeamB = teamB;

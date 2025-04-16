@@ -159,7 +159,7 @@ namespace VolleyBallTournament
             //_waveValue.X = MathF.Cos(_ticWave) * 8f;
             _waveValue.Y = MathF.Sin(_ticWave) * 8f;
 
-            if (_match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2)
+            if (_match.State.CurState == Match.States.PoolPlay1 || _match.State.CurState == Match.States.PoolPlay2)
                 _rotationBall += .05f;
 
             _ticBallSize += 0.1f;
@@ -259,7 +259,7 @@ namespace VolleyBallTournament
             Color color = Color.White * .25f;
             float thickness = 3f;
 
-            bool isPlay = _match.State.CurState == Match.States.Play1 || _match.State.CurState == Match.States.Play2 || _match.State.CurState == Match.States.DemiPlay;
+            bool isPlay = _match.State.CurState == Match.States.PoolPlay1 || _match.State.CurState == Match.States.PoolPlay2 || _match.State.CurState == Match.States.DemiPlay;
 
             batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (isPlay ? .5f : .25f));
             batch.FillRectangle(AbsRectF.Extend(0f), Color.Goldenrod * (isPlay ? 1f : .5f));

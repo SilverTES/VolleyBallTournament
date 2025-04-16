@@ -263,9 +263,11 @@ namespace VolleyBallTournament
                 DrawBasicTeam(batch, AbsRectF, _parent);
 
                 if (_isShowStats)
+                {
                     DrawStats(batch);
+                    DrawMatchResults(batch);
+                }
 
-                DrawMatchResults(batch);
             }
 
             if (indexLayer == (int)Layers.HUD)

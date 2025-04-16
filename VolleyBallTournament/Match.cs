@@ -20,19 +20,19 @@ namespace VolleyBallTournament
 
         public enum States
         {
-            NextMatch,
-            WarmUp,
-            Ready,
-            CountDown1,
-            Play1,
-            PreSwap,
-            SwapSide,
-            CountDown2,
-            Play2,
-            Finish,
-            ValidPoints,
+            PoolNextMatch,
+            PoolWarmUp,
+            PoolReady,
+            PoolCountDown1,
+            PoolPlay1,
+            PoolPreSwap,
+            PoolSwapSide,
+            PoolCountDown2,
+            PoolPlay2,
+            PoolFinishMatch,
+            PoolValidPoints,
 
-            BeginDemiFinal,
+            DemiFinalBegin,
             DemiNextMatch,
             DemiWarmUp,
 
@@ -45,23 +45,23 @@ namespace VolleyBallTournament
             
         }
         public static List<int> Process { get; private set; } = Enums.GetList<States>();
-        public State<States> State { get; private set; } = new State<States>(States.Ready);
+        public State<States> State { get; private set; } = new State<States>(States.PoolReady);
 
         public Dictionary<States, string> Infos = new Dictionary<States, string>()
         {
-            {States.NextMatch, "Prochain match"},
-            {States.WarmUp, "Echauffement"},
-            {States.Ready, "Joueurs en place"},
-            {States.CountDown1, "Début du Match"},
-            {States.Play1, "Manche 1 en cours"},
-            {States.PreSwap, "Fin de Manche 1"},
-            {States.SwapSide, "Changement de côté"},
-            {States.CountDown2, "Reprise du Match"},
-            {States.Play2, "Manche 2 en cours"},
-            {States.Finish, "Fin du match"},
-            {States.ValidPoints, "Validation des Points"},
+            {States.PoolNextMatch, "Prochain match"},
+            {States.PoolWarmUp, "Echauffement"},
+            {States.PoolReady, "Joueurs en place"},
+            {States.PoolCountDown1, "Début du Match"},
+            {States.PoolPlay1, "Manche 1 en cours"},
+            {States.PoolPreSwap, "Fin de Manche 1"},
+            {States.PoolSwapSide, "Changement de côté"},
+            {States.PoolCountDown2, "Reprise du Match"},
+            {States.PoolPlay2, "Manche 2 en cours"},
+            {States.PoolFinishMatch, "Fin du match"},
+            {States.PoolValidPoints, "Validation des Points"},
 
-            {States.BeginDemiFinal, "Debut des Demi Finales"},
+            {States.DemiFinalBegin, "Debut des Demi Finales"},
 
             {States.DemiNextMatch, "Prochaine Demi Finale"},
             {States.DemiWarmUp, "Echauffement"},
@@ -99,6 +99,8 @@ namespace VolleyBallTournament
         private static int IndexMatch = 0;
         private int _ticState = 0;
 
+        private int _pointGap = 1;
+
         public Team TeamA => _teamA;
         private Team _teamA;
         public Team TeamB => _teamB;
@@ -106,9 +108,7 @@ namespace VolleyBallTournament
         public Team TeamReferee => _teamReferee;
         private Team _teamReferee;
 
-        public Team TeamHasService => _teamHasService;
         private Team _teamHasService;
-        public Team LastTeamHasService => _lastTeamHasService;
         private Team _lastTeamHasService;
 
         public Action<Team> OnChangeService;
@@ -141,6 +141,11 @@ namespace VolleyBallTournament
         }
         private void DefineStates()
         {
+            State.On(States.DemiFinalBegin, () => 
+            {
+                _pointGap = 2;
+            });
+
             State.On(States.DemiWarmUp, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
@@ -179,13 +184,13 @@ namespace VolleyBallTournament
             State.On(States.DemiValidPoints, () =>
             {
                 Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
-                ValidSet();
+                ValidSet(_pointGap);
 
-                if (GetLooser() != null)
-                    GetLooser().Stats.AddResult(Result.Loose);
+                if (GetLooser(_pointGap) != null)
+                    GetLooser(_pointGap).Stats.AddResult(Result.Loose);
 
-                if (GetWinner() != null)
-                    GetWinner().Stats.AddResult(Result.Win);
+                if (GetWinner(_pointGap) != null)
+                    GetWinner(_pointGap).Stats.AddResult(Result.Win);
 
             });
             State.Off(States.DemiValidPoints, () =>
@@ -285,25 +290,25 @@ namespace VolleyBallTournament
             Misc.Log("Cancel Action");
             ChangeTeamHasService(_lastTeamHasService);
         }
-        public void ValidSet()
+        public void ValidSet(int pointGap)
         {
-            var winner = GetWinner();
+            var winner = GetWinner(pointGap);
             TeamA.Stats.AddScoreSet(new Set(winner == TeamA, TeamA.Stats.ScorePoint));
             TeamB.Stats.AddScoreSet(new Set(winner == TeamB, TeamB.Stats.ScorePoint));
         }
-        public Team GetWinner()
+        public Team GetWinner(int pointGap = 1)
         {
             if (_teamA == null || _teamB == null) return null;
             if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
             
-            return _teamA.Stats.ScorePoint > _teamB.Stats.ScorePoint ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint >= _teamB.Stats.ScorePoint + pointGap ? _teamA : _teamB;
         }
-        public Team GetLooser()
+        public Team GetLooser(int pointGap = 1)
         {
             if (_teamA == null || _teamB == null) return null;
             if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
 
-            return _teamA.Stats.ScorePoint < _teamB.Stats.ScorePoint ? _teamA : _teamB;
+            return _teamA.Stats.ScorePoint + pointGap <= _teamB.Stats.ScorePoint ? _teamA : _teamB;
         }
         public Team GetTeamOppenent(Team team)
         {
@@ -387,7 +392,7 @@ namespace VolleyBallTournament
         {
             //Misc.Log($"{points}");
 
-            if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish || State.CurState == States.DemiPlay)
+            if (State.CurState == States.PoolPlay1 || State.CurState == States.PoolPlay2 || State.CurState == States.PoolFinishMatch || State.CurState == States.DemiPlay)
             {
                 if (points == 0) return;
 
@@ -405,7 +410,7 @@ namespace VolleyBallTournament
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
-            else if (State.CurState == States.Ready || State.CurState == States.DemiReady)
+            else if (State.CurState == States.PoolReady || State.CurState == States.DemiReady)
             {
                 ChangeTeamHasService(TeamA);
             }
@@ -414,7 +419,7 @@ namespace VolleyBallTournament
         {
             //Misc.Log($"{points}");
 
-            if (State.CurState == States.Play1 || State.CurState == States.Play2 || State.CurState == States.Finish || State.CurState == States.DemiPlay)
+            if (State.CurState == States.PoolPlay1 || State.CurState == States.PoolPlay2 || State.CurState == States.PoolFinishMatch || State.CurState == States.DemiPlay)
             {
                 if (points == 0) return;
 
@@ -432,7 +437,7 @@ namespace VolleyBallTournament
 
                 Static.SoundPoint.Play(.25f, .01f, 0f);
             }
-            else if (State.CurState == States.Ready || State.CurState == States.DemiReady)
+            else if (State.CurState == States.PoolReady || State.CurState == States.DemiReady)
             {
                 ChangeTeamHasService(TeamB);
             }
@@ -441,36 +446,36 @@ namespace VolleyBallTournament
         {
             switch (State.CurState)
             {
-                case States.Ready:
+                case States.PoolReady:
 
                     break;
-                case States.NextMatch:
+                case States.PoolNextMatch:
 
                     break;
-                case States.Finish:
+                case States.PoolFinishMatch:
 
                     break;
-                case States.WarmUp:
+                case States.PoolWarmUp:
                     break;
 
-                case States.Play1:
+                case States.PoolPlay1:
 
                     break;
-                case States.CountDown1:
+                case States.PoolCountDown1:
                     break;
 
-                case States.CountDown2:
+                case States.PoolCountDown2:
                     break;
 
-                case States.SwapSide:
+                case States.PoolSwapSide:
                     break;
 
-                case States.Play2:
+                case States.PoolPlay2:
                     break;
 
-                case States.ValidPoints:
+                case States.PoolValidPoints:
                     break;
-                case States.PreSwap:
+                case States.PoolPreSwap:
                     break;
                 case States.DemiNextMatch:
                     break;
@@ -480,8 +485,8 @@ namespace VolleyBallTournament
                     break;
                 case States.DemiPlay:
 
-                    if (GetWinner() != null)
-                        if (GetWinner().Stats.ScorePoint >= _currentMatchConfig.NbPointToWinSet)
+                    if (GetWinner(_pointGap) != null)
+                        if (GetWinner(_pointGap).Stats.ScorePoint >= _currentMatchConfig.NbPointToWinSet)
                             GotoNextState();
 
                     break;
@@ -489,11 +494,11 @@ namespace VolleyBallTournament
                     break;
                 case States.DemiValidPoints:
 
-                    if (GetWinner() != null)
+                    if (GetWinner(_pointGap) != null)
                     {
-                        if (GetWinner().Stats.IsWinMatch(_currentMatchConfig))
+                        if (GetWinner(_pointGap).Stats.IsWinMatch(_currentMatchConfig))
                         {
-                            GetWinner().SetIsWinner(true);
+                            GetWinner(_pointGap).SetIsWinner(true);
 
                             ResetScorePoints();
                             State.Change(States.DemiFinishMatch); // Ne Pas utiliser State.Change dans un trigger On Off comportement imprévu
@@ -504,7 +509,7 @@ namespace VolleyBallTournament
                     break;
                 case States.DemiSwapSide:
                     break;
-                case States.BeginDemiFinal:
+                case States.DemiFinalBegin:
                     break;
 
                 case States.DemiFinishMatch:
@@ -519,7 +524,7 @@ namespace VolleyBallTournament
         {
             UpdateRect();
 
-            if ((int)State.CurState >= (int)States.BeginDemiFinal && (int)State.CurState < (int)States.DemiFinishMatch)
+            if ((int)State.CurState >= (int)States.DemiFinalBegin && (int)State.CurState < (int)States.DemiFinishMatch)
             {
                 if (ButtonControl.OnePress($"AddPointA{_idTerrain}", Keyboard.GetState().IsKeyDown((Keys)112 + _idTerrain * 4)))
                 {
