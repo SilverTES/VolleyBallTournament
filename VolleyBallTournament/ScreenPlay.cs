@@ -7,6 +7,7 @@ using Mugen.GFX;
 using Mugen.Input;
 using System.IO;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace VolleyBallTournament
 {
@@ -63,16 +64,18 @@ namespace VolleyBallTournament
             _rotationManagerPhasePool = new RotationManager();
             _rotationManagerPhasePool.LoadFile(configPhasePool, _phaseRegister.GetTeams(), _phaseRegister.GetMatchs());
 
-            _phasePool1 = new PhasePool(0, "Phase de poule Brassage", _rotationManagerPhasePool, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
-            _phasePool2 = new PhasePool(1, "Phase de poule Qualification", _rotationManagerPhasePool).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
+            _phasePool1 = new PhasePool(game, 0, "Phase de poule Brassage", _rotationManagerPhasePool, _phaseRegister).SetX(Screen.Width * 1f).AppendTo(this).This<PhasePool>();
+            _phasePool2 = new PhasePool(game, 1, "Phase de poule Qualification", _rotationManagerPhasePool).SetX(Screen.Width * 2f).AppendTo(this).This<PhasePool>();
 
             _phasePool1.SetRotation(0, _rotationManagerPhasePool);
 
 
-            _phaseDemiFinal = new PhaseDemiFinal("Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
+            _phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
-            _phaseDemiFinal.GetMatch(0).SetPhaseDemiFinal(_phaseDemiFinal);
-            _phaseDemiFinal.GetMatch(2).SetPhaseDemiFinal(_phaseDemiFinal);
+            var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 5);
+
+            _phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
+            //_phaseDemiFinal.GetMatch(2).SetMatchConfigs(matchConfigs);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");

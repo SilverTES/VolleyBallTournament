@@ -113,14 +113,16 @@ namespace VolleyBallTournament
         Container _divMatch;
         Container _divSemi;
 
-        public List<MatchConfig> MatchConfigs => _matchConfigs;
-        private List<MatchConfig> _matchConfigs = [];
-        public const int NbRotation = 4;
+        //public List<MatchConfig> MatchConfigs => _matchConfigs;
+        //private List<MatchConfig> _matchConfigs = [];
+        //public const int NbRotation = 4;
 
         public Action<PhaseDemiFinal> OnFinishPhase;
 
-        public PhaseDemiFinal(string title)
+        Game _game;
+        public PhaseDemiFinal(Game game, string title)
         { 
+            _game = game;
             _title = title;
 
             SetSize(Screen.Width, Screen.Height);
@@ -166,39 +168,18 @@ namespace VolleyBallTournament
             _divMain.Refresh();
 
 
-            _matchs[1].SetIsFreeCourt(true);
+            //_matchs[1].SetIsFreeCourt(true);
 
-            CreateMatchConfigs();
+            //CreateMatchConfigsDemiFinal(_teams);
 
             _matchs[0].State.Set(States.BeginDemiFinal);
-            _matchs[2].State.Set(States.BeginDemiFinal);
+            //_matchs[2].State.Set(States.BeginDemiFinal);
 
             _matchs[0].SetTicState((int)States.BeginDemiFinal);
-            _matchs[2].SetTicState((int)States.BeginDemiFinal);
+            //_matchs[2].SetTicState((int)States.BeginDemiFinal);
 
         }
-        private MatchConfig CreateMatchConfigDemi(int nbSetToWin, int nbPointToWinSet, int idTeamA, int idTeamB, int idTeamReferee)
-        {
-            return new MatchConfig(0, nbSetToWin, nbPointToWinSet, _teams[idTeamA], _teams[idTeamB], _teams[idTeamReferee]);
-        }
-        private void CreateMatchConfigs()
-        {
-            // Demi consolante Looser
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 12, 13, 8));
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 14, 15, 10));
 
-            // demi consolante Looser
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 8, 9, 12));
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 10, 11, 14));
-
-            // demi principale Looser
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 4, 5, 0));
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 6, 7, 2));
-
-            // demi principale Winner
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 0, 1, 4));
-            _matchConfigs.Add(CreateMatchConfigDemi(2, 25, 2, 3, 6));
-        }
         public List<Team> GetTeams() { return _teams; }
         public Team GetTeam(int index) { return _teams[index]; }
         public List<Match> GetMatchs() { return _matchs; }
@@ -221,12 +202,14 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this).This<Match>();
+                var match = new Match(_game, $"{i + 1}", new MatchConfig(i, 1, 25, teamA, teamB, teamReferee)).AppendTo(this).This<Match>();
                 _matchs.Add(match);
 
                 Misc.Log($"Create Match {i + 1}");
 
                 _divMatch.Insert(match);
+
+                match.SetIsFreeCourt(true);
             }
         }
         public override Node Update(GameTime gameTime)

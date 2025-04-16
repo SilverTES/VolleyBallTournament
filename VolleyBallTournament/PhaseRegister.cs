@@ -35,11 +35,14 @@ namespace VolleyBallTournament
         private RotationManager _rotationManager = new RotationManager();
 
         private TextBox _currentTextBox = null;
+
+        Game _game;
         public PhaseRegister(Game game, string xmlFile)//, int nbGroup, int nbTeamPerGroup, int nbMatch)
         {
             //_nbGroup = nbGroup;
             //_nbTeamPerGroup = nbTeamPerGroup;
             //_nbMatch = nbMatch;
+            _game = game;
 
             LoadConfigFile(xmlFile);
 
@@ -119,7 +122,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee);
+                var match = new Match(_game, $"{i + 1}", new MatchConfig(i, 1, 25, teamA, teamB, teamReferee));
 
                 _matchs.Add(match);
             }

@@ -41,7 +41,8 @@ namespace VolleyBallTournament
 
         public Action<PhasePool> OnFinishPhase;
 
-        public PhasePool(int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
+        Game _game;
+        public PhasePool(Game game, int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
             Id = id;
 
@@ -275,7 +276,7 @@ namespace VolleyBallTournament
                 var teamB = new Team("TeamB");
                 var teamReferee = new Team("TeamR");
 
-                var match = new Match(i, $"{i + 1}", teamA, teamB, teamReferee).AppendTo(this).This<Match>();
+                var match = new Match(_game, $"{i + 1}", new MatchConfig(i, 1, 25, teamA, teamB, teamReferee)).AppendTo(this).This<Match>();
                 _matchs.Add(match);
 
                 Misc.Log($"Create Match {i + 1}");
@@ -392,8 +393,8 @@ namespace VolleyBallTournament
                 {
                     var match = _matchs[matchConfig.IdTerrain];
 
-                    match.SetTeam(matchConfig.TeamA, matchConfig.TeamB, matchConfig.TeamReferee);
-                    match.SetNbSetToWin(matchConfig.NbSetToWin);
+                    match.SetMatchConfig(matchConfig);
+                    //match.SetNbSetToWin(matchConfig.NbSetToWin);
                 }
             }
         }
@@ -517,7 +518,7 @@ namespace VolleyBallTournament
 
             States nextState = (States)Process[_ticState];
 
-            State.Set(nextState);
+            State.Change(nextState);
 
             var matchs = GetMatchs();
             for (int i = 0; i < matchs.Count; i++)

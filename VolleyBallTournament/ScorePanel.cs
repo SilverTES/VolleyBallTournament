@@ -84,11 +84,11 @@ namespace VolleyBallTournament
                 //batch.LeftMiddleBorderedString(Static.FontMain, _teamA.Group.GroupName, AbsRectF.LeftMiddle - Vector2.UnitX * 20, Color.White, Color.Black);
                 //batch.RightMiddleBorderedString(Static.FontMain, _teamB.Group.GroupName, AbsRectF.RightMiddle + Vector2.UnitX * 20, Color.White, Color.Black);
 
-                if (_match.NbSetToWin > 1)
-                {
-                    //batch.CenterBorderedStringXY(Static.FontMain, _match.TeamA.ScoreSet.ToString(), SetAPos, Color.Cyan, Color.Black);
-                    //batch.CenterBorderedStringXY(Static.FontMain, _match.TeamB.ScoreSet.ToString(), SetBPos, Color.Cyan, Color.Black);
-                }
+                //if (_match.NbSetToWin > 1)
+                //{
+                //    //batch.CenterBorderedStringXY(Static.FontMain, _match.TeamA.ScoreSet.ToString(), SetAPos, Color.Cyan, Color.Black);
+                //    //batch.CenterBorderedStringXY(Static.FontMain, _match.TeamB.ScoreSet.ToString(), SetBPos, Color.Cyan, Color.Black);
+                //}
 
                 batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamA.Stats.ScorePoint.ToString(), ScoreAPos, Color.Gold, Color.Black);
                 batch.CenterBorderedStringXY(Static.FontMain3, _match.TeamB.Stats.ScorePoint.ToString(), ScoreBPos, Color.Gold, Color.Black);

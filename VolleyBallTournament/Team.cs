@@ -9,6 +9,8 @@ using Mugen.Physics;
 using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 
@@ -65,6 +67,10 @@ namespace VolleyBallTournament
                     if (match.GetTeamOppenent(team) != null)
                         _currentBonusPoint = _scorePoint - match.GetTeamOppenent(team).Stats._scorePoint;
             }
+        }
+        public bool IsWinMatch(MatchConfig matchConfig)
+        {
+            return Results.Count(e => e == Result.Win) >= matchConfig.NbSetToWin;
         }
         public void ResetResult() { _results.Clear(); }
         public void AddResult(Result result) { _results.Add(result); }
@@ -133,6 +139,8 @@ namespace VolleyBallTournament
 
         private Vector2 _newPosition = Vector2.Zero;
 
+        public bool IsWinner => _isWinner;
+        private bool _isWinner = false;
         public bool IsPlaying => _isPlaying;
         private bool _isPlaying = false;
         public bool IsReferee => _isReferee;
@@ -181,6 +189,7 @@ namespace VolleyBallTournament
         }
         public void ResetTeamStatus()
         {
+            SetIsWinner(false);
             SetIsPlaying(false);
             SetIsReferee(false);
             SetMatch(null);
@@ -200,6 +209,7 @@ namespace VolleyBallTournament
         public void SetStats(Stats stats) { _stats = stats; }
 
         public void SetService(bool hasService) { _hasService = hasService; }
+        public void SetIsWinner(bool isWinner) { _isWinner = isWinner; }
         public void SetIsPlaying(bool isPlaying) { _isPlaying = isPlaying; }
         public void SetIsReferee(bool isReferee) { _isReferee = isReferee; }
         public void SetMatch(Match match) { _match = match; if (match == null) return; }
@@ -255,12 +265,13 @@ namespace VolleyBallTournament
                 if (_isShowStats)
                     DrawStats(batch);
 
-                DrawVictory(batch);
+                DrawMatchResults(batch);
             }
 
             if (indexLayer == (int)Layers.HUD)
             {
                 DrawReferee(batch, AbsRectF);
+                DrawWinner(batch, AbsRectF);
             }
             
             if (indexLayer == (int)Layers.Debug)
@@ -297,8 +308,6 @@ namespace VolleyBallTournament
         {
             if (_isReferee)
             {
-                //batch.Rectangle(AbsRectF.Extend(-4f), Color.Yellow, 3f);
-                //batch.Draw(Static.TexReferee, Color.White, 0, rectF.Center + Vector2.UnitX * 10, Position.CENTER, Vector2.One / 4);
                 if (_match != null)
                 {
                     string text = $"Arbitre Terrain {_match.Court.CourtName}";
@@ -311,8 +320,24 @@ namespace VolleyBallTournament
                 }
             }
         }
+        public void DrawWinner(SpriteBatch batch, RectangleF rectF)
+        {
+            if (_isWinner)
+            {
+                if (_match != null)
+                {
+                    string text = $"Vainqueur";
+                    Vector2 pos = rectF.TopCenter - Vector2.UnitY * 4;
+                    batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Blue * .75f, 0f);
+                    batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
 
-        private void DrawVictory(SpriteBatch batch)
+                    batch.CenterStringXY(Static.FontMini, text, pos + Vector2.One * 2, Color.Black * .5f);
+                    batch.CenterStringXY(Static.FontMini, text, pos, Color.Gold);
+                }
+            }
+        }
+
+        private void DrawMatchResults(SpriteBatch batch)
         {
             for (int i = 0; i < Stats.NbMatchPlayed; i++)
             {
