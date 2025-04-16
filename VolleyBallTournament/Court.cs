@@ -210,6 +210,9 @@ namespace VolleyBallTournament
             {
                 if (!_match.IsFreeCourt)
                     _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
+
+                if (_match.TeamA.IsMatchPoint) _match.TeamA.DrawMatchPoint(batch, Team.Bound + _teamAPos);
+                if (_match.TeamB.IsMatchPoint) _match.TeamB.DrawMatchPoint(batch, Team.Bound + _teamBPos);
             }
 
 

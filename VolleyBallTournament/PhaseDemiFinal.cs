@@ -68,7 +68,7 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 //batch.FillRectangle(rectDiv, Color.DarkSlateBlue * .5f);
-                //batch.Rectangle(rectDiv, Color.Gray * .5f);
+                batch.Rectangle(rectDiv, Color.Black * .5f, 3f);
                 //batch.Rectangle(rectDiv.Extend(-4f), Color.Gray * .5f);
 
                 var pos = rectDiv.TopCenter - Vector2.UnitY * 20;
@@ -85,12 +85,12 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.HUD)
             {
                 //batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 54, Color.Gold * 1f, 0);
-                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 48, Color.Black * .5f, 0);
-                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.LeftMiddle, Color.Gold);
+                //batch.FilledCircle(Static.TexCircle, rectDiv1.Center, 48, Color.Black * .5f, 0);
+                //batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.Center, Color.Gold);
 
                 //batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 54, Color.Gold * 1f, 0);
-                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 48, Color.Black * .5f, 0);
-                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.LeftMiddle, Color.Gold);
+                //batch.FilledCircle(Static.TexCircle, rectDiv2.Center, 48, Color.Black * .5f, 0);
+                //batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.Center, Color.Gold);
             }
 
             return base.Draw(batch, gameTime, indexLayer);

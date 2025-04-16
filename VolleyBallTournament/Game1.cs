@@ -60,6 +60,7 @@ namespace VolleyBallTournament
         public static SoundEffect SoundWhistle;
         public static SoundEffect SoundSwap;
         public static SoundEffect SoundRanking;
+        public static SoundEffect SoundVictory;
 
         public static void DrawRoundedRectangle(SpriteBatch batch, Texture2D texLine, Rectangle rect, Color color, int topLeftRadius, int topRightRadius, int bottomRightRadius, int bottomLeftRadius, int thickness, int segments = 4)
         {
@@ -172,6 +173,7 @@ namespace VolleyBallTournament
             Static.SoundWhistle = Content.Load<SoundEffect>("Sounds/referee-whistle");
             Static.SoundSwap = Content.Load<SoundEffect>("Sounds/electric_door_opening_1");
             Static.SoundRanking = Content.Load<SoundEffect>("Sounds/key2");
+            Static.SoundVictory = Content.Load<SoundEffect>("Sounds/victory-sound-1");
 
             Static.TexCircle = GFX.CreateCircleTextureAA(GraphicsDevice, 100, 4);
             Static.TexLine = GFX.CreateLineTextureAA(GraphicsDevice, 100, 15, 7);

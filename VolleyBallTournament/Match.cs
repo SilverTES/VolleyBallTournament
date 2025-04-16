@@ -163,6 +163,7 @@ namespace VolleyBallTournament
 
             State.On(States.DemiNextMatch, () =>
             {
+                Static.SoundVictory.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
                 Misc.Log("SET NEXT MATCH");
                 ResetTeamsStatus();
                 //ResetScorePoints();
@@ -269,9 +270,14 @@ namespace VolleyBallTournament
         {
             if (_teamA == null || _teamB == null) return null;
             if (_teamA.Stats.ScorePoint == _teamB.Stats.ScorePoint) return null;
-            if (pointGap > Math.Abs(_teamA.Stats.ScorePoint - _teamB.Stats.ScorePoint)) return null;
             
-            return _teamA.Stats.ScorePoint > _teamB.Stats.ScorePoint ? _teamA : _teamB;
+            if (Math.Abs(_teamA.Stats.ScorePoint - _teamB.Stats.ScorePoint) > pointGap - 1)
+            {
+                if (_teamA.Stats.ScorePoint > _teamB.Stats.ScorePoint ) return _teamA;
+                if (_teamB.Stats.ScorePoint > _teamA.Stats.ScorePoint ) return _teamB;
+            }
+
+            return null;
         }
         public Team GetLooser(int pointGap = 1)
         {
@@ -287,6 +293,16 @@ namespace VolleyBallTournament
                 return _teamB;
             if (team == _teamB)
                 return _teamA;
+
+            return null;
+        }
+        public Team GetTeamHasMatchPoint()
+        {
+            var winner = GetWinner(_pointGap - 1);
+            if (winner == null) return null;
+
+            if (winner.Stats.ScorePoint >= _currentMatchConfig.NbPointToWinSet && winner.Stats.IsCloseToWinMatch(_currentMatchConfig))
+                return winner;
 
             return null;
         }
@@ -462,7 +478,15 @@ namespace VolleyBallTournament
                         if (GetWinner(_pointGap).Stats.ScorePoint >= _currentMatchConfig.NbPointToWinSet)
                             GotoNextState();
 
-                    break;
+                    if (GetTeamHasMatchPoint() != null)
+                        GetTeamHasMatchPoint().SetIsMatchPoint(true);
+                    else
+                    {
+                        TeamA.SetIsMatchPoint(false);
+                        TeamB.SetIsMatchPoint(false);
+                    }    
+
+                        break;
                 case States.DemiFinishSet:
                     break;
                 case States.DemiValidPoints:
@@ -474,7 +498,7 @@ namespace VolleyBallTournament
                             GetWinner(_pointGap).SetIsWinner(true);
 
                             ResetScorePoints();
-                            State.Change(States.DemiFinishMatch); // Ne Pas utiliser State.Change dans un trigger On Off comportement imprévu
+                            SetTicState((int)States.DemiFinishMatch); // Ne Pas utiliser State.Change dans un trigger On Off comportement imprévu
 
                         }
                     }
@@ -488,7 +512,7 @@ namespace VolleyBallTournament
                 case States.DemiFinishMatch:
 
                     // Debug
-                    if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) State.Change(States.DemiNextMatch);
+                    if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) SetTicState((int)States.DemiNextMatch);
 
                     break;
 
@@ -502,19 +526,19 @@ namespace VolleyBallTournament
 
             if ((int)State.CurState >= (int)States.DemiFinalBegin && (int)State.CurState < (int)States.DemiFinishMatch)
             {
-                if (ButtonControl.OnePress($"AddPointA{_idTerrain}", Keyboard.GetState().IsKeyDown((Keys)112 + _idTerrain * 4)))
+                if (ButtonControl.OnePress($"AddPointA{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)112 + _idTerrain * 4)))
                 {
                     AddPointA(+1);
                 }
-                if (ButtonControl.OnePress($"SubPointA{_idTerrain}", Keyboard.GetState().IsKeyDown((Keys)113 + _idTerrain * 4)))
+                if (ButtonControl.OnePress($"SubPointA{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)113 + _idTerrain * 4)))
                 {
                     AddPointA(-1);
                 }
-                if (ButtonControl.OnePress($"AddPointB{_idTerrain}", Keyboard.GetState().IsKeyDown((Keys)114 + _idTerrain * 4)))
+                if (ButtonControl.OnePress($"AddPointB{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)114 + _idTerrain * 4)))
                 {
                     AddPointB(-1);
                 }
-                if (ButtonControl.OnePress($"SubPointB{_idTerrain}", Keyboard.GetState().IsKeyDown((Keys)115 + _idTerrain * 4)))
+                if (ButtonControl.OnePress($"SubPointB{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)115 + _idTerrain * 4)))
                 {
                     AddPointB(+1);
                 }
@@ -568,7 +592,7 @@ namespace VolleyBallTournament
             {
                 //batch.LeftTopString(Static.FontMini, $"{_teamHasService.TeamName}", AbsXY + new Vector2(10, 10), Color.Red);
                 //batch.LeftTopString(Static.FontMini, $"{_lastTeamHasService.TeamName}", AbsXY + new Vector2(10, 40), Color.Red);
-                batch.BottomCenterString(Static.FontMini, $"{State.CurState}", AbsXY + new Vector2(10, 40), Color.Red);
+                //batch.BottomCenterString(Static.FontMini, $"{State.CurState}", AbsXY + new Vector2(10, 40), Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

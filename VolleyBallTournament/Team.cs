@@ -72,6 +72,10 @@ namespace VolleyBallTournament
         {
             return Results.Count(e => e == Result.Win) >= matchConfig.NbSetToWin;
         }
+        public bool IsCloseToWinMatch(MatchConfig matchConfig)
+        {
+            return Results.Count(e => e == Result.Win) == matchConfig.NbSetToWin - 1;
+        }
         public void ResetResult() { _results.Clear(); }
         public void AddResult(Result result) { _results.Add(result); }
         public void ResetAllPoints()
@@ -139,7 +143,9 @@ namespace VolleyBallTournament
 
         private Vector2 _newPosition = Vector2.Zero;
 
-        public bool IsWinner => _isWinner;
+        public bool IsMatchPoint => _isMatchPoint;
+        private bool _isMatchPoint = false;
+        //public bool IsWinner => _isWinner;
         private bool _isWinner = false;
         public bool IsPlaying => _isPlaying;
         private bool _isPlaying = false;
@@ -190,7 +196,8 @@ namespace VolleyBallTournament
         }
         public void ResetTeamStatus()
         {
-            SetIsWinner(false);
+            //SetIsWinner(false);
+            SetIsMatchPoint(false);
             SetIsPlaying(false);
             SetIsReferee(false);
             SetMatch(null);
@@ -210,6 +217,7 @@ namespace VolleyBallTournament
         public void SetStats(Stats stats) { _stats = stats; }
 
         public void SetService(bool hasService) { _hasService = hasService; }
+        public void SetIsMatchPoint(bool isMatchPoint) { _isMatchPoint = isMatchPoint; }
         public void SetIsWinner(bool isWinner) { _isWinner = isWinner; }
         public void SetIsPlaying(bool isPlaying) { _isPlaying = isPlaying; }
         public void SetIsReferee(bool isReferee) { _isReferee = isReferee; }
@@ -277,7 +285,7 @@ namespace VolleyBallTournament
                 DrawWinner(batch, AbsRectF);
 
                 if (_isShowSets)
-                    Court.DrawSet(batch, this, AbsRectF.TopRight - Vector2.UnitX * 48 * Stats.Sets.Count);
+                    Court.DrawSet(batch, this, AbsRectF.TopRight - Vector2.UnitY * 10 + Vector2.UnitX * 64 - Vector2.UnitX * 48 * Stats.Sets.Count);
             }
             
             if (indexLayer == (int)Layers.Debug)
@@ -326,20 +334,33 @@ namespace VolleyBallTournament
                 }
             }
         }
+        public void DrawMatchPoint(SpriteBatch batch, RectangleF rectF)
+        {
+            if (!_isReferee)
+            {
+                if (_match != null)
+                {
+                    string text = $"Balle de Match";
+                    Vector2 pos = rectF.BottomCenter - Vector2.UnitY * 4;
+                    batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Black * .75f, 0f);
+                    batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
+
+                    batch.CenterStringXY(Static.FontMini, text, pos + Vector2.One * 2, Color.Black * .5f);
+                    batch.CenterStringXY(Static.FontMini, text, pos, Color.Orange);
+                }
+            }
+        }
         public void DrawWinner(SpriteBatch batch, RectangleF rectF)
         {
             if (_isWinner)
             {
-                if (_match != null)
-                {
-                    string text = $"Vainqueur";
-                    Vector2 pos = rectF.TopLeft - Vector2.UnitY * 4 + Vector2.UnitX * 120 + Vector2.UnitY * _waveValue * 4f;
-                    batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Blue * .75f, 0f);
-                    batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 1f);
+                string text = $"Vainqueur";
+                Vector2 pos = rectF.TopLeft - Vector2.UnitY * 4 + Vector2.UnitX * 20 + Vector2.UnitY * _waveValue * 4f;
+                batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Blue * .75f, 0f);
+                batch.RectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(12, -20), Color.Gray, 2f);
 
-                    batch.CenterStringXY(Static.FontMini, text, pos + Vector2.One * 2, Color.Black * .5f);
-                    batch.CenterStringXY(Static.FontMini, text, pos, Color.Gold);
-                }
+                batch.CenterStringXY(Static.FontMini, text, pos + Vector2.One * 2, Color.Black * .5f);
+                batch.CenterStringXY(Static.FontMini, text, pos, Color.Gold);
             }
         }
 

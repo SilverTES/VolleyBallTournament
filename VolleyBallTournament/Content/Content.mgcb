@@ -194,3 +194,9 @@
 /processorParam:Quality=Best
 /build:Sounds/slide-ping.wav
 
+#begin Sounds/victory-sound-1.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Sounds/victory-sound-1.wav
+
