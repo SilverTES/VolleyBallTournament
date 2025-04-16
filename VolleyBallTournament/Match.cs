@@ -165,9 +165,9 @@ namespace VolleyBallTournament
             {
                 Misc.Log("SET NEXT MATCH");
                 ResetTeamsStatus();
-                ResetScorePoints();
-                ResetSets();
-                ResetResults();
+                //ResetScorePoints();
+                //ResetSets();
+                //ResetResults();
 
                 ImportMatchConfigDemi();
 
@@ -195,38 +195,7 @@ namespace VolleyBallTournament
             });
             State.Off(States.DemiValidPoints, () =>
             {
-                //Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
-                Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
-                // On retribut les points dans les team respectif qui viennent de finir de jouer
-
-                //if (GetWinner() == null)
-                //{
-                //    Misc.Log("Match Null");
-                //    TeamA.Stats.AddRankingPoint(1);
-                //    TeamB.Stats.AddRankingPoint(1);
-
-                //    TeamA.Stats.AddResult(Result.Null);
-                //    TeamB.Stats.AddResult(Result.Null);
-                //}
-                //else
-
-                //GetWinner().Stats.AddRankingPoint(3);
-
-                //TeamA.Stats.ValidBonusPoint();
-                //TeamB.Stats.ValidBonusPoint();
-
-                //_currentRotation++;
-                ////_step = int.Clamp(_step, 0, _nbStep - 1);
-                //if (_currentRotation >= NbRotation)
-                //{
-                //    Misc.Log("Fin des matchs");
-                //    for (int i = 0; i < _matchs.Count; i++)
-                //        _matchs[i].SetIsFreeCourt(true);
-
-                //    if (OnFinishPhase != null)
-                //        OnFinishPhase(this);
-                //}
-
+                //Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
             });
             State.On(States.DemiSwapSide, () =>
             {
@@ -349,6 +318,7 @@ namespace VolleyBallTournament
         {
             _teamA.Stats.ResetResult();
             _teamB.Stats.ResetResult();
+            
         }
         public void ResetSets()
         {
@@ -364,6 +334,7 @@ namespace VolleyBallTournament
         {
             _teamA.ResetTeamStatus();
             _teamB.ResetTeamStatus();
+            _teamReferee.ResetTeamStatus();
         }
         public static void ResetTeamsStatus(List<Team> teams)
         {
@@ -515,6 +486,9 @@ namespace VolleyBallTournament
                     break;
 
                 case States.DemiFinishMatch:
+
+                    // Debug
+                    if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) State.Change(States.DemiNextMatch);
 
                     break;
 
