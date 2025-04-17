@@ -187,7 +187,7 @@ namespace VolleyBallTournament
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling + Vector2.One * 4, Color.Black * .75f);
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling, _colorTextScrolling);
 
-                batch.FillRectangle(new Rectangle(Screen.Width - 130, 10, 120, 40), Color.Black * .5f);
+                batch.FillRectangle(new Rectangle(Screen.Width - 130, 10, 130, 40), Color.Black * .5f);
                 batch.LeftMiddleString(Static.FontMain, DateTime.Now.ToString("HH:mm:ss"), new Vector2(Screen.Width - 120, 30), Color.White);
             }
 

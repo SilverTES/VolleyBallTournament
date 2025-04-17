@@ -41,6 +41,9 @@ namespace VolleyBallTournament
 
         public Action<PhasePool> OnFinishPhase;
 
+        private DateTime _startRotationTime;
+        private DateTime _endRotationTime;
+
         Game _game;
         public PhasePool(Game game, int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
@@ -77,7 +80,7 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            State.Set(States.PoolNextMatch);
+            SetTicRotation((int)States.PoolNextMatch);
 
             DefineStates();
         }
@@ -85,6 +88,9 @@ namespace VolleyBallTournament
         {
             State.On(States.PoolWarmUp, () =>
             {
+                if (_currentRotation == 0)
+                    _startRotationTime = DateTime.Now;
+
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
 
                 Timer.SetDuration(_rotationManager.GetWarmUpTime(_currentRotation));
@@ -452,6 +458,16 @@ namespace VolleyBallTournament
                 group.Refresh();
             }
         }
+        public void RefreshNextTurnTimes(RotationManager rotationManager)
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                var nextTurn = team.FindNextTurnTime(_currentRotation, rotationManager);
+
+                //team.SetNextTurn(nextTurn);
+            }
+        }
         public List<Team> GetTeams() { return _teams; }
         public Team GetTeam(int index) { return _teams[index]; }
         public List<Match> GetMatchs() { return _matchs; }
@@ -553,6 +569,11 @@ namespace VolleyBallTournament
                 RunState();
 
                 // Debug
+                if (ButtonControl.OnePress($"RefreshNextTurn", Static.Key.IsKeyDown(Keys.T)))
+                {
+                    RefreshNextTurnTimes(_rotationManager);
+                }
+
                 if (ButtonControl.OnePress($"SwapTeams", Static.Key.IsKeyDown(Keys.S)))
                 {
                     for (int i = 0;i <_matchs.Count;i++)
@@ -561,6 +582,8 @@ namespace VolleyBallTournament
 
                 if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))
                 {
+                    // Actualise les horaires d'attente des match et arbitrage !
+                    RefreshNextTurnTimes(_rotationManager);
 
                     if (_currentRotation < _rotationManager.NbRotation)
                     {
@@ -684,15 +707,15 @@ namespace VolleyBallTournament
 
                 if (i == 0)
                 {
-                    batch.CenterStringXY(Static.FontMini, "Début des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
-                    batch.CenterStringXY(Static.FontMini, DateTime.Now.ToString("HH:mm"), pos - Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, "Début des Rotations", pos + Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, _startRotationTime.ToString("HH:mm"), pos - Vector2.UnitY * 40, Color.Yellow);
                 }
 
                 if (i == _rotationManager.NbRotation - 2)
                 {
 
-                    batch.CenterStringXY(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 40, Color.Yellow);
-                    batch.CenterStringXY(Static.FontMini, DateTime.Now.ToString("HH:mm"), pos2 - Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, "Fin des Rotations", pos2 + Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, _endRotationTime.ToString("HH:mm"), pos2 - Vector2.UnitY * 40, Color.Yellow);
                 }
 
 

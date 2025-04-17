@@ -57,7 +57,7 @@ namespace VolleyBallTournament
                 var team = _teams[i];
 
                 team.Stats.SetRank(i + 1);
-                team.MoveToPosition(new Vector2(0, (team._rect.Height + 8) * i));
+                team.MoveToPosition(new Vector2(0, (team._rect.Height + 16) * i));
             }
         }
         public override Node Update(GameTime gameTime)

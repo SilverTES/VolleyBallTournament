@@ -23,6 +23,13 @@ namespace VolleyBallTournament
         public int Points = scorePoint; // points in Set
     }
 
+    public struct NextTurn()
+    {
+        public DateTime Time;
+        public string Message; // message
+        public int IdTerrain;
+    }
+
     public class Team : Node  
     {
         public Stats Stats => _stats;
@@ -48,7 +55,8 @@ namespace VolleyBallTournament
         private bool _isShowSets = true;
 
         private bool _isShowNextTurn = true;
-        private TimeSpan _nextTurnTime = new();
+        private NextTurn _nextTurn;
+        //private DateTime _nextTurnTime = new();
 
         public bool HasService => _hasService;
         private bool _hasService = false;
@@ -79,6 +87,51 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
+        public NextTurn FindNextTurnTime(int currentRotation, RotationManager rotationManager) 
+        { 
+            int rotation = 0;
+            _nextTurn.Time = DateTime.Now;
+            double totalTime = 0;
+
+            for (int j = currentRotation + 1; j < rotationManager.GridMatchConfig.Height; j++)
+            {
+                var matchTime = rotationManager.GetMatchTime(rotation);
+                var warmUpTime = rotationManager.GetWarmUpTime(rotation);
+                totalTime += matchTime * 2 + warmUpTime;
+
+                Misc.Log($"/////////////{rotation} {totalTime}");
+
+                for (int i = 0; i < rotationManager.GridMatchConfig.Width; i++)
+                {
+                    var matchConfig = rotationManager.GridMatchConfig.Get(i, j);
+
+                    if (matchConfig != null)
+                    {
+                        if (matchConfig.TeamReferee == this)
+                        {
+                            _nextTurn.Message = "Arbitre";
+                            _nextTurn.IdTerrain = matchConfig.IdTerrain;
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+                            return _nextTurn;
+                        }
+                        if (matchConfig.TeamA == this || matchConfig.TeamB == this)
+                        {
+                            _nextTurn.Message = "Joue";
+                            _nextTurn.IdTerrain = matchConfig.IdTerrain;
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+                            return _nextTurn;
+                        }
+                    }
+
+                }
+
+
+                rotation++;
+            }
+            
+            
+            return _nextTurn; 
+        }
         public void ResetSets()
         {
             Stats.Sets.Clear();
@@ -107,8 +160,8 @@ namespace VolleyBallTournament
         //        match.ResetSets();
         //    }
         //}
+        public void SetNextTurn (NextTurn nextTurn) { _nextTurn = nextTurn; }
         public void SetStats(Stats stats) { _stats = stats; }
-
         public void SetService(bool hasService) { _hasService = hasService; }
         public void SetIsMatchPoint(bool isMatchPoint) { _isMatchPoint = isMatchPoint; }
         public void SetIsWinner(bool isWinner) { _isWinner = isWinner; }
@@ -194,11 +247,12 @@ namespace VolleyBallTournament
         public void DrawNextTurn(SpriteBatch batch)
         {
             float alpha = 1f;
-            var text = $" Arbitre à {_nextTurnTime.Hours:D2}:{_nextTurnTime.Minutes:D2} T1 ";
-            var pos = AbsRectF.RightMiddle - Vector2.UnitX * 40;
-            //batch.FillRectangleCentered(AbsRectF.RightMiddle - Vector2.UnitX * 80, new Vector2(120, 32), Color.Black, 0);
-            Static.DrawTextFrame(batch, Static.FontMini, pos, text, Color.Gray * alpha, Color.Black * alpha, - Vector2.UnitX * 80);
-            batch.RightMiddleString(Static.FontMini, text, pos, Color.White * alpha);
+            var text = $" {_nextTurn.Message} à {_nextTurn.Time:HH:mm} T{_nextTurn.IdTerrain + 1} ";
+            
+            var pos = AbsRectF.TopRight - Vector2.UnitX * 100;
+
+            batch.FillRectangleCentered(pos, Static.FontMini.MeasureString(text) + new Vector2(0, -16), Color.Black * .75f, 0);
+            batch.CenterStringXY(Static.FontMini, text, pos, Color.Green * alpha);
         }
         public void DrawStats(SpriteBatch batch)
         {
@@ -219,7 +273,7 @@ namespace VolleyBallTournament
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : HSV.ToRGB(150, 1, _waveValue) * 1f, 1f);
-            batch.Rectangle(rectF.Extend(-6f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
+            batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
             batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray * 1f);
         }

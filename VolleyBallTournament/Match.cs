@@ -51,7 +51,7 @@ namespace VolleyBallTournament
         {
             {States.PoolNextMatch, "Prochain match"},
             {States.PoolWarmUp, "Echauffement"},
-            {States.PoolReady, "Joueurs en place"},
+            {States.PoolReady, "Joueurs prêt"},
             {States.PoolCountDown1, "Début du Match"},
             {States.PoolPlay1, "Manche 1 en cours"},
             {States.PoolPreSwap, "Fin de Manche 1"},
