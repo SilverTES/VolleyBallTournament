@@ -80,7 +80,7 @@ namespace VolleyBallTournament
             _divMain.SetPosition((Screen.Width - _divMain.Rect.Width) / 2, (Screen.Height - _divMain.Rect.Height) / 2);
             _divMain.Refresh();
 
-            SetTicRotation((int)States.PoolNextMatch);
+            SetTicState((int)States.PoolNextMatch);
 
             DefineStates();
         }
@@ -466,6 +466,9 @@ namespace VolleyBallTournament
                 var nextTurn = team.FindNextTurnTime(_currentRotation, rotationManager);
 
                 //team.SetNextTurn(nextTurn);
+                var matchTime = rotationManager.GetMatchTime(0);
+                var warmUpTime = rotationManager.GetWarmUpTime(0);
+                _endRotationTime =  DateTime.Now.AddSeconds((matchTime * 2 + warmUpTime) * (rotationManager.NbRotation - _currentRotation));
             }
         }
         public List<Team> GetTeams() { return _teams; }
@@ -485,7 +488,7 @@ namespace VolleyBallTournament
             {
                 Misc.Log("Finish CountDown");
                 Timer.StopTimer();
-                SetTicRotation((_ticState + 1) % Enums.Count<States>());
+                SetTicState((_ticState + 1) % Enums.Count<States>());
             }
         }
         private void RunState()
@@ -544,7 +547,7 @@ namespace VolleyBallTournament
                     break;
             }
         }
-        private void SetTicRotation(int ticProcess)
+        private void SetTicState(int ticProcess)
         {
             _ticState = ticProcess;
 
@@ -594,7 +597,7 @@ namespace VolleyBallTournament
                         if (_ticState > (int)States.PoolValidPoints)
                             _ticState = (int)States.PoolNextMatch;
 
-                        SetTicRotation(_ticState); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
+                        SetTicState(_ticState); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
                         //SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
                     }
                 }
