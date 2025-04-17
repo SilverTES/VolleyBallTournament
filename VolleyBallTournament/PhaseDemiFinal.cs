@@ -1,10 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
-using Mugen.Input;
 using System;
 using System.Collections.Generic;
 using static VolleyBallTournament.Match;

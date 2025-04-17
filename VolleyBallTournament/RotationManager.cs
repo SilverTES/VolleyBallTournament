@@ -20,7 +20,8 @@ namespace VolleyBallTournament
         public int NbRotation => _nbRotation;
         private int _nbRotation;
 
-        Grid2D<MatchConfig> _grid;
+        public Grid2D<MatchConfig> GridMatchConfig => _gridMatchConfig;
+        Grid2D<MatchConfig> _gridMatchConfig;
 
         public static List<string> TeamLetters =
         [
@@ -28,12 +29,13 @@ namespace VolleyBallTournament
             "N","O","P","Q","R","S","T","U","V","W","X","Y","Z",
         ];
 
-        public static Dictionary<string, int> Indexs { get; private set; } = new Dictionary<string, int>();
+        public static Dictionary<string, int> Indexs { get; private set; } = [];
 
         public RotationManager() 
         {
 
         }
+        // Créations des les Indexd d'équipe exemple: "A1" = 0 , "C1" = 2 et aussi selon le nombre d'équipe par groupe 
         private void CreateTeamsIndex(int nbGroup, int nbTeamPerGroup)
         {
             int indexTeam = 0;
@@ -56,9 +58,9 @@ namespace VolleyBallTournament
             //Misc.Log("GET MATCH CONFIG ************");
             List<MatchConfig> list = [];
 
-            for (int i = 0; i < _grid.Width; i++)
+            for (int i = 0; i < _gridMatchConfig.Width; i++)
             {
-                list.Add(_grid.Get(i, rotation));
+                list.Add(_gridMatchConfig.Get(i, rotation));
                 //Misc.Log($"Load Match {i} : {_grid.Get(i, rotation).IdTerrain}");
             }
 
@@ -88,7 +90,7 @@ namespace VolleyBallTournament
             int nbEquipeParGroupe = int.Parse(config.Attribute("nbEquipeParGroupe").Value);
             int nbTerrain = int.Parse(config.Attribute("nbTerrain").Value);
 
-            _grid = new Grid2D<MatchConfig>(_nbTerrain = nbTerrain, _nbRotation = nbRotation);
+            _gridMatchConfig = new Grid2D<MatchConfig>(_nbTerrain = nbTerrain, _nbRotation = nbRotation);
             CreateTeamsIndex(_nbGroup = nbGroupe, _nbTeamPerGroup = nbEquipeParGroupe);
 
 
@@ -128,7 +130,7 @@ namespace VolleyBallTournament
 
                     Console.WriteLine($"  Terrain {terrain} : {equipes} (Arbitre : {arbitre})");
 
-                    _grid.Set(indexMatch, indexRotation, matchConfig); // Important le rotation-1 , parceque le tableau débute à Zero et rotation est déja 1 quand il renconte l'élément "<rotation>"
+                    _gridMatchConfig.Set(indexMatch, indexRotation, matchConfig); // Important le rotation-1 , parceque le tableau débute à Zero et rotation est déja 1 quand il renconte l'élément "<rotation>"
 
                     indexMatch++;
                 }
@@ -138,14 +140,15 @@ namespace VolleyBallTournament
                 Console.WriteLine();
             }
 
-            for (int r = 0; r < _grid.Height; r++)
+            Misc.Log("---- Show Grid Match ---");
+            for (int r = 0; r < _gridMatchConfig.Height; r++)
             {
-                for (int c = 0; c < _grid.Width; c++)
+                for (int c = 0; c < _gridMatchConfig.Width; c++)
                 {
-                    var match = _grid.Get(c, r);
+                    var match = _gridMatchConfig.Get(c, r);
                     if (match != null)
                     {
-                        Console.Write($"{_grid.Get(c, r).IdTerrain}");
+                        Console.Write($"{_gridMatchConfig.Get(c, r).IdTerrain}");
                     }
                     else
                     {

@@ -2,16 +2,10 @@
 using Microsoft.Xna.Framework.Graphics;
 using Mugen.Animation;
 using Mugen.Core;
-using Mugen.Event;
 using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Physics;
 using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 
 
 namespace VolleyBallTournament
@@ -27,108 +21,6 @@ namespace VolleyBallTournament
     {
         public bool IsWin = isWin; // true win, false loose
         public int Points = scorePoint; // points in Set
-    }
-
-    public class Stats()
-    {
-        //private Match _match = match;
-        //private Team _team = team;
-        public string TeamName => _teamName;
-        private string _teamName;
-        public int ScorePoint => _scorePoint;
-        private int _scorePoint = 0;
-        public List<Set> Sets => _sets;
-        private List<Set> _sets = [];
-        private int _rank = 0;
-        public int RankingPoint => _rankingPoint;
-        private int _rankingPoint = 0; 
-        //public EasingValue EaseRankingPoint => _easeRankingPoint;
-        //EasingValue _easeRankingPoint = new(0);
-        public int CurrentBonusPoint => _currentBonusPoint;
-        private int _currentBonusPoint = 0;
-        public int BonusPoint => _bonusPoint;
-        private int _bonusPoint = 0;
-        public int TotalPoint => _totalPoint;
-        private int _totalPoint = 0; 
-        //public EasingValue EaseTotalPoint => _easeTotalPoint;
-        //EasingValue _easeTotalPoint = new(0);
-
-        public int NbMatchPlayed => _results.Count;
-        public List<Result> Results => _results;
-        private List<Result> _results = new List<Result>();
-
-        public void Update(Match match, Team team)
-        {
-            _scorePoint = int.Clamp(_scorePoint, 0, 99);
-
-            if (match != null)
-            {
-                if (!team.IsReferee) // Seul l'équipe qui joue on leur bonus qui changent !
-                    if (match.GetTeamOppenent(team) != null)
-                        _currentBonusPoint = _scorePoint - match.GetTeamOppenent(team).Stats._scorePoint;
-            }
-        }
-        public bool IsWinMatch(MatchConfig matchConfig)
-        {
-            return Results.Count(e => e == Result.Win) >= matchConfig.NbSetToWin;
-        }
-        public bool IsCloseToWinMatch(MatchConfig matchConfig)
-        {
-            return Results.Count(e => e == Result.Win) == matchConfig.NbSetToWin - 1;
-        }
-        public void ResetResult() { _results.Clear(); }
-        public void AddResult(Result result) { _results.Add(result); }
-        public void ResetAllPoints()
-        {
-            _rank = 0;
-            _scorePoint = 0;
-            _rankingPoint = 0;
-            _bonusPoint = 0;
-            _totalPoint = 0;
-        }
-        //public void SetMatch(Match match) { _match = match; }
-        public void SetTeamName(string teamName) { _teamName = teamName; }
-        public void AddRankingPoint(int points)
-        {
-            _rankingPoint += points;
-            //_easeRankingPoint.SetValue(_rankingPoint);
-        }
-        public void SetRankingPoint(int points)
-        {
-            _rankingPoint = points;
-            //_easeRankingPoint.SetValue(_rankingPoint);
-        }
-        public void AddTotalPoint(int points)
-        {
-            _totalPoint += points;
-            //_easeTotalPoint.SetValue(_totalPoint);
-        }
-        public void SetTotalPoint(int points)
-        {
-            _totalPoint = points;
-            //_easeTotalPoint.SetValue(_totalPoint);
-        }
-        public void ValidBonusPoint()
-        {
-            _bonusPoint += _currentBonusPoint;
-            _currentBonusPoint = 0;
-        }
-        public void AddPoint(int points) 
-        { 
-            _scorePoint += points;
-            _scorePoint = int.Clamp(_scorePoint, 0, 99);
-            AddTotalPoint(points); 
-        }
-        public void SetScorePoint(int points) { _scorePoint = points; }
-        public void AddScoreSet(Set set) { _sets.Add(set); }
-        public void SetRank(int rank) { _rank = rank; }
-
-        public Stats Clone()
-        {
-            Stats clone = (Stats)MemberwiseClone();
-
-            return clone;
-        }
     }
 
     public class Team : Node  
@@ -155,10 +47,11 @@ namespace VolleyBallTournament
         private bool _isShowStats = true;
         private bool _isShowSets = true;
 
-        //public int NbMaxMatchPlayed = 3;
+        private bool _isShowNextTurn = true;
+        private TimeSpan _nextTurnTime = new();
+
         public bool HasService => _hasService;
         private bool _hasService = false;
-        //private Team _lastTeamHasService = null;
 
         Animate _animate;
 
@@ -286,6 +179,9 @@ namespace VolleyBallTournament
 
                 if (_isShowSets)
                     Court.DrawSet(batch, this, AbsRectF.TopRight - Vector2.UnitY * 10 + Vector2.UnitX * 64 - Vector2.UnitX * 48 * Stats.Sets.Count);
+
+                if (_isShowNextTurn && !_isPlaying && !_isReferee)
+                    DrawNextTurn(batch);
             }
             
             if (indexLayer == (int)Layers.Debug)
@@ -294,6 +190,15 @@ namespace VolleyBallTournament
             }
 
             return base.Draw(batch, gameTime, indexLayer);
+        }
+        public void DrawNextTurn(SpriteBatch batch)
+        {
+            float alpha = 1f;
+            var text = $" Arbitre à {_nextTurnTime.Hours:D2}:{_nextTurnTime.Minutes:D2} T1 ";
+            var pos = AbsRectF.RightMiddle - Vector2.UnitX * 40;
+            //batch.FillRectangleCentered(AbsRectF.RightMiddle - Vector2.UnitX * 80, new Vector2(120, 32), Color.Black, 0);
+            Static.DrawTextFrame(batch, Static.FontMini, pos, text, Color.Gray * alpha, Color.Black * alpha, - Vector2.UnitX * 80);
+            batch.RightMiddleString(Static.FontMini, text, pos, Color.White * alpha);
         }
         public void DrawStats(SpriteBatch batch)
         {
@@ -314,7 +219,7 @@ namespace VolleyBallTournament
             batch.FillRectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Style.ColorValue.ColorFromHexa("#003366") * 1f : Color.DarkSlateBlue * 1f);
 
             batch.Rectangle(rectF.Extend(-4f), !(_isPlaying || _isReferee) ? Color.Black * 1f : HSV.ToRGB(150, 1, _waveValue) * 1f, 1f);
-            batch.Rectangle(rectF.Extend(-8f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
+            batch.Rectangle(rectF.Extend(-6f), !(_isPlaying || _isReferee) ? Color.Black * .5f : Color.Gray * .5f, 1f);
 
             batch.LeftMiddleString(Static.FontMain, $"{Stats.TeamName}", rectF.LeftMiddle + Vector2.UnitX * 20, _isPlaying ? Color.GreenYellow : _isReferee ? Color.Orange : Color.Gray * 1f);
         }

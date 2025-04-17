@@ -24,8 +24,6 @@ namespace VolleyBallTournament
         private float _ballSize = 0;
         private float _rotationBall = 0f;
 
-        //private Vector2 _setAPos;
-        //private Vector2 _setBPos;
         public Vector2 ScoreAPos => _scoreAPos;
         private Vector2 _scoreAPos;
         public Vector2 ScoreBPos => _scoreBPos;
@@ -37,8 +35,6 @@ namespace VolleyBallTournament
         private Vector2 _vBallAPos;
         private Vector2 _vBallBPos;
         private Vector2 _vBallCurrentPos;
-        //private Team _prevTeamHasService = null;
-        //private Team _teamHasService = null;
 
         private Vector2 _infosPos;
         private Vector2 _courtNamePos;
@@ -112,9 +108,6 @@ namespace VolleyBallTournament
 
             _scoreAPos = Team.Bound.TopRight + _teamAPos - Vector2.UnitX * 10;
             _scoreBPos = Team.Bound.TopRight + _teamBPos - Vector2.UnitX * 10;
-
-            //_setAPos = Team.Bound.RightMiddle + _teamAPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
-            //_setBPos = Team.Bound.RightMiddle + _teamBPos + Vector2.UnitX * 0 - Vector2.UnitY * 50;
 
         }
         public void UpdateVBallPosition()

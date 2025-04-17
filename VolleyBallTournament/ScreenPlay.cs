@@ -8,6 +8,7 @@ using Mugen.Input;
 using System.IO;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Net.NetworkInformation;
 
 namespace VolleyBallTournament
 {
@@ -19,7 +20,7 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
-        private PhaseDemiFinal _phaseDemiFinal;
+        //private PhaseDemiFinal _phaseDemiFinal;
 
         private RotationManager _rotationManagerPhasePool;
 
@@ -30,8 +31,6 @@ namespace VolleyBallTournament
         float _cameraX;
 
         Vector2 _versionPos;
-
-        //int _rotation = 0;
 
         private int _nbScreen = 3;
 
@@ -70,11 +69,11 @@ namespace VolleyBallTournament
             _phasePool1.SetRotation(0, _rotationManagerPhasePool);
 
 
-            _phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
+            //_phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
-            var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 3);
+            //var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 3);
 
-            _phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
+            //_phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
             //_phaseDemiFinal.GetMatch(2).SetMatchConfigs(matchConfigs);
 
             _animate = new Animate();
@@ -84,7 +83,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 3, 0);
+            SetPosition(_cameraX = -Screen.Width * 1, 0);
 
 
             _phasePool1.OnFinishPhase += (phasePool) =>
@@ -118,12 +117,12 @@ namespace VolleyBallTournament
             _phaseRegister.IsLocked = true;
             _phasePool1.IsLocked = true;
             _phasePool2.IsLocked = true;
-            _phaseDemiFinal.IsLocked = true;
+            //_phaseDemiFinal.IsLocked = true;
 
             if (_cameraX == -_phaseRegister._x) _phaseRegister.IsLocked = false;
             if (_cameraX == -_phasePool1._x) _phasePool1.IsLocked = false;
             if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
-            if (_cameraX == -_phaseDemiFinal._x) _phaseDemiFinal.IsLocked = false;
+            //if (_cameraX == -_phaseDemiFinal._x) _phaseDemiFinal.IsLocked = false;
 
             //
             if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
@@ -187,11 +186,14 @@ namespace VolleyBallTournament
                 //batch.FilledCircle(Static.TexCircle, _scrolling + AbsXY, 40, Color.Yellow);
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling + Vector2.One * 4, Color.Black * .75f);
                 batch.LeftMiddleString(_fontScrolling, _textScrolling + _textScrolling, _scrolling, _colorTextScrolling);
+
+                batch.FillRectangle(new Rectangle(Screen.Width - 130, 10, 120, 40), Color.Black * .5f);
+                batch.LeftMiddleString(Static.FontMain, DateTime.Now.ToString("HH:mm:ss"), new Vector2(Screen.Width - 120, 30), Color.White);
             }
 
             if (indexLayer == (int)Layers.Debug)
-            { 
-                batch.RightMiddleString(Static.FontMicro, $"VolleyBall Tournament V{1}.{0} ©SilverTES 2025", _versionPos, Color.White);
+            {
+                //batch.RightMiddleString(Static.FontMicro, $"VolleyBall Tournament V{1}.{0} ©SilverTES 2025", _versionPos, Color.White);
 
                 var clients = Static.Server.Clients;
                 for (int i = 0; i < clients.Count; i++)

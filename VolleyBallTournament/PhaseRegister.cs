@@ -31,20 +31,16 @@ namespace VolleyBallTournament
         private List<Group> _groups = [];
         private List<Match> _matchs = [];
 
-        public RotationManager RotationManager => _rotationManager;
-        private RotationManager _rotationManager = new RotationManager();
-
         private TextBox _currentTextBox = null;
 
         Game _game;
-        public PhaseRegister(Game game, string xmlFile)//, int nbGroup, int nbTeamPerGroup, int nbMatch)
+        private string _xmlFile;
+        public PhaseRegister(Game game, string xmlFile)
         {
-            //_nbGroup = nbGroup;
-            //_nbTeamPerGroup = nbTeamPerGroup;
-            //_nbMatch = nbMatch;
             _game = game;
+            _xmlFile = xmlFile;
 
-            LoadConfigFile(xmlFile);
+            LoadConfigFile(_xmlFile, out _nbGroup, out _nbTeamPerGroup, out _nbMatch);
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -79,7 +75,7 @@ namespace VolleyBallTournament
             }
 
         }
-        private void LoadConfigFile(string xmlFile)
+        private void LoadConfigFile(string xmlFile, out int nbGroup, out int nbTeamPerGroup, out int nbMatch)
         {
             XDocument doc = XDocument.Load(xmlFile);
             // Lire la config
@@ -88,9 +84,34 @@ namespace VolleyBallTournament
             int nbEquipeParGroupe = int.Parse(config.Attribute("nbEquipeParGroupe").Value);
             int nbTerrain = int.Parse(config.Attribute("nbTerrain").Value);
 
-            _nbGroup = nbGroupe;
-            _nbTeamPerGroup = nbEquipeParGroupe;
-            _nbMatch = nbTerrain;
+            nbGroup = nbGroupe;
+            nbTeamPerGroup = nbEquipeParGroupe;
+            nbMatch = nbTerrain;
+        }
+        private void LoadNameFromFile(string xmlFile)
+        {
+            Misc.Log("Load Name From File");
+            XDocument doc = XDocument.Load(xmlFile);
+            // Lit les noms inscrit dans le fichier xml
+            var teams = doc.Root.Elements("equipe");
+
+            var textBoxs = GetTexBoxs();
+
+            int index = 0;
+            foreach (var team in teams)
+            {
+                string id = team.Attribute("id").Value;
+                string name = team.Value;
+
+                Misc.Log($"{id} : {name}");
+
+                var textBox = textBoxs[index];
+
+                textBox.Text = name;
+                textBox.OnChange(textBox);
+                index++;
+            }
+
         }
         public List<Team> GetTeams() { return _teams; }
         public List<Group> GetGroups() { return _groups; }
@@ -290,6 +311,13 @@ namespace VolleyBallTournament
 
                     if (ButtonControl.OnPress("Left", _key.IsKeyDown(Keys.Left))) FocusPrevGroupRegister(_currentTextBox);
                     if (ButtonControl.OnPress("Right", _key.IsKeyDown(Keys.Right))) FocusNextGroupRegister(_currentTextBox);
+
+                    // Load Name from file
+                    if (ButtonControl.OnPress("LoadNameFromFile", _key.IsKeyDown(Keys.L)))
+                    {
+                        Misc.Log("grghsrherherhj");
+                        LoadNameFromFile(_xmlFile);
+                    }
                 }
             }
 

@@ -46,8 +46,6 @@ namespace VolleyBallTournament
         }
         public void Refresh()
         {
-            //_teams = _teams.OrderByDescending(p => p.TotalPoint).ToList();
-
             _teams = _teams
                 .OrderByDescending(e => e.Stats.RankingPoint)
                 .ThenByDescending(e => e.Stats.BonusPoint)
@@ -60,7 +58,6 @@ namespace VolleyBallTournament
 
                 team.Stats.SetRank(i + 1);
                 team.MoveToPosition(new Vector2(0, (team._rect.Height + 8) * i));
-                //team.SetPosition(0, team._rect.Height * i);
             }
         }
         public override Node Update(GameTime gameTime)

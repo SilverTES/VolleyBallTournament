@@ -8,7 +8,7 @@ using Mugen.GUI;
 using Mugen.Input;
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using static VolleyBallTournament.Match;
 
 namespace VolleyBallTournament
@@ -222,7 +222,6 @@ namespace VolleyBallTournament
                 }
 
                 _currentRotation++;
-                //_step = int.Clamp(_step, 0, _nbStep - 1);
                 if (_currentRotation >= _rotationManager.NbRotation)
                 {
                     Misc.Log("Fin des matchs");
@@ -314,6 +313,7 @@ namespace VolleyBallTournament
 
             var groups = phasePool.GetGroups();
 
+            // Sépare les Principale / Consolante
             foreach (var group in groups)
             {
                 for (int i = 0; i < 2; i++)
@@ -322,16 +322,31 @@ namespace VolleyBallTournament
                     teamsConsolante.Add(group.GetTeam(i+2));
                 }
             }
-            
+
+            // tri par ordre de puissance des équipes
+
+            teamsPrincipale = teamsPrincipale
+                .OrderByDescending(e => e.Stats.RankingPoint)
+                .ThenByDescending(e => e.Stats.BonusPoint)
+                .ThenByDescending(e => e.Stats.TotalPoint)
+                .ToList();
+
+            teamsConsolante = teamsConsolante
+                .OrderByDescending(e => e.Stats.RankingPoint)
+                .ThenByDescending(e => e.Stats.BonusPoint)
+                .ThenByDescending(e => e.Stats.TotalPoint)
+                .ToList();
+
+
             int index = 0;
-            foreach (var team in teamsConsolante)
+            foreach (var team in teamsConsolante) // les 8 premières _teams[] sont les consolantes
             {
                 Misc.Log($"Consolante {team.Stats.TeamName}");
 
                 _teams[index].SetStats(team.Stats.Clone());
                 index++;
             }
-            foreach (var team in teamsPrincipale)
+            foreach (var team in teamsPrincipale) // les 8 suivantes sont les principales
             {
                 Misc.Log($"Principale {team.Stats.TeamName}");
 
@@ -339,8 +354,8 @@ namespace VolleyBallTournament
                 index++;
             }
 
-            int[] groupATeamIndex = [1, 7, 2, 4];
-            int[] groupBTeamIndex = [5, 3, 6, 8];
+            int[] groupATeamIndex = [8, 1, 4, 5]; // B C se rencontre dans la dernière rotation les plus fort 1 et 4
+            int[] groupBTeamIndex = [7, 2, 3, 6]; // B C se rencontre dans la dernière rotation les plus fort 2 et 3
 
             // les deux groupe consolante A & B
             for (int i = 0; i < 4; i++)
@@ -356,6 +371,7 @@ namespace VolleyBallTournament
                 _groups[3].CopyTeamStats(i, teamsPrincipale[groupBTeamIndex[i] - 1]);
             }
 
+
             ResetTeamsStatus(_teams);
             ResetAllMatchScorePoints(_matchs);
             ResetAllMatchSetPoints(_matchs);
@@ -370,11 +386,11 @@ namespace VolleyBallTournament
             SetRotation(0, _rotationManager);
 
             // Reclasse les équipes en fonctione des points accumulés
-            for (int i = 0; i < _groups.Count; i++)
-            {
-                var group = _groups[i];
-                group.Refresh();
-            }
+            //for (int i = 0; i < _groups.Count; i++)
+            //{
+            //    var group = _groups[i];
+            //    group.Refresh();
+            //}
 
         }
 
@@ -561,25 +577,25 @@ namespace VolleyBallTournament
                 }
 
                 // Debug
-                if (ButtonControl.OnePress($"ShufflePoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
-                {
-                    if (State.CurState == States.PoolPlay1)
-                        ShuffleTeamsPoint();
-                }
-                if (ButtonControl.OnePress($"ShuffleTotalPoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad1)))
-                {
-                    //if (State.CurState == States.Play1)
-                        ShuffleTeamsTotalPoint();
-                }
+                //if (ButtonControl.OnePress($"ShufflePoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad0)))
+                //{
+                //    if (State.CurState == States.PoolPlay1)
+                //        ShuffleTeamsPoint();
+                //}
+                //if (ButtonControl.OnePress($"ShuffleTotalPoint{Id}", Keyboard.GetState().IsKeyDown(Keys.NumPad1)))
+                //{
+                //    //if (State.CurState == States.Play1)
+                //        ShuffleTeamsTotalPoint();
+                //}
 
 
-                if (ButtonControl.OnePress($"Reset{Id}", Keyboard.GetState().IsKeyDown(Keys.Back)))
-                {
-                    SetTicRotation(0);
-                    ResetTeamsStatus(_teams);
-                    ResetTeamsTotalPoint();
-                    SetRotation(0, _rotationManager);
-                }
+                //if (ButtonControl.OnePress($"Reset{Id}", Keyboard.GetState().IsKeyDown(Keys.Back)))
+                //{
+                //    SetTicRotation(0);
+                //    ResetTeamsStatus(_teams);
+                //    ResetTeamsTotalPoint();
+                //    SetRotation(0, _rotationManager);
+                //}
 
                 for (int i = 0; i < _matchs.Count; i++)
                 {
@@ -636,7 +652,7 @@ namespace VolleyBallTournament
             {
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
-                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 64)/2, 80));
+                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 64)/2, 120));
             }
 
             if (indexLayer == (int)Layers.Debug)
@@ -667,10 +683,17 @@ namespace VolleyBallTournament
                 var pos2 = new Vector2(position.X + (i+1) * 64, position.Y);
 
                 if (i == 0)
+                {
                     batch.CenterStringXY(Static.FontMini, "Début des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, DateTime.Now.ToString("HH:mm"), pos - Vector2.UnitY * 40, Color.Yellow);
+                }
 
                 if (i == _rotationManager.NbRotation - 2)
+                {
+
                     batch.CenterStringXY(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, DateTime.Now.ToString("HH:mm"), pos2 - Vector2.UnitY * 40, Color.Yellow);
+                }
 
 
                 if (i < _rotationManager.NbRotation - 1)

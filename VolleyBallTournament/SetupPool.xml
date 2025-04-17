@@ -44,5 +44,26 @@
     <match terrain ="3" equipes = "B4:C4" arbitre = "C3" nbSet ="1"/>
   </rotation>
 
+  <equipe id ="A1">BRANDON</equipe>
+  <equipe id ="B1">YES SIR</equipe>
+  <equipe id ="C1">ON SAIT PAS</equipe>
+  <equipe id ="D1">SPICY CHIKEN</equipe>
+
+  <equipe id ="A2">HAMNOY</equipe>
+  <equipe id ="B2">PAS MAL MAX</equipe>
+  <equipe id ="C2">LES TORPILLES</equipe>
+  <equipe id ="D2">TAGS</equipe>
+
+  <equipe id ="A3">LES BRAS CASSES</equipe>
+  <equipe id ="B3">LES 4MIDABLES</equipe>
+  <equipe id ="C3">BLOC N ROLL</equipe>
+  <equipe id ="D3">LES FIFOUS</equipe>
+
+  <equipe id ="A4">EXEMPT</equipe>
+  <equipe id ="B4">PISSENLIT</equipe>
+  <equipe id ="C4">A LA VOLLEY</equipe>
+  <equipe id ="D4">LES FOUS FURIEUX</equipe>
+
+
 </phasePool>
 

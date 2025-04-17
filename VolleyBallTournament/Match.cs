@@ -77,23 +77,15 @@ namespace VolleyBallTournament
 
         public bool IsFreeCourt => _isFreeCourt;
         private bool _isFreeCourt = false; // terrain libre
-        //public int NbSetToWin => _nbSetToWin;
-        //private int _nbSetToWin = 2;
-
-        //public int NbPointToWinSet => _nbPointToWinSet;
-        //private int _nbPointToWinSet = 25;
 
         public int IdTerrain => _idTerrain;
         private int _idTerrain = Const.NoIndex;
 
-        //public ScorePanel ScorePanel => _scorePanel;
-        //private ScorePanel _scorePanel;
         public Court Court => _court;
         private Court _court;
 
         private Container _div;
 
-        //private int _nbTeamPerGroup = 3;
         private List<MatchConfig> _matchConfigs;
         private MatchConfig _currentMatchConfig;
         private static int IndexMatch = 0;
@@ -120,21 +112,15 @@ namespace VolleyBallTournament
 
             _div = new Container(Style.Space.One * 10, new Style.Space(80,80,160,160), Mugen.Physics.Position.VERTICAL);
 
-            //_scorePanel = new ScorePanel(this);
             _court = new Court(courtName, this);
-
-            //_scorePanel.AppendTo(this);
             _court.AppendTo(this);
 
-            SetMatchConfig(matchConfig);//, nbTeamPerGroup);
+            SetMatchConfig(matchConfig);
 
-            //_div.Insert(_scorePanel);
             _div.Insert(_court);
             _div.Refresh();
 
             SetSize(_div._rect.Width, _div._rect.Height);
-
-            //State.Set(States.NextMatch);
 
             DefineStates();
 
@@ -310,7 +296,7 @@ namespace VolleyBallTournament
         {
             _matchConfigs = matchConfigs;
         }
-        public void SetMatchConfig(MatchConfig matchConfig)//, int nbTeamPerGroup)
+        public void SetMatchConfig(MatchConfig matchConfig)
         {
             SetIsFreeCourt(false);
 
@@ -575,17 +561,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                //batch.FillRectangle(AbsRectF, Color.MonoGameOrange * .25f);
-                //batch.Rectangle(AbsRectF, Color.White, 3f);
 
-                //batch.Line(AbsRectF.LeftMiddle, AbsRectF.RightMiddle, Color.White, 3f);
-
-                //var threeMeter = Vector2.UnitY * 50;
-
-                //batch.Line(AbsRectF.LeftMiddle - threeMeter, AbsRectF.RightMiddle - threeMeter, Color.White, 1f);
-                //batch.Line(AbsRectF.LeftMiddle + threeMeter, AbsRectF.RightMiddle + threeMeter, Color.White, 1f);
-
-                //batch.CenterBorderedStringXY(Static.FontMain, _courtName, AbsRectF.TopCenter - Vector2.UnitY * 20, Color.Yellow, Color.Black);
             }
 
             if (indexLayer == (int)Layers.Debug)

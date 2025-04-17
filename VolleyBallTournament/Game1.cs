@@ -107,11 +107,11 @@ namespace VolleyBallTournament
             }
         }
 
-        public static void DrawTextFrame(SpriteBatch batch, SpriteFont font,  Vector2 position, string text, Color line, Color bg, Vector2 offset, float thickness = 1f)
+        public static void DrawTextFrame(SpriteBatch batch, SpriteFont font,  Vector2 position, string text, Color lineColor, Color bgColor, Vector2 offset, float thickness = 1f)
         {
             var size = font.MeasureString(text) + new Vector2(40, -20);
-            batch.FillRectangleCentered(position + offset, size, Color.Black * .5f, 0);
-            batch.RectangleCentered(position + offset, size, Color.Cyan * .5f, thickness);
+            batch.FillRectangleCentered(position + offset, size, bgColor * .5f, 0);
+            batch.RectangleCentered(position + offset, size, lineColor * .5f, thickness);
         }
     }
 
