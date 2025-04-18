@@ -84,7 +84,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 3, 0);
+            SetPosition(_cameraX = -Screen.Width * 1, 0);
 
 
             _phasePool1.OnFinishPhase += (phasePool) =>

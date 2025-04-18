@@ -8,6 +8,8 @@ using Mugen.GUI;
 using Mugen.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using static VolleyBallTournament.Match;
 
@@ -31,8 +33,8 @@ namespace VolleyBallTournament
         private List<Group> _groups = new();
         private List<Team> _teams = new();
 
-        public TimerCountDown Timer => _timer;
-        private readonly TimerCountDown _timer;
+        public TimerCountDown TimerCountDown => _timerCountDown;
+        private readonly TimerCountDown _timerCountDown;
 
         private int _currentRotation = 0;
         private RotationManager _rotationManager;
@@ -41,8 +43,10 @@ namespace VolleyBallTournament
 
         public Action<PhasePool> OnFinishPhase;
 
-        private DateTime _startRotationTime;
-        private DateTime _endRotationTime;
+        private DateTime _startPhaseTime;
+        private DateTime _endPhaseTime;
+
+        private Stopwatch _chrono;
 
         Game _game;
         public PhasePool(Game game, int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
@@ -51,6 +55,8 @@ namespace VolleyBallTournament
             _game = game;
             _title = title;
             _rotationManager = rotationManager;
+
+            _chrono = new Stopwatch();
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -70,8 +76,8 @@ namespace VolleyBallTournament
                 CreateMatchs(nbMatch);
             }
 
-            _timer = (TimerCountDown)new TimerCountDown().AppendTo(this);
-            _divTimer.Insert(_timer);
+            _timerCountDown = (TimerCountDown)new TimerCountDown().AppendTo(this);
+            _divTimer.Insert(_timerCountDown);
 
             _divMain.Insert(_divTimer);
             _divMain.Insert(_divMatch);
@@ -84,8 +90,8 @@ namespace VolleyBallTournament
             // Initial State
             SetTicState((int)States.PoolNextMatch);
 
-            _startRotationTime = DateTime.Now;
-            RefreshNextTurnTimes(_currentRotation, rotationManager);
+            _startPhaseTime = DateTime.Now;
+            RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
 
             DefineStates();
         }
@@ -94,73 +100,82 @@ namespace VolleyBallTournament
             State.On(States.PoolWarmUp, () =>
             {
                 if (_currentRotation == 0)
-                    _startRotationTime = DateTime.Now;
+                    _startPhaseTime = DateTime.Now;
 
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
 
-                Timer.SetDuration(_rotationManager.GetWarmUpTime());
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(_rotationManager.GetWarmUpTime());
+                TimerCountDown.StartTimer();
             });
             State.Off(States.PoolWarmUp, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, .01f, 0f);
 
-                Timer.SetDuration(0);
+                TimerCountDown.SetDuration(0);
+
+
             });
 
             State.On(States.PoolCountDown1, () =>
             {
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
-                Timer.SetDuration(3);
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(3);
+                TimerCountDown.StartTimer();
             });
             State.On(States.PoolCountDown2, () =>
             {
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
-                Timer.SetDuration(3);
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(3);
+                TimerCountDown.StartTimer();
+            });
+            State.Off(States.PoolCountDown1, () =>
+            {
+            });
+
+            State.Off(States.PoolCountDown2, () =>
+            {
             });
 
             State.On(States.PoolPlay1, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
-                Timer.SetDuration(_rotationManager.GetMatchTime());
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(_rotationManager.GetMatchTime());
+                TimerCountDown.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.PoolPlay1, () =>
             {
                 //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
-                Timer.StopTimer();
+                TimerCountDown.StopTimer();
                 //Misc.Log("Off Play");
             });
 
             State.On(States.PoolPlay2, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
-                Timer.SetDuration(_rotationManager.GetMatchTime());
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(_rotationManager.GetMatchTime());
+                TimerCountDown.StartTimer();
                 //Misc.Log("On Play");
             });
             State.Off(States.PoolPlay2, () =>
             {
                 //Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.1f, 0f);
-                Timer.StopTimer();
+                TimerCountDown.StopTimer();
                 //Misc.Log("Off Play");
             });
 
             State.On(States.PoolPreSwap, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
-                Timer.SetDuration(2);
-                Timer.StartTimer();
+                TimerCountDown.SetDuration(2);
+                TimerCountDown.StartTimer();
 
                 //ValidSets();
             });
 
             State.On(States.PoolSwapSide, () =>
             {
-                Timer.SetDuration(0);
+                TimerCountDown.SetDuration(0);
 
                 // On change de côté
                 var matchs = GetMatchs();
@@ -170,9 +185,14 @@ namespace VolleyBallTournament
                     match.Court.SwapTeams();
                 }
             });
+            State.Off(States.PoolSwapSide, () =>
+            {
+            });
 
             State.On(States.PoolNextMatch, () =>
             {
+                RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
+
                 Static.SoundVictory.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
 
                 ResetTeamsStatus(_teams);
@@ -180,16 +200,32 @@ namespace VolleyBallTournament
                 ResetAllMatchSetPoints(_matchs);
 
                 SetRotation(_currentRotation, _rotationManager);
+            });
+            State.Off(States.PoolNextMatch, () =>
+            {
 
             });
+
             State.On(States.PoolReady, () =>
             {
-                _timer.StopTimer();
+                TimerCountDown.ResetTimer();
+                TimerCountDown.StopTimer();
+
+            });            
+            State.Off(States.PoolReady, () =>
+            {
+
+                RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
             });
             State.On(States.PoolFinishMatch, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
+
             });
+            State.On(States.PoolFinishMatch, () =>
+            {
+            });
+
             State.On(States.PoolValidPoints, () =>
             {
                 Static.SoundBeep.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
@@ -244,11 +280,10 @@ namespace VolleyBallTournament
                     if (OnFinishPhase != null)
                         OnFinishPhase(this);
                 }
-
+                
             });
 
         }
-
         private void ValidSets(int pointGap)
         {
             var matchs = GetMatchs();
@@ -472,18 +507,24 @@ namespace VolleyBallTournament
                 team.Stats.SetBonusPoint(0);
             }
         }
-        private void RefreshNextTurnTimes(int rotation, RotationManager rotationManager)
+        private void RefreshNextTurnTimes(int rotation, RotationManager rotationManager, double delta)
         {
+            var matchTime = (rotationManager.GetMatchTime() * 2);
+            var warmUpTime = rotationManager.GetWarmUpTime();
+
+            double timeRemaining = 0;
+
+            if ((int)State.CurState < (int)States.PoolValidPoints) timeRemaining = matchTime + warmUpTime;
+            if ((int)State.CurState < (int)States.PoolPlay2) timeRemaining = matchTime / 2 + warmUpTime;
+            if ((int)State.CurState < (int)States.PoolPlay1) timeRemaining = warmUpTime;
+
             for (int i = 0; i < _teams.Count; i++)
             {
                 var team = _teams[i];
-                var nextTurn = team.FindNextTurnTime(rotation, rotationManager);
-
-                //team.SetNextTurn(nextTurn);
-                var matchTime = rotationManager.GetMatchTime();
-                var warmUpTime = rotationManager.GetWarmUpTime();
-                _endRotationTime =  DateTime.Now.AddSeconds((matchTime * 2 + warmUpTime) * (rotationManager.NbRotation - rotation));
+                team.RefreshNextTurnTime(rotation, rotationManager, delta - timeRemaining);
             }
+
+            _endPhaseTime = DateTime.Now.AddSeconds((matchTime + warmUpTime) * (rotationManager.NbRotation - rotation) + delta);
         }
         private void HideNextTurnTimes(List<Team> teams)
         {
@@ -509,15 +550,15 @@ namespace VolleyBallTournament
         public Group GetGroup(int index) { return _groups[index]; }
         private void PlayCountDown(SoundEffect sound, double secondRemaining = 3d, float volume = .25f, float pitch = .1f, float pan = 0f)
         {
-            if (Timer.OnRemaingTime(secondRemaining) && sound != null)
+            if (TimerCountDown.OnRemaingTime(secondRemaining) && sound != null)
             {
                 sound.Play(volume * Static.VolumeMaster, pitch, pan);
             }
 
-            if (Timer.IsFinish())
+            if (TimerCountDown.IsFinish())
             {
                 Misc.Log("Finish CountDown");
-                Timer.StopTimer();
+                TimerCountDown.StopTimer();
                 SetTicState((_ticState + 1) % Enums.Count<States>());
             }
         }
@@ -581,7 +622,7 @@ namespace VolleyBallTournament
         {
             _ticState = ticProcess;
 
-            States nextState = (States)Process[_ticState];
+            States nextState = (States)ProcessStates[_ticState];
 
             State.Change(nextState);
 
@@ -601,14 +642,12 @@ namespace VolleyBallTournament
             {
                 RunState();
 
-                // Actualise les horaires d'attente des match et arbitrage ! en temps réel !
-                RefreshNextTurnTimes(_currentRotation, _rotationManager);
-                
+
                 // Debug
-                if (ButtonControl.OnePress($"RefreshNextTurn", Static.Key.IsKeyDown(Keys.T)))
-                {
-                    //RefreshNextTurnTimes(_currentRotation, _rotationManager);
-                }
+                //if (ButtonControl.OnePress($"RefreshNextTurn", Static.Key.IsKeyDown(Keys.T)))
+                //{
+                //    RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
+                //}
 
                 if (ButtonControl.OnePress($"SwapTeams", Static.Key.IsKeyDown(Keys.S)))
                 {
@@ -616,10 +655,16 @@ namespace VolleyBallTournament
                         _matchs[i].Court.SwapTeams();
                 }
 
-                if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))
+                bool canForward = 
+                    State.CurState == States.PoolNextMatch || 
+                    State.CurState == States.PoolReady || 
+                    State.CurState == States.PoolSwapSide || 
+                    State.CurState == States.PoolFinishMatch ||
+                    State.CurState == States.PoolValidPoints;
+
+                if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space) && canForward))
                 {
-                    // Actualise les horaires d'attente des match et arbitrage !
-                    //RefreshNextTurnTimes(_currentRotation, _rotationManager);
+
 
                     if (_currentRotation < _rotationManager.NbRotation)
                     {
@@ -627,11 +672,15 @@ namespace VolleyBallTournament
 
                         _ticState++;
 
+                        // Boucle sur le prochain match
                         if (_ticState > (int)States.PoolValidPoints)
                             _ticState = (int)States.PoolNextMatch;
 
-                        SetTicState(_ticState); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
-                        //SetTicRotation((_ticRotation + 1) % Enums.Count<States>()); // reviens a la première étape automatiquement si _ticRotation atteint la dernière étape + 1
+                        SetTicState(_ticState);
+
+
+                        if (_ticState != (int)States.PoolValidPoints)
+                            RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
                     }
                 }
 
@@ -755,14 +804,14 @@ namespace VolleyBallTournament
                 if (i == 0)
                 {
                     batch.CenterStringXY(Static.FontMini, "Début des Matchs", pos + Vector2.UnitY * 40, Color.Yellow);
-                    batch.CenterStringXY(Static.FontMini, _startRotationTime.ToString("HH:mm"), pos - Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, _startPhaseTime.ToString("HH:mm"), pos - Vector2.UnitY * 40, Color.Yellow);
                 }
 
                 if (i == _rotationManager.NbRotation - 2)
                 {
 
                     batch.CenterStringXY(Static.FontMini, "Fin des Matchs", pos2 + Vector2.UnitY * 40, Color.Yellow);
-                    batch.CenterStringXY(Static.FontMini, _endRotationTime.ToString("HH:mm"), pos2 - Vector2.UnitY * 40, Color.Yellow);
+                    batch.CenterStringXY(Static.FontMini, _endPhaseTime.ToString("HH:mm"), pos2 - Vector2.UnitY * 40, Color.Yellow);
                 }
 
 

@@ -46,7 +46,7 @@ namespace VolleyBallTournament
             DemiFinalEnd,
             
         }
-        public static List<int> Process { get; private set; } = Enums.GetList<States>();
+        public static List<int> ProcessStates { get; private set; } = Enums.GetList<States>();
         public State<States> State { get; private set; } = new State<States>(States.PoolReady);
 
         public Dictionary<States, string> Infos = new Dictionary<States, string>()
@@ -241,7 +241,7 @@ namespace VolleyBallTournament
         private void SetTicState(int ticProcess)
         {
             _ticState = ticProcess;
-            States nextState = (States)Process[_ticState];
+            States nextState = (States)ProcessStates[_ticState];
             State.Change(nextState);
         }
         public void SetIsFreeCourt(bool isFreeCourt) { _isFreeCourt = isFreeCourt; }
@@ -533,7 +533,7 @@ namespace VolleyBallTournament
                 case States.DemiFinishMatch:
 
                     // Debug
-                    if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) SetTicState((int)States.DemiNextMatch);
+                    //if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) SetTicState((int)States.DemiNextMatch);
 
                     break;
 

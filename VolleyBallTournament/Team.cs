@@ -6,6 +6,8 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Physics;
 using System;
+using System.Runtime.Serialization;
+using static VolleyBallTournament.Match;
 
 
 namespace VolleyBallTournament
@@ -87,17 +89,19 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
-        public NextTurn FindNextTurnTime(int currentRotation, RotationManager rotationManager) 
+        public NextTurn RefreshNextTurnTime(int currentRotation, RotationManager rotationManager, double delta) 
         { 
             int rotation = 0;
             _nextTurn.Time = DateTime.Now;
             double totalTime = 0;
 
+            double mancheTime = rotationManager.GetMatchTime();
+            double matchTime = mancheTime * 2 + 20;
+            double warmUpTime = rotationManager.GetWarmUpTime();
+
             for (int j = currentRotation + 1; j < rotationManager.GridMatchConfig.Height; j++)
             {
-                var matchTime = rotationManager.GetMatchTime();
-                var warmUpTime = rotationManager.GetWarmUpTime();
-                totalTime += matchTime * 2 + warmUpTime;
+                totalTime += matchTime + warmUpTime;
 
                 //Misc.Log($"/////////////{rotation} {totalTime}");
 
@@ -111,20 +115,18 @@ namespace VolleyBallTournament
                         {
                             _nextTurn.Message = "Arbitre";
                             _nextTurn.IdTerrain = matchConfig.IdTerrain;
-                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime + delta);
                             return _nextTurn;
                         }
                         if (matchConfig.TeamA == this || matchConfig.TeamB == this)
                         {
                             _nextTurn.Message = "Joue";
                             _nextTurn.IdTerrain = matchConfig.IdTerrain;
-                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime + delta);
                             return _nextTurn;
                         }
                     }
-
                 }
-
 
                 rotation++;
             }
@@ -248,7 +250,7 @@ namespace VolleyBallTournament
         public void DrawNextTurn(SpriteBatch batch)
         {
             float alpha = 1f;
-            var text = $" {_nextTurn.Message} à {_nextTurn.Time:HH:mm} T{_nextTurn.IdTerrain + 1} ";
+            var text = $" {_nextTurn.Message} à {_nextTurn.Time:HH:mm:ss} T{_nextTurn.IdTerrain + 1} ";
 
             var pos = AbsRectF.TopCenter;// - Vector2.UnitX * 100;
 
