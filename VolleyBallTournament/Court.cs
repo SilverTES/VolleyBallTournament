@@ -48,7 +48,7 @@ namespace VolleyBallTournament
             _courtName = courtName;
             _match = match;
 
-            SetSize(180, 260);
+            SetSize(160, 240);
 
             _rotationBall = (float)Misc.Rng.NextDouble() * Geo.RAD_360;
 
@@ -106,8 +106,8 @@ namespace VolleyBallTournament
                 _teamBPos = _animate2D.Value("SwapB");
             }
 
-            _scoreAPos = Team.Bound.TopRight + _teamAPos - Vector2.UnitX * 10;
-            _scoreBPos = Team.Bound.TopRight + _teamBPos - Vector2.UnitX * 10;
+            _scoreAPos = Team.Bound.TopRight + _teamAPos - Vector2.UnitX * 10 + Vector2.UnitY * 20;
+            _scoreBPos = Team.Bound.TopRight + _teamBPos - Vector2.UnitX * 10 + Vector2.UnitY * 20;
 
         }
         public void UpdateVBallPosition()
@@ -184,7 +184,9 @@ namespace VolleyBallTournament
                 {
                     _match.TeamA.DrawBasicTeam(batch, Team.Bound + _teamAPos, _parent);
                     _match.TeamB.DrawBasicTeam(batch, Team.Bound + _teamBPos, _parent);
-                    _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos, _parent);
+
+                    if (_match.TeamReferee != null)
+                        _match.TeamReferee.DrawBasicTeam(batch, Team.Bound + _teamRefereePos, _parent);
 
                     DrawVBall(batch, _vBallCurrentPos);
 
@@ -201,11 +203,14 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                if (!_match.IsFreeCourt)
+                if (!_match.IsFreeCourt && _match.TeamReferee != null)
                     _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
 
-                if (_match.TeamA.IsMatchPoint) _match.TeamA.DrawMatchPoint(batch, Team.Bound + _teamAPos);
-                if (_match.TeamB.IsMatchPoint) _match.TeamB.DrawMatchPoint(batch, Team.Bound + _teamBPos);
+                if (!_match.IsFreeCourt)
+                {
+                    if (_match.TeamA.IsMatchPoint) _match.TeamA.DrawMatchPoint(batch, Team.Bound + _teamAPos);
+                    if (_match.TeamB.IsMatchPoint) _match.TeamB.DrawMatchPoint(batch, Team.Bound + _teamBPos);
+                }
             }
 
 
@@ -255,7 +260,7 @@ namespace VolleyBallTournament
             Color color = Color.White * .25f;
             float thickness = 3f;
 
-            bool isPlay = _match.State.CurState == Match.States.PoolPlay1 || _match.State.CurState == Match.States.PoolPlay2 || _match.State.CurState == Match.States.DemiPlay;
+            bool isPlay = _match.State.CurState == Match.States.PoolPlay1 || _match.State.CurState == Match.States.PoolPlay2 || _match.State.CurState == Match.States.DemiPlay || _match.State.CurState == Match.States.PoolFinishMatch;
 
             batch.FillRectangle(AbsRectF.Extend(64f), Color.MonoGameOrange * (isPlay ? .5f : .25f));
             batch.FillRectangle(AbsRectF.Extend(0f), Color.Goldenrod * (isPlay ? 1f : .5f));

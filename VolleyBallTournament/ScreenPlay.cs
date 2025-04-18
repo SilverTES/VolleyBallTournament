@@ -20,7 +20,7 @@ namespace VolleyBallTournament
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
-        //private PhaseDemiFinal _phaseDemiFinal;
+        private PhaseDemiFinal _phaseDemiFinal;
 
         private RotationManager _rotationManagerPhasePool;
 
@@ -69,12 +69,13 @@ namespace VolleyBallTournament
             _phasePool1.SetRotation(0, _rotationManagerPhasePool);
 
 
-            //_phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
+            _phaseDemiFinal = new PhaseDemiFinal(game, "Phase Demi Finales").SetX(Screen.Width * 3f).AppendTo(this).This<PhaseDemiFinal>();
 
-            //var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 2, 3);
+            var matchConfigs = MatchConfig.CreateMatchConfigsDemiFinal(_phaseDemiFinal.GetTeams(), 1, 3);
 
-            //_phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
-            //_phaseDemiFinal.GetMatch(2).SetMatchConfigs(matchConfigs);
+            _phaseDemiFinal.GetMatch(0).SetMatchConfigs(matchConfigs);
+            _phaseDemiFinal.GetMatch(1).SetMatchConfigs(matchConfigs);
+            _phaseDemiFinal.GetMatch(2).SetMatchConfigs(matchConfigs);
 
             _animate = new Animate();
             _animate.Add("SlideLeft");
@@ -83,7 +84,7 @@ namespace VolleyBallTournament
             _versionPos = AbsRectF.TopRight - Vector2.UnitX * 8 + Vector2.UnitY * 16;
 
             //Debug
-            SetPosition(_cameraX = -Screen.Width * 1, 0);
+            SetPosition(_cameraX = -Screen.Width * 3, 0);
 
 
             _phasePool1.OnFinishPhase += (phasePool) =>

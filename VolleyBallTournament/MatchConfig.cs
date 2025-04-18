@@ -35,28 +35,36 @@ namespace VolleyBallTournament
             TeamReferee = teamReferee;
         }
         public static MatchConfig CreateMatchConfigsByTeams(List<Team> teams, int nbSetToWin, int nbPointToWinSet, int idTeamA, int idTeamB, int idTeamReferee)
-        {
-            return new MatchConfig(0, nbSetToWin, nbPointToWinSet, teams[idTeamA], teams[idTeamB], teams[idTeamReferee]);
+        {   
+            Team teamA = null;
+            Team teamB = null;
+            Team teamReferee = null;
+
+            if (idTeamA >= 0 && idTeamA < teams.Count) teamA = teams[idTeamA];
+            if (idTeamB >= 0 && idTeamB < teams.Count) teamB = teams[idTeamB];
+            if (idTeamReferee >= 0 && idTeamReferee < teams.Count) teamReferee = teams[idTeamReferee];
+
+            return new MatchConfig(0, nbSetToWin, nbPointToWinSet, teamA, teamB, teamReferee);
         }
 
         public static List<MatchConfig> CreateMatchConfigsDemiFinal(List<Team> teams, int nbSetToWin, int nbPointToWinSet)
         {
             List<MatchConfig> matchConfigs = [];
             // Demi consolante Looser
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 12, 13, 8));
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 14, 15, 10));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 12, 13, -1));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 14, 15, -1));
 
             // demi consolante Looser
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 8, 9, 12));
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 10, 11, 14));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 8, 9, -1));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 10, 11, -1));
 
             // demi principale Looser
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 4, 5, 0));
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 6, 7, 2));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 4, 5, -1));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 6, 7, -1));
 
             // demi principale Winner
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 0, 1, 4));
-            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 2, 3, 6));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 0, 1, -1));
+            matchConfigs.Add(CreateMatchConfigsByTeams(teams, nbSetToWin, nbPointToWinSet, 2, 3, -1));
 
             return matchConfigs;
         }

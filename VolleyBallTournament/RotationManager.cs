@@ -8,8 +8,8 @@ namespace VolleyBallTournament
 {
     public class RotationManager
     {
-        private List<double>_matchTime = [];
-        private List<double>_warmUpTime = [];
+        private double _matchTime;
+        private double _warmUpTime;
         public int NbGroup => _nbGroup;
         private int _nbGroup;
         public int NbTeamPerGroup => _nbTeamPerGroup;
@@ -66,13 +66,13 @@ namespace VolleyBallTournament
 
             return list;
         }
-        public double GetMatchTime(int rotation)
+        public double GetMatchTime()
         {
-            return _matchTime[rotation];
+            return _matchTime;
         }
-        public double GetWarmUpTime(int rotation)
+        public double GetWarmUpTime()
         {
-            return _warmUpTime[rotation];
+            return _warmUpTime;
         }
         public void LoadFile(string xmlFile, List<Team> teams, List<Match> matchs)
         {
@@ -89,6 +89,11 @@ namespace VolleyBallTournament
             int nbGroupe = int.Parse(config.Attribute("nbGroupe").Value);
             int nbEquipeParGroupe = int.Parse(config.Attribute("nbEquipeParGroupe").Value);
             int nbTerrain = int.Parse(config.Attribute("nbTerrain").Value);
+            int tempsMatch = int.Parse(config.Attribute("temps").Value);
+            int tempsEchauffement = int.Parse(config.Attribute("echauffement").Value);
+
+            _matchTime = tempsMatch;
+            _warmUpTime = tempsEchauffement;
 
             _gridMatchConfig = new Grid2D<MatchConfig>(_nbTerrain = nbTerrain, _nbRotation = nbRotation);
             CreateTeamsIndex(_nbGroup = nbGroupe, _nbTeamPerGroup = nbEquipeParGroupe);
@@ -102,11 +107,8 @@ namespace VolleyBallTournament
             int indexRotation = 0;
             foreach (var rotation in rotations)
             {
-                int tempsMatch = int.Parse(rotation.Attribute("temps").Value);
-                int tempsEchauffement = int.Parse(rotation.Attribute("echauffement").Value);
+
                 Console.WriteLine($"Rotation {rotation} - Temps : {tempsMatch}s - Echauffement : {tempsEchauffement}");
-                _matchTime.Add(tempsMatch);
-                _warmUpTime.Add(tempsEchauffement);
 
                 int indexMatch = 0;
                 foreach (var match in rotation.Elements("match"))

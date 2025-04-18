@@ -57,7 +57,7 @@ namespace VolleyBallTournament
                 var team = _teams[i];
 
                 team.Stats.SetRank(i + 1);
-                team.MoveToPosition(new Vector2(0, (team._rect.Height + 16) * i));
+                team.MoveToPosition(new Vector2(0, (team._rect.Height + 12) * i));
             }
         }
         public override Node Update(GameTime gameTime)
@@ -81,11 +81,11 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                var pos = AbsRectF.TopCenter - Vector2.UnitY * 50;
+                var pos = AbsRectF.TopCenter - Vector2.UnitY * 40;
 
-                Static.DrawTextFrame(batch, Static.FontMain, pos, GroupName, Color.Cyan * .5f, Color.Black * .5f, Vector2.UnitY * 3);
+                Static.DrawTextFrame(batch, Static.FontMini, pos, GroupName, Color.Cyan * .5f, Color.Black * .5f, Vector2.UnitY * 0, 3f);
 
-                batch.CenterStringXY(Static.FontMain, GroupName, pos, Color.Cyan);
+                batch.CenterStringXY(Static.FontMini, GroupName, pos, Color.Cyan);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

@@ -54,6 +54,7 @@ namespace VolleyBallTournament
             _bonusPoint = 0;
             _totalPoint = 0;
         }
+        public void SetBonusPoint(int bonusPoint) {  _bonusPoint = bonusPoint; _currentBonusPoint = bonusPoint; }
         public void SetTeamName(string teamName) { _teamName = teamName; }
         public void AddRankingPoint(int points) { _rankingPoint += points; }
         public void SetRankingPoint(int points) { _rankingPoint = points; }

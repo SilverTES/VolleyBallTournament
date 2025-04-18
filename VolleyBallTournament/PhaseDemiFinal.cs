@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Mugen.Core;
 using Mugen.GFX;
 using Mugen.GUI;
+using Mugen.Input;
 using System;
 using System.Collections.Generic;
 using static VolleyBallTournament.Match;
@@ -66,7 +68,7 @@ namespace VolleyBallTournament
             if (indexLayer == (int)Layers.Main)
             {
                 //batch.FillRectangle(rectDiv, Color.DarkSlateBlue * .5f);
-                batch.Rectangle(rectDiv, Color.Black * .5f, 3f);
+                //batch.Rectangle(rectDiv, Color.Black * .5f, 3f);
                 //batch.Rectangle(rectDiv.Extend(-4f), Color.Gray * .5f);
 
                 var pos = rectDiv.TopCenter - Vector2.UnitY * 20;
@@ -74,21 +76,21 @@ namespace VolleyBallTournament
                 batch.CenterStringXY(Static.FontMain, _name, pos, Color.Cyan);
 
                 //batch.FillRectangle(rectDiv1, Color.Black * .25f);
-                batch.Rectangle(rectDiv1, Color.Gold * .75f);
+                batch.Rectangle(rectDiv1, Color.Gold * .75f, 3f);
 
                 //batch.FillRectangle(rectDiv2, Color.Black * .25f);
-                batch.Rectangle(rectDiv2, Color.Gold * .75f);
+                batch.Rectangle(rectDiv2, Color.Gold * .75f, 3f);
 
             }
             if (indexLayer == (int)Layers.HUD)
             {
-                //batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 54, Color.Gold * 1f, 0);
-                //batch.FilledCircle(Static.TexCircle, rectDiv1.Center, 48, Color.Black * .5f, 0);
-                //batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.Center, Color.Gold);
+                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 54, Color.Gold * 1f, 0);
+                batch.FilledCircle(Static.TexCircle, rectDiv1.LeftMiddle, 48, Color.Black * .5f, 0);
+                batch.CenterStringXY(Static.FontMain, _name1, rectDiv1.LeftMiddle, Color.Gold);
 
-                //batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 54, Color.Gold * 1f, 0);
-                //batch.FilledCircle(Static.TexCircle, rectDiv2.Center, 48, Color.Black * .5f, 0);
-                //batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.Center, Color.Gold);
+                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 54, Color.Gold * 1f, 0);
+                batch.FilledCircle(Static.TexCircle, rectDiv2.LeftMiddle, 48, Color.Black * .5f, 0);
+                batch.CenterStringXY(Static.FontMain, _name2, rectDiv2.LeftMiddle, Color.Gold);
             }
 
             return base.Draw(batch, gameTime, indexLayer);
@@ -170,14 +172,24 @@ namespace VolleyBallTournament
 
             //CreateMatchConfigsDemiFinal(_teams);
 
-            _matchs[0].State.Set(States.DemiFinalBegin);
-            //_matchs[2].State.Set(States.BeginDemiFinal);
+            //_matchs[0].State.Set(States.DemiFinalBegin);
+            //_matchs[1].State.Set(States.DemiFinalBegin);
+            //_matchs[2].State.Set(States.DemiFinalBegin);
 
-            _matchs[0].SetTicState((int)States.DemiFinalBegin);
-            //_matchs[2].SetTicState((int)States.BeginDemiFinal);
+            _matchs[0].BeginDemiFinal();
+            _matchs[1].BeginDemiFinal();
+            _matchs[2].BeginDemiFinal();
 
+            HideNextTurnTimes(_teams);
         }
-
+        private void HideNextTurnTimes(List<Team> teams)
+        {
+            for (int i = 0; i < teams.Count; i++)
+            {
+                var team = teams[i];
+                team.SetIsShowNextTurns(false);
+            }
+        }
         public List<Team> GetTeams() { return _teams; }
         public Team GetTeam(int index) { return _teams[index]; }
         public List<Match> GetMatchs() { return _matchs; }
@@ -220,6 +232,43 @@ namespace VolleyBallTournament
             }
             else
             {
+
+                for (int i = 0; i < _matchs.Count; i++)
+                {
+                    var match = _matchs[i];
+
+                    if ((int)match.State.CurState >= (int)States.DemiFinalBegin && (int)match.State.CurState < (int)States.DemiFinishMatch)
+                    {
+                        if (ButtonControl.OnePress($"AddPointA{i}Demi", Keyboard.GetState().IsKeyDown((Keys)112 + i * 4)))
+                        {
+                            match.AddPointA(+1);
+                        }
+                        if (ButtonControl.OnePress($"SubPointA{i}Demi", Keyboard.GetState().IsKeyDown((Keys)113 + i * 4)))
+                        {
+                            match.AddPointA(-1);
+                        }
+                        if (ButtonControl.OnePress($"AddPointB{i}Demi", Keyboard.GetState().IsKeyDown((Keys)114 + i * 4)))
+                        {
+                            match.AddPointB(-1);
+                        }
+                        if (ButtonControl.OnePress($"SubPointB{i}Demi", Keyboard.GetState().IsKeyDown((Keys)115 + i * 4)))
+                        {
+                            match.AddPointB(+1);
+                        }
+                    }
+
+                    if (match.State.CurState == States.DemiFinishMatch)
+                    {
+                        if (ButtonControl.OnePress($"Space{i}Demi", Keyboard.GetState().IsKeyDown((Keys)97 + i))) 
+                            if (!match.IsFreeCourt) 
+                                match.GotoNextMatch();
+
+                    }
+                    else
+                        if (ButtonControl.OnePress($"Space{i}Demi", Keyboard.GetState().IsKeyDown((Keys)97 + i))) match.GotoNextState();
+
+                }
+
 
             }
 

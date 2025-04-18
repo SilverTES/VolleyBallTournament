@@ -22,7 +22,7 @@ namespace VolleyBallTournament
             _durationTime = durationInSeconds;
             _isRunning = false;
 
-            SetSize(480, 160);
+            SetSize(360, 120);
             SetPivot(Mugen.Physics.Position.CENTER);
         }
         public bool IsFinish()
@@ -93,7 +93,7 @@ namespace VolleyBallTournament
         {
             if (indexLayer == (int)Layers.Main)
             {
-                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .5f, 0);
+                batch.FillRectangleCentered(AbsXY + OXY, AbsRect.Size.ToVector2(), Color.Black * .75f, 0);
                 //batch.CenterStringXY(Static.FontDigitMonoBG, GetFormattedTime(), AbsXY + OXY, Color.Black);
                 batch.CenterStringXY(Static.FontDigitMono, GetFormattedTime(), AbsXY + OXY, Color.OrangeRed);
             }

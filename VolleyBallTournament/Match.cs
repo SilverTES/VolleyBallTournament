@@ -33,15 +33,17 @@ namespace VolleyBallTournament
             PoolValidPoints,
 
             DemiFinalBegin,
+            
             DemiNextMatch,
             DemiWarmUp,
-
             DemiReady,
             DemiPlay,
             DemiFinishSet,
             DemiValidPoints,
             DemiSwapSide,
             DemiFinishMatch,
+
+            DemiFinalEnd,
             
         }
         public static List<int> Process { get; private set; } = Enums.GetList<States>();
@@ -58,7 +60,7 @@ namespace VolleyBallTournament
             {States.PoolSwapSide, "Changement de côté"},
             {States.PoolCountDown2, "Reprise du Match"},
             {States.PoolPlay2, "Manche 2 en cours"},
-            {States.PoolFinishMatch, "Fin du match"},
+            {States.PoolFinishMatch, "Dernière balle si égalité"},
             {States.PoolValidPoints, "Validation des Points"},
 
             {States.DemiFinalBegin, "Debut des Demi Finales"},
@@ -72,6 +74,7 @@ namespace VolleyBallTournament
             {States.DemiValidPoints, "Validation des Points"},
             {States.DemiSwapSide, "Changement de côté"},
             {States.DemiFinishMatch, "Fin du Match"},
+            {States.DemiFinalEnd, "Fin de Demi Finales"},
 
         };
 
@@ -110,7 +113,7 @@ namespace VolleyBallTournament
         {
             _idTerrain = matchConfig.IdTerrain;
 
-            _div = new Container(Style.Space.One * 10, new Style.Space(80,80,160,160), Mugen.Physics.Position.VERTICAL);
+            _div = new Container(Style.Space.One * 10, new Style.Space(110,80,160,160), Mugen.Physics.Position.VERTICAL);
 
             _court = new Court(courtName, this);
             _court.AppendTo(this);
@@ -156,7 +159,10 @@ namespace VolleyBallTournament
                 //ResetSets();
                 //ResetResults();
 
-                ImportMatchConfigDemi();
+                if (!ImportMatchConfigDemi())
+                {
+                    SetTicState((int)States.DemiFinalEnd);
+                }
 
             });
             State.On(States.DemiReady, () =>
@@ -193,25 +199,46 @@ namespace VolleyBallTournament
             State.On(States.DemiFinishMatch, () =>
             {
                 Misc.Log("Fin du Match de Demi");
+                //_currentMatchConfig = null;
+                //SetIsFreeCourt(true);
+            });
+            State.On(States.DemiFinalEnd, () =>
+            {
+                Misc.Log("************************************ FIN DES DEMI FINALES");
+                _matchConfigs = null;
+                SetIsFreeCourt(true);
             });
 
         }
-        private void ImportMatchConfigDemi()
+        private bool ImportMatchConfigDemi()
         {
             Misc.Log($"ImportMatchConfigDemi {IndexMatch}");
 
-            if (_matchConfigs == null) return;
+            if (_matchConfigs == null) return false;
 
-            if (IndexMatch < 0 || IndexMatch > _matchConfigs.Count) return;
+            if (IndexMatch < 0 || IndexMatch > _matchConfigs.Count - 1) return false;
 
             var matchConfig = _matchConfigs[IndexMatch];
             
             if (matchConfig != null)
+            {
                 SetMatchConfig(matchConfig);
+                IndexMatch++;
+                return true;
+            }
 
-            IndexMatch++;
+            return false;
         }
-        public void SetTicState(int ticProcess)
+        public void GotoNextMatch()
+        {
+            SetTicState((int)States.DemiNextMatch);
+        }
+        public void BeginDemiFinal()
+        {
+            SetTicState((int)States.DemiFinalBegin);
+            ImportMatchConfigDemi();
+        }
+        private void SetTicState(int ticProcess)
         {
             _ticState = ticProcess;
             States nextState = (States)Process[_ticState];
@@ -304,15 +331,22 @@ namespace VolleyBallTournament
             _teamB = matchConfig.TeamB;
             _teamReferee = matchConfig.TeamReferee;
 
-            _teamA.SetIsPlaying(true);
-            _teamB.SetIsPlaying(true);
-            _teamReferee.SetIsReferee(true);
-
-            SetTeamHasService(_teamA);
-
-            _teamA.SetMatch(this);
-            _teamB.SetMatch(this);
-            _teamReferee.SetMatch(this);
+            if (_teamA != null)
+            {
+                _teamA.SetIsPlaying(true);
+                _teamA.SetMatch(this);
+                SetTeamHasService(_teamA);
+            }
+            if (_teamB != null)
+            {
+                _teamB.SetIsPlaying(true);
+                _teamB.SetMatch(this);
+            }
+            if (_teamReferee != null)
+            {
+                _teamReferee.SetIsReferee(true);
+                _teamReferee.SetMatch(this);
+            }
 
             _currentMatchConfig = matchConfig;
         }
@@ -336,7 +370,8 @@ namespace VolleyBallTournament
         {
             _teamA.ResetTeamStatus();
             _teamB.ResetTeamStatus();
-            _teamReferee.ResetTeamStatus();
+            if (_teamReferee != null)
+                _teamReferee.ResetTeamStatus();
         }
         public static void ResetTeamsStatus(List<Team> teams)
         {
@@ -510,42 +545,16 @@ namespace VolleyBallTournament
         {
             UpdateRect();
 
-            if ((int)State.CurState >= (int)States.DemiFinalBegin && (int)State.CurState < (int)States.DemiFinishMatch)
-            {
-                if (ButtonControl.OnePress($"AddPointA{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)112 + _idTerrain * 4)))
-                {
-                    AddPointA(+1);
-                }
-                if (ButtonControl.OnePress($"SubPointA{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)113 + _idTerrain * 4)))
-                {
-                    AddPointA(-1);
-                }
-                if (ButtonControl.OnePress($"AddPointB{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)114 + _idTerrain * 4)))
-                {
-                    AddPointB(-1);
-                }
-                if (ButtonControl.OnePress($"SubPointB{_idTerrain}Demi", Keyboard.GetState().IsKeyDown((Keys)115 + _idTerrain * 4)))
-                {
-                    AddPointB(+1);
-                }
-
-                // Debug
-                if (ButtonControl.OnePress($"SwapTeams{_idTerrain}Demi", Static.Key.IsKeyDown(Keys.S)))
-                {
-                    Court.SwapTeams();
-                }
-
-                if (ButtonControl.OnePress($"Space{_idTerrain}Demi", Keyboard.GetState().IsKeyDown(Keys.Space))) GotoNextState();
-            }
-
             RunState();
 
             UpdateChilds(gameTime);
 
             return base.Update(gameTime);
         }
-        private void GotoNextState()
+        public void GotoNextState()
         {
+            if (IndexMatch > 7 && _ticState == (int)States.DemiFinalEnd) return;
+
             _ticState++;
 
             if (_ticState > (int)States.DemiSwapSide)
@@ -568,7 +577,7 @@ namespace VolleyBallTournament
             {
                 //batch.LeftTopString(Static.FontMini, $"{_teamHasService.TeamName}", AbsXY + new Vector2(10, 10), Color.Red);
                 //batch.LeftTopString(Static.FontMini, $"{_lastTeamHasService.TeamName}", AbsXY + new Vector2(10, 40), Color.Red);
-                //batch.BottomCenterString(Static.FontMini, $"{State.CurState}", AbsXY + new Vector2(10, 40), Color.Red);
+                batch.BottomCenterString(Static.FontMini, $"{State.CurState}", AbsXY + new Vector2(10, 40), Color.Red);
             }
 
             DrawChilds(batch, gameTime, indexLayer);
