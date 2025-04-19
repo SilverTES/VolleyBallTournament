@@ -203,8 +203,8 @@ namespace VolleyBallTournament
 
             if (indexLayer == (int)Layers.HUD)
             {
-                if (!_match.IsFreeCourt && _match.TeamReferee != null)
-                    _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
+                //if (!_match.IsFreeCourt && _match.TeamReferee != null)
+                //    _match.TeamReferee.DrawReferee(batch, Team.Bound + _teamRefereePos);
 
                 if (!_match.IsFreeCourt)
                 {

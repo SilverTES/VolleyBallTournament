@@ -447,6 +447,7 @@ namespace VolleyBallTournament
 
             ResetTeamsTotalPoint();
             ResetTeamsBonusPoint();
+            ResetTeamsScorePoint();
 
             // On remet à zéro le ranking point des équipes avant de commencer la phase
             for (int i = 0; i < _teams.Count; i++)
@@ -514,6 +515,14 @@ namespace VolleyBallTournament
         //        team.Stats.SetScorePoint(Misc.Rng.Next(8, 20));
         //    }
         //}
+        public void ResetTeamsScorePoint()
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                team.Stats.SetScorePoint(0);
+            }
+        }
         public void ResetTeamsTotalPoint()
         {
             for (int i = 0; i < _teams.Count; i++)
@@ -708,7 +717,7 @@ namespace VolleyBallTournament
                     State.CurState == States.PoolFinishMatch ||
                     State.CurState == States.PoolValidPoints;
 
-                if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space) && canForward))
+                if (ButtonControl.OnePress($"Space{Id}", Keyboard.GetState().IsKeyDown(Keys.Space)))// && canForward))
                 {
 
 
@@ -886,10 +895,10 @@ namespace VolleyBallTournament
             batch.CenterStringXY(Static.FontMini, " Prochain Match ", position - Vector2.UnitY * 30, Color.WhiteSmoke);
 
             //batch.FillRectangleCentered(position, Static.FontMini.MeasureString(vsText) + new Vector2(0, -20), Color.Black * .5f, 0);
-            batch.CenterStringXY(Static.FontMini, vsText, position, Color.LightGray);
+            batch.CenterStringXY(Static.FontMini, vsText, position, Color.YellowGreen);
 
             //batch.FillRectangleCentered(position + Vector2.UnitY * 30, Static.FontMini.MeasureString(aText) + new Vector2(0, -20), Color.Black * .5f, 0);
-            batch.CenterStringXY(Static.FontMini, aText, position + Vector2.UnitY * 30, Color.LightGray);
+            batch.CenterStringXY(Static.FontMini, aText, position + Vector2.UnitY * 30, Color.Orange);
 
         }
     }

@@ -145,9 +145,10 @@ namespace VolleyBallTournament
                 Static.Server.SendUpdatePhaseToAll();
             }
             //
-            //if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
+            //if (ButtonControl.OnePress("ImportPool", _key.IsKeyDown(Keys.C)))
             //{
-            //    _phasePool2.GetTeam(0).SetStats(_phasePool1.GetTeam(0).Stats);
+            //    //_phasePool2.GetTeam(0).SetStats(_phasePool1.GetTeam(0).Stats);
+            //    //_phasePool2.Import16TeamsBrassageToQualification("SetupPool.xml", _phasePool1);
             //}
 
             if (ButtonControl.OnePress("SlideLeft", _key.IsKeyDown(Keys.Left) && _key.IsKeyDown(Keys.LeftControl)))
@@ -224,7 +225,7 @@ namespace VolleyBallTournament
                         batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i].Id} : Controle le Terrain {clientXCourts[i]+1}", new Vector2(10, 80 + 32 * i), Color.Orange);
                     }
 
-                batch.RightMiddleString(Static.FontMicro, $"CurrentScreenNode  = {CurrentScreenNode._name}", _versionPos, Color.Orange);
+                //batch.RightMiddleString(Static.FontMicro, $"CurrentScreenNode  = {CurrentScreenNode._name}", _versionPos, Color.Orange);
             }
 
             //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 200, Color.White);
