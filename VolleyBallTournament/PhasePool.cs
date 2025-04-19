@@ -52,6 +52,8 @@ namespace VolleyBallTournament
         Game _game;
         public PhasePool(Game game, int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
+            _name = "PhasePool";
+            _type = UID.Get<PhasePool>();
             Id = id;
             _game = game;
             _title = title;
@@ -202,7 +204,6 @@ namespace VolleyBallTournament
             {
                 
                 _chrono.Start();
-                //RefreshNextTurnTimes(_currentRotation, _rotationManager);
 
                 Static.SoundVictory.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
 
@@ -211,6 +212,8 @@ namespace VolleyBallTournament
                 ResetAllMatchSetPoints(_matchs);
 
                 SetRotation(_currentRotation, _rotationManager);
+
+                Static.Server.SendUpdateToAll(_matchs);
             });
             State.Off(States.PoolNextMatch, () =>
             {
@@ -232,7 +235,6 @@ namespace VolleyBallTournament
             State.Off(States.PoolReady, () =>
             {
                 _chrono.Stop();
-                //RefreshNextTurnTimes(_currentRotation, _rotationManager);
             });
             State.On(States.PoolFinishMatch, () =>
             {
@@ -801,7 +803,7 @@ namespace VolleyBallTournament
             {
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40 + Vector2.One * 6, Color.Black);
                 batch.LeftTopString(Static.FontMain, _title, AbsRectF.TopLeft + Vector2.UnitX * 40, Color.White);
-                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 64)/2, 120));
+                DrawRotation(batch, AbsXY + Vector2.UnitX * 620 + new Vector2((Screen.Width - (_rotationManager.NbRotation - 1) * 64)/2, 80));
 
 
                 // Affichage Prochain Matchs
@@ -810,7 +812,7 @@ namespace VolleyBallTournament
                 {
                     var match = _matchs[i];
                     var matchConfig = nextMatchs[i];
-                    DrawNextMatchs(batch, match.AbsRectF.TopCenter - Vector2.UnitY * 16, matchConfig);
+                    DrawNextMatchs(batch, match.AbsRectF.TopCenter - Vector2.UnitY * 4, matchConfig);
                 }
             }
 
@@ -876,16 +878,18 @@ namespace VolleyBallTournament
 
             var vsText = $" {matchConfig.TeamA.Stats.TeamName}   vs   {matchConfig.TeamB.Stats.TeamName} ";
             var aText = $" ¬{matchConfig.TeamReferee.Stats.TeamName} ";
-            Vector2 size = Static.FontMini.MeasureString(vsText);
 
             //batch.FillRectangleCentered(position + Vector2.UnitX * (size.X / 2), size + new Vector2(0, -20), Color.Black * .5f, 0);
             //batch.LeftMiddleString(Static.FontMini, vsText, position, Color.Red);
 
-            batch.FillRectangleCentered(position, size + new Vector2(0, -20), Color.Black * .5f, 0);
-            batch.CenterStringXY(Static.FontMini, vsText, position, Color.Red);
+            batch.FillRectangleCentered(position - Vector2.UnitY * 30, Static.FontMini.MeasureString(" Prochain Match ") + new Vector2(0, -20), Color.Black * .5f, 0);
+            batch.CenterStringXY(Static.FontMini, " Prochain Match ", position - Vector2.UnitY * 30, Color.WhiteSmoke);
 
-            batch.FillRectangleCentered(position + Vector2.UnitY * 30, Static.FontMini.MeasureString(aText) + new Vector2(0, -20), Color.Black * .5f, 0);
-            batch.CenterStringXY(Static.FontMini, aText, position + Vector2.UnitY * 30, Color.Red);
+            //batch.FillRectangleCentered(position, Static.FontMini.MeasureString(vsText) + new Vector2(0, -20), Color.Black * .5f, 0);
+            batch.CenterStringXY(Static.FontMini, vsText, position, Color.LightGray);
+
+            //batch.FillRectangleCentered(position + Vector2.UnitY * 30, Static.FontMini.MeasureString(aText) + new Vector2(0, -20), Color.Black * .5f, 0);
+            batch.CenterStringXY(Static.FontMini, aText, position + Vector2.UnitY * 30, Color.LightGray);
 
         }
     }

@@ -7,19 +7,31 @@ using Mugen.GFX;
 using Mugen.Input;
 using System.IO;
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.Net.NetworkInformation;
 
 namespace VolleyBallTournament
 {
+    public enum Phases
+    {
+        None,
+        Pool1,
+        Pool2,
+        DemiFinal,
+        Final,
+    }
+
     public class ScreenPlay : Node  
     {
+        private Node _prevScreenNode;
+        public Node CurrentScreenNode;
+
+        public Phases Phase;
         public PhaseRegister PhaseRegister => _phaseRegister;
         private PhaseRegister _phaseRegister;
         public PhasePool PhasePool1 => _phasePool1;
         private PhasePool _phasePool1;
         public PhasePool PhasePool2 => _phasePool2;
         private PhasePool _phasePool2;
+        public PhaseDemiFinal PhaseDemiFinal => _phaseDemiFinal;
         private PhaseDemiFinal _phaseDemiFinal;
 
         private RotationManager _rotationManagerPhasePool;
@@ -118,18 +130,25 @@ namespace VolleyBallTournament
             _phaseRegister.IsLocked = true;
             _phasePool1.IsLocked = true;
             _phasePool2.IsLocked = true;
-            //_phaseDemiFinal.IsLocked = true;
+            _phaseDemiFinal.IsLocked = true;
 
-            if (_cameraX == -_phaseRegister._x) _phaseRegister.IsLocked = false;
-            if (_cameraX == -_phasePool1._x) _phasePool1.IsLocked = false;
-            if (_cameraX == -_phasePool2._x) _phasePool2.IsLocked = false;
-            //if (_cameraX == -_phaseDemiFinal._x) _phaseDemiFinal.IsLocked = false;
+            _prevScreenNode = CurrentScreenNode;
 
-            //
-            if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
+            if (_cameraX == -_phaseRegister._x) {_phaseRegister.IsLocked = false; CurrentScreenNode = _phaseRegister; Phase = Phases.None; }
+            if (_cameraX == -_phasePool1._x) {_phasePool1.IsLocked = false; CurrentScreenNode = _phasePool1; Phase = Phases.Pool1; }
+            if (_cameraX == -_phasePool2._x) {_phasePool2.IsLocked = false; CurrentScreenNode =_phasePool2; Phase = Phases.Pool2; }
+            if (_cameraX == -_phaseDemiFinal._x) {_phaseDemiFinal.IsLocked = false; CurrentScreenNode =_phaseDemiFinal; Phase = Phases.DemiFinal; }
+
+
+            if (_prevScreenNode != CurrentScreenNode)
             {
-                _phasePool2.GetTeam(0).SetStats(_phasePool1.GetTeam(0).Stats);
+                Static.Server.SendUpdatePhaseToAll();
             }
+            //
+            //if (ButtonControl.OnePress("CopyTeam0", _key.IsKeyDown(Keys.C)))
+            //{
+            //    _phasePool2.GetTeam(0).SetStats(_phasePool1.GetTeam(0).Stats);
+            //}
 
             if (ButtonControl.OnePress("SlideLeft", _key.IsKeyDown(Keys.Left) && _key.IsKeyDown(Keys.LeftControl)))
             {
@@ -197,10 +216,15 @@ namespace VolleyBallTournament
                 //batch.RightMiddleString(Static.FontMicro, $"VolleyBall Tournament V{1}.{0} ©SilverTES 2025", _versionPos, Color.White);
 
                 var clients = Static.Server.Clients;
-                for (int i = 0; i < clients.Count; i++)
-                {
-                    batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i]}", new Vector2(40, 80 + 40 * i), Color.Orange);
-                }
+                var clientXCourts = Static.Server.ClientControlCourts;
+
+                if (clients.Count > 0)
+                    for (int i = 0; i < clients.Count; i++)
+                    {
+                        batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i].Id} : Controle le Terrain {clientXCourts[i]+1}", new Vector2(10, 80 + 32 * i), Color.Orange);
+                    }
+
+                batch.RightMiddleString(Static.FontMicro, $"CurrentScreenNode  = {CurrentScreenNode._name}", _versionPos, Color.Orange);
             }
 
             //batch.String(Static.FontMain, $"{_cameraX}", Vector2.One * 200, Color.White);

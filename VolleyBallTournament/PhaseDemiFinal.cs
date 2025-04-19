@@ -50,7 +50,6 @@ namespace VolleyBallTournament
             _div.Insert(_div1);
             _div.Insert(_div2);
         }
-
         public override Node Update(GameTime gameTime)
         {
             UpdateRect();
@@ -99,7 +98,7 @@ namespace VolleyBallTournament
     public class PhaseDemiFinal : Node
     {
         //public State<States> State { get; private set; } = new State<States>(States.Ready);
-
+        public string Title => _title;
         string _title;
         public bool IsLocked = false;
 
@@ -121,7 +120,9 @@ namespace VolleyBallTournament
 
         Game _game;
         public PhaseDemiFinal(Game game, string title)
-        { 
+        {
+            _name = "PhaseDemiFinal";
+            _type = UID.Get<PhaseDemiFinal>();
             _game = game;
             _title = title;
 
@@ -182,6 +183,37 @@ namespace VolleyBallTournament
 
             HideNextTurnTimes(_teams);
         }
+        public void Import16TeamsQualificationToDemi(string configFile, PhasePool phasePool)
+        {
+            Misc.Log($"Import Teams from {phasePool.Title} to {Title}");
+
+            List<Team> teamsConsolanteLooser = new List<Team>();
+            List<Team> teamsConsolanteWinner = new List<Team>();
+            List<Team> teamsPrincipaleLooser = new List<Team>();
+            List<Team> teamsPrincipaleWinner = new List<Team>();
+
+            var groups = phasePool.GetGroups();
+
+            // sépare les 2 gagnant de chaque poule et les 2 perdants
+            for (int g = 0; g < 2; g++)
+            {
+                var group = groups[g];
+
+                for (int i = 0; i < 2; i++)
+                {
+                    teamsConsolanteWinner.Add(group.GetTeam(i));
+                    teamsConsolanteLooser.Add(group.GetTeam(i + 2));
+                }
+                group = groups[g + 2];
+                for (int i = 0; i < 2; i++)
+                {
+                    teamsPrincipaleWinner.Add(group.GetTeam(i));
+                    teamsPrincipaleLooser.Add(group.GetTeam(i + 2));
+                }
+            }
+
+        }
+
         private void HideNextTurnTimes(List<Team> teams)
         {
             for (int i = 0; i < teams.Count; i++)

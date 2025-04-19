@@ -37,6 +37,8 @@ namespace VolleyBallTournament
         private string _xmlFile;
         public PhaseRegister(Game game, string xmlFile)
         {
+            _name = "PhaseRegister";
+            _type = UID.Get<PhaseRegister>();
             _game = game;
             _xmlFile = xmlFile;
 

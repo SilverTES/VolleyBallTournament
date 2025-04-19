@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <phasePool>
   
-  <config nbGroupe = "4" nbEquipeParGroupe = "4" nbTerrain = "3" temps = "30" echauffement = "10"/>
+  <config nbGroupe = "4" nbEquipeParGroupe = "4" nbTerrain = "3" temps = "10" echauffement = "5"/>
   
   <rotation>
     <match terrain ="1" equipes = "A1:B1" arbitre = "A4" nbSet ="1"/>

@@ -52,6 +52,7 @@ namespace VolleyBallTournament
         Message,
         AddPoint,
         Update,
+        UpdatePhase,
     }
 
     public class NetworkServer
@@ -60,6 +61,8 @@ namespace VolleyBallTournament
         private readonly NetManager _server;
         public Dictionary<int, NetPeer> Clients => _connectedPeers;
         private readonly Dictionary<int, NetPeer> _connectedPeers;
+
+        public Dictionary<int, int> ClientControlCourts = [];
 
         ScreenPlay _screenPlay;
         public NetworkServer(ScreenPlay screenPlay)
@@ -76,6 +79,10 @@ namespace VolleyBallTournament
             _listener.NetworkReceiveEvent += OnNetworkReceive;
             _listener.NetworkReceiveUnconnectedEvent += OnNetworkReceiveUnconnected;
             _screenPlay = screenPlay;
+
+            ClientControlCourts[0] = 0;
+            ClientControlCourts[1] = 1;
+            ClientControlCourts[2] = 2;
         }
         public void StartServer()
         {
@@ -128,6 +135,8 @@ namespace VolleyBallTournament
         private void OnPeerConnected(NetPeer peer)
         {
             _connectedPeers[peer.Id] = peer;
+            ClientControlCourts[peer.Id] = 0;
+
            Misc.Log($"Client connecté : {peer.Address} (ID: {peer.Id})");
 
             // Envoyer un message de bienvenue
@@ -167,7 +176,7 @@ namespace VolleyBallTournament
                     break;
                 case MessageType.Update:
 
-                    ProcessUpdate(peer, reader);
+                    ProcessRequestUpdate(peer, reader);
 
                     break;
 
@@ -209,11 +218,32 @@ namespace VolleyBallTournament
             writer.Put(match.TeamB.Stats.TeamName);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
         }
-        private void ProcessUpdate(NetPeer peer, NetPacketReader reader)
+        private void ProcessRequestUpdate(NetPeer peer, NetPacketReader reader)
         {
             int matchIndex = reader.GetInt();
 
-            var match = _screenPlay.PhasePool1.GetMatch(matchIndex);
+            ClientControlCourts[peer.Id] = matchIndex;
+
+            Match match = null;
+
+            if (_screenPlay.Phase == Phases.Pool1) match = _screenPlay.PhasePool1.GetMatch(matchIndex);
+            if (_screenPlay.Phase == Phases.Pool2) match = _screenPlay.PhasePool2.GetMatch(matchIndex);
+            if (_screenPlay.Phase == Phases.DemiFinal) match = _screenPlay.PhaseDemiFinal.GetMatch(matchIndex);
+
+            
+            SendUpdateTo(peer, match);
+
+            //NetDataWriter writer = new NetDataWriter();
+            //writer.Put((byte)MessageType.Update); // Identifiant de type
+            //writer.Put(match.TeamA.Stats.ScorePoint);
+            //writer.Put(match.TeamB.Stats.ScorePoint);
+            //writer.Put(match.TeamA.Stats.TeamName);
+            //writer.Put(match.TeamB.Stats.TeamName);
+            //peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        public void SendUpdateTo(NetPeer peer, Match match)
+        {
+            if (match == null) return;
 
             NetDataWriter writer = new NetDataWriter();
             writer.Put((byte)MessageType.Update); // Identifiant de type
@@ -222,6 +252,27 @@ namespace VolleyBallTournament
             writer.Put(match.TeamA.Stats.TeamName);
             writer.Put(match.TeamB.Stats.TeamName);
             peer.Send(writer, DeliveryMethod.ReliableOrdered);
+        }
+        public void SendUpdateToAll(List<Match> matchs)
+        {
+            for (int i = 0; i < matchs.Count; i++)
+            {
+                if (Static.Server.Clients.ContainsKey(i))
+                    Static.Server.SendUpdateTo(Static.Server.Clients[i], matchs[Static.Server.ClientControlCourts[Static.Server.Clients[i].Id]]);
+            }
+        }
+        public void SendUpdatePhaseToAll()
+        {
+            NetDataWriter writer = new NetDataWriter();
+            writer.Put((byte)MessageType.UpdatePhase);
+            writer.Put((int)_screenPlay.Phase);
+
+            for (int i = 0; i < _connectedPeers.Count; i++)
+            {
+                var peer = _connectedPeers[i];
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);
+            }
+
         }
 
         // Mettre à jour le serveur (appelé dans Game.Update)
