@@ -48,6 +48,7 @@ namespace VolleyBallTournament
 
         private Stopwatch _chrono;
 
+
         Game _game;
         public PhasePool(Game game, int id, string title, RotationManager rotationManager, PhaseRegister phaseRegister = null, int nbGroup = 4, int nbTeamPerGroup = 4, int nbMatch = 3)
         {
@@ -57,6 +58,7 @@ namespace VolleyBallTournament
             _rotationManager = rotationManager;
 
             _chrono = new Stopwatch();
+            _chrono.Start();
 
             SetSize(Screen.Width, Screen.Height);
 
@@ -91,7 +93,7 @@ namespace VolleyBallTournament
             SetTicState((int)States.PoolNextMatch);
 
             _startPhaseTime = DateTime.Now;
-            RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
+            RefreshNextTurnTimes(_currentRotation, _rotationManager);
 
             DefineStates();
         }
@@ -99,6 +101,7 @@ namespace VolleyBallTournament
         {
             State.On(States.PoolWarmUp, () =>
             {
+
                 if (_currentRotation == 0)
                     _startPhaseTime = DateTime.Now;
 
@@ -121,19 +124,23 @@ namespace VolleyBallTournament
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 TimerCountDown.SetDuration(3);
                 TimerCountDown.StartTimer();
+                _chrono.Start();
             });
             State.On(States.PoolCountDown2, () =>
             {
                 Static.SoundCountDown.Play(0.5f * Static.VolumeMaster, .1f, 0f);
                 TimerCountDown.SetDuration(3);
                 TimerCountDown.StartTimer();
+                _chrono.Start();
             });
             State.Off(States.PoolCountDown1, () =>
             {
+                _chrono.Stop();
             });
 
             State.Off(States.PoolCountDown2, () =>
             {
+                _chrono.Stop();
             });
 
             State.On(States.PoolPlay1, () =>
@@ -171,6 +178,7 @@ namespace VolleyBallTournament
                 TimerCountDown.StartTimer();
 
                 //ValidSets();
+                _chrono.Start();
             });
 
             State.On(States.PoolSwapSide, () =>
@@ -187,11 +195,14 @@ namespace VolleyBallTournament
             });
             State.Off(States.PoolSwapSide, () =>
             {
+                _chrono.Stop();
             });
 
             State.On(States.PoolNextMatch, () =>
             {
-                RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
+                
+                _chrono.Start();
+                //RefreshNextTurnTimes(_currentRotation, _rotationManager);
 
                 Static.SoundVictory.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
 
@@ -203,6 +214,11 @@ namespace VolleyBallTournament
             });
             State.Off(States.PoolNextMatch, () =>
             {
+                _chrono.Stop();
+                _chrono.Reset();
+
+                RefreshNextTurnTimes(_currentRotation, _rotationManager);
+                Misc.Log("START NEXT TURN TIMES -//////////////////////////");
 
             });
 
@@ -211,18 +227,19 @@ namespace VolleyBallTournament
                 TimerCountDown.ResetTimer();
                 TimerCountDown.StopTimer();
 
+                _chrono.Start();
             });            
             State.Off(States.PoolReady, () =>
             {
-
-                RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
+                _chrono.Stop();
+                //RefreshNextTurnTimes(_currentRotation, _rotationManager);
             });
             State.On(States.PoolFinishMatch, () =>
             {
                 Static.SoundStart.Play(0.5f * Static.VolumeMaster, 0.01f, 0f);
-
+                _chrono.Start();
             });
-            State.On(States.PoolFinishMatch, () =>
+            State.Off(States.PoolFinishMatch, () =>
             {
             });
 
@@ -233,8 +250,11 @@ namespace VolleyBallTournament
             });
             State.Off(States.PoolValidPoints, () =>
             {
-                //Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
+                _chrono.Stop();
+
                 
+                //Static.SoundRanking.Play(1f * Static.VolumeMaster, 0.0001f, 0f);
+
                 // On retribut les points dans les team respectif qui viennent de finir de jouer
                 var matchs = GetMatchs();
                 for (int i = 0; i < matchs.Count; i++)
@@ -280,6 +300,7 @@ namespace VolleyBallTournament
                     if (OnFinishPhase != null)
                         OnFinishPhase(this);
                 }
+
                 
             });
 
@@ -507,24 +528,45 @@ namespace VolleyBallTournament
                 team.Stats.SetBonusPoint(0);
             }
         }
-        private void RefreshNextTurnTimes(int rotation, RotationManager rotationManager, double delta)
+        //private void RefreshNextTurnTimes(int rotation, RotationManager rotationManager, double delta)
+        //{
+        //    var matchTime = (rotationManager.GetMatchTime() * 2);
+        //    var warmUpTime = rotationManager.GetWarmUpTime();
+
+        //    double timeRemaining = 0;
+
+        //    if ((int)State.CurState < (int)States.PoolValidPoints) timeRemaining = matchTime + warmUpTime;
+        //    if ((int)State.CurState < (int)States.PoolPlay2) timeRemaining = matchTime / 2 + warmUpTime;
+        //    if ((int)State.CurState < (int)States.PoolPlay1) timeRemaining = warmUpTime;
+
+        //    for (int i = 0; i < _teams.Count; i++)
+        //    {
+        //        var team = _teams[i];
+        //        team.RefreshNextTurnTime(rotation, rotationManager, delta - timeRemaining);
+        //    }
+
+        //    _endPhaseTime = DateTime.Now.AddSeconds((matchTime + warmUpTime) * (rotationManager.NbRotation - rotation) + delta);
+        //}
+        private void RefreshNextTurnTimes(int rotation, RotationManager rotationManager)
         {
-            var matchTime = (rotationManager.GetMatchTime() * 2);
-            var warmUpTime = rotationManager.GetWarmUpTime();
-
-            double timeRemaining = 0;
-
-            if ((int)State.CurState < (int)States.PoolValidPoints) timeRemaining = matchTime + warmUpTime;
-            if ((int)State.CurState < (int)States.PoolPlay2) timeRemaining = matchTime / 2 + warmUpTime;
-            if ((int)State.CurState < (int)States.PoolPlay1) timeRemaining = warmUpTime;
-
             for (int i = 0; i < _teams.Count; i++)
             {
                 var team = _teams[i];
-                team.RefreshNextTurnTime(rotation, rotationManager, delta - timeRemaining);
+                team.RefreshNextTurnTime(rotation, rotationManager);
             }
 
-            _endPhaseTime = DateTime.Now.AddSeconds((matchTime + warmUpTime) * (rotationManager.NbRotation - rotation) + delta);
+            var matchTime = rotationManager.GetMatchTime() * 2;
+            var warmUpTime = rotationManager.GetWarmUpTime();
+
+            _endPhaseTime = DateTime.Now.AddSeconds((matchTime + warmUpTime) * (rotationManager.NbRotation - rotation));
+        }
+        private void UpdateNextTurnTimes(TimeSpan delay)
+        {
+            for (int i = 0; i < _teams.Count; i++)
+            {
+                var team = _teams[i];
+                team.SetNextTurnTime(team.NextTurn.StartTime + delay);
+            }
         }
         private void HideNextTurnTimes(List<Team> teams)
         {
@@ -567,15 +609,15 @@ namespace VolleyBallTournament
             switch (State.CurState)
             {
                 case States.PoolReady:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     break;
 
                 case States.PoolNextMatch:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     break;
 
                 case States.PoolFinishMatch:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     break;
 
                 case States.PoolWarmUp:
@@ -594,23 +636,25 @@ namespace VolleyBallTournament
                     break;
 
                 case States.PoolCountDown1:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
                 case States.PoolCountDown2:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     PlayCountDown(Static.SoundCountDown, 3);
                     break;
 
 
                 case States.PoolValidPoints:
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     break;
 
                 case States.PoolSwapSide:
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     break;
 
                 case States.PoolPreSwap:
-
+                    UpdateNextTurnTimes(_chrono.Elapsed);
                     PlayCountDown(null);
                     break;
 
@@ -677,10 +721,6 @@ namespace VolleyBallTournament
                             _ticState = (int)States.PoolNextMatch;
 
                         SetTicState(_ticState);
-
-
-                        if (_ticState != (int)States.PoolValidPoints)
-                            RefreshNextTurnTimes(_currentRotation, _rotationManager, 0);
                     }
                 }
 
@@ -786,7 +826,7 @@ namespace VolleyBallTournament
 
                 //batch.RightMiddleString(Static.FontMini, $"{(int)State.CurState} {State.CurState} Temps = {_rotationManager.Duration}s", AbsRectF.TopRight + Vector2.UnitY * 20 - Vector2.UnitX * 20, Color.Cyan);
 
-                
+                //batch.CenterStringXY(Static.FontMain, $"{_chrono.Elapsed.Seconds}", AbsRectF.TopCenter + Vector2.UnitY * 20, Color.Yellow);
             }
 
             DrawChilds(batch, gameTime, indexLayer);

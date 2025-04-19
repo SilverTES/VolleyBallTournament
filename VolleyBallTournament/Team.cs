@@ -6,7 +6,6 @@ using Mugen.GFX;
 using Mugen.GUI;
 using Mugen.Physics;
 using System;
-using System.Runtime.Serialization;
 using static VolleyBallTournament.Match;
 
 
@@ -27,6 +26,7 @@ namespace VolleyBallTournament
 
     public struct NextTurn()
     {
+        public DateTime StartTime;
         public DateTime Time;
         public string Message; // message
         public int IdTerrain;
@@ -57,8 +57,8 @@ namespace VolleyBallTournament
         private bool _isShowSets = true;
 
         private bool _isShowNextTurn = true;
+        public NextTurn NextTurn => _nextTurn;
         private NextTurn _nextTurn;
-        //private DateTime _nextTurnTime = new();
 
         public bool HasService => _hasService;
         private bool _hasService = false;
@@ -89,14 +89,19 @@ namespace VolleyBallTournament
             _animate = new Animate();
             _animate.Add("move");
         }
-        public NextTurn RefreshNextTurnTime(int currentRotation, RotationManager rotationManager, double delta) 
+        public void SetNextTurnTime(DateTime time)
+        {
+            _nextTurn.Time = time;
+        }
+        public NextTurn RefreshNextTurnTime(int currentRotation, RotationManager rotationManager) 
         { 
             int rotation = 0;
+            _nextTurn.StartTime = DateTime.Now;
             _nextTurn.Time = DateTime.Now;
             double totalTime = 0;
 
             double mancheTime = rotationManager.GetMatchTime();
-            double matchTime = mancheTime * 2 + 20;
+            double matchTime = mancheTime * 2;
             double warmUpTime = rotationManager.GetWarmUpTime();
 
             for (int j = currentRotation + 1; j < rotationManager.GridMatchConfig.Height; j++)
@@ -115,14 +120,20 @@ namespace VolleyBallTournament
                         {
                             _nextTurn.Message = "Arbitre";
                             _nextTurn.IdTerrain = matchConfig.IdTerrain;
-                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime + delta);
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+
+                            _nextTurn.StartTime = _nextTurn.Time;
+
                             return _nextTurn;
                         }
                         if (matchConfig.TeamA == this || matchConfig.TeamB == this)
                         {
                             _nextTurn.Message = "Joue";
                             _nextTurn.IdTerrain = matchConfig.IdTerrain;
-                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime + delta);
+                            _nextTurn.Time = _nextTurn.Time.AddSeconds(totalTime);
+
+                            _nextTurn.StartTime = _nextTurn.Time;
+
                             return _nextTurn;
                         }
                     }
