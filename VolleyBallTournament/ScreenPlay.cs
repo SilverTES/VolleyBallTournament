@@ -222,7 +222,8 @@ namespace VolleyBallTournament
                 if (clients.Count > 0)
                     for (int i = 0; i < clients.Count; i++)
                     {
-                        batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i].Id} : Controle le Terrain {clientXCourts[i]+1}", new Vector2(10, 80 + 32 * i), Color.Orange);
+                        if (clientXCourts.ContainsKey(i))
+                            batch.LeftMiddleString(Static.FontMicro, $"{i} : {clients[i].Id} : Controle le Terrain {clientXCourts[i]+1}", new Vector2(10, 80 + 32 * i), Color.Orange);
                     }
 
                 //batch.RightMiddleString(Static.FontMicro, $"CurrentScreenNode  = {CurrentScreenNode._name}", _versionPos, Color.Orange);

@@ -269,8 +269,11 @@ namespace VolleyBallTournament
 
             for (int i = 0; i < _connectedPeers.Count; i++)
             {
-                var peer = _connectedPeers[i];
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                if (_connectedPeers.ContainsKey(i))
+                {
+                    var peer = _connectedPeers[i];
+                    peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                }
             }
 
         }
